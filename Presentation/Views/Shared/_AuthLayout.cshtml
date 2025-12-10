@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - @(ViewData["SiteTitle"] ?? "Biblioteca")</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #f5f5f7;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .auth-container {
+            background: #ffffff;
+            border-radius: 18px;
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .auth-header {
+            background: #ffffff;
+            padding: 1.5rem 2rem 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .auth-logo {
+            width: 72px;
+            height: 72px;
+            background: #eff6ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.75rem;
+            color: #1d4ed8;
+            font-size: 1.75rem;
+        }
+        
+        .auth-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .auth-subtitle {
+            font-size: 0.95rem;
+            color: #6b7280;
+        }
+        
+        .auth-body {
+            padding: 1.75rem 2rem 2rem;
+        }
+        
+        .btn-primary {
+            background: #111827;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 999px;
+            font-weight: 500;
+        }
+        
+        .btn-primary:hover {
+            background: #020617;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+        }
+        
+        .form-control {
+            border: 1px solid #e5e7eb;
+            padding: 0.75rem 0.9rem;
+            border-radius: 10px;
+            font-size: 0.95rem;
+        }
+        
+        .form-control:focus {
+            border-color: #111827;
+            box-shadow: 0 0 0 1px #11182710;
+        }
+        
+        .login-link {
+            color: #111827;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .login-link:hover {
+            text-decoration: underline;
+        }
+        
+        .alert {
+            border-radius: 8px;
+            border: none;
+            font-size: 0.9rem;
+        }
+
+        .auth-footer-text {
+            font-size: 0.85rem;
+        }
+    </style>
+    
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6 col-xl-5">
+                <div class="auth-container">
+                    <div class="auth-header d-flex align-items-center gap-3">
+                        <div class="auth-logo d-flex align-items-center justify-content-center">
+                            <img src="~/images/logo.png" alt="Logo Biblioteca" style="max-width: 100%; max-height: 100%; object-fit: contain;" />
+                        </div>
+                        <div>
+                            <h3 class="auth-title mb-1">@(ViewData["SiteTitle"] ?? "Biblioteca PSM")</h3>
+                            <p class="auth-subtitle mb-0">@(ViewData["LibrarySlogan"] ?? "Tu acceso simple al conocimiento")</p>
+                        </div>
+                    </div>
+                    
+                    <div class="auth-body">
+                        <!-- Alertas de TempData -->
+                        @if (TempData["SuccessMessage"] != null)
+                        {
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <i class="fas fa-check-circle me-2"></i> @TempData["SuccessMessage"]
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        }
+                        
+                        @if (TempData["ErrorMessage"] != null)
+                        {
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="fas fa-exclamation-circle me-2"></i> @TempData["ErrorMessage"]
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        }
+                        
+                        @if (TempData["WarningMessage"] != null)
+                        {
+                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                <i class="fas fa-exclamation-triangle me-2"></i> @TempData["WarningMessage"]
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        }
+                        
+                        @if (TempData["InfoMessage"] != null)
+                        {
+                            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                                <i class="fas fa-info-circle me-2"></i> @TempData["InfoMessage"]
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        }
+                        
+                        @RenderBody()
+                    </div>
+                </div>
+                
+                <!-- Footer del login -->
+                <div class="text-center mt-4 text-muted auth-footer-text">
+                    <p class="mb-2">
+                        @if (ViewContext.RouteData.Values["Action"]?.ToString() == "Login")
+                        {
+                            <span>¿No tienes cuenta? <a asp-controller="Registro" asp-action="Create" class="login-link">Regístrate aquí</a></span>
+                        }
+                        else
+                        {
+                            <span>¿Ya tienes cuenta? <a asp-controller="Usuario" asp-action="Login" class="login-link">Inicia sesión aquí</a></span>
+                        }
+                    </p>
+                    <p class="mb-0 text-muted">
+                        <i class="fas fa-copyright me-1"></i> 
+                        @(ViewData["FooterText"] ?? "© 2025 Biblioteca Universitaria")
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+
+

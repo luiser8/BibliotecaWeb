@@ -3,10 +3,10 @@ namespace Domain.Entities;
 public class Rol
 {
     public int Id { get; set; }
-    public string Nombre { get; set; }
+    public string? Nombre { get; set; }
     public bool Activo { get; set; }
     public DateTime FechaCreado { get; set; }
     
-    public ICollection<TipoUsuario> TiposUsuarios { get; set; }
-    public ICollection<RolPolitica> RolPoliticas { get; set; }
+    public ICollection<Usuario>? TiposUsuarios { get; set; }
+    public ICollection<RolPolitica>? RolPoliticas { get; set; }
 }

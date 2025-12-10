@@ -1,0 +1,23 @@
+namespace Domain.Entities;
+
+public class AuthUsuario
+{
+    public int UsuarioId { get; set; }
+    public string? Cedula { get; set; }
+    public string? Correo { get; set; }
+    public string? Contrasena { get; set; }
+    public string? Nombres { get; set; }
+    public string? Apellidos { get; set; }
+    public int RolId { get; set; }
+    public string? Rol { get; set; }
+    public string? Extension { get; set; }
+    public string? Carrera { get; set; }
+    //public List<PoliticasUsuario>? Politicas { get; set; }
+}
+
+public class PoliticasUsuario
+{
+    public int PoliticaId { get; set; }
+    public string? Nombre { get; set; }
+    public string? Ruta { get; set; }
+}

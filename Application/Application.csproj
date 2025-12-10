@@ -7,12 +7,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Request\" />
-      <Folder Include="Responses\" />
+      <Folder Include="DTOs\Carreras\Request\" />
+      <Folder Include="DTOs\Carreras\Responses\" />
+      <Folder Include="DTOs\Extension\Request\" />
+      <Folder Include="DTOs\TipoUsuario\Request\" />
+      <Folder Include="DTOs\TipoUsuario\Responses\" />
+      <Folder Include="DTOs\Usuarios\Responses\" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\Domain\Domain.csproj" />
+      <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

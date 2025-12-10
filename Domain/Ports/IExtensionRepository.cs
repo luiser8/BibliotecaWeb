@@ -6,5 +6,5 @@ public interface IExtensionRepository
 {
     Task<Extension> GetByIdAsync(int id);
     Task<List<Extension>> GetAllAsync();
-    Task<List<Extension>> GetAllWithCarrerasAsync();
+    Task<List<ExtensionCarrera>> GetAllWithCarrerasAsync();
 }

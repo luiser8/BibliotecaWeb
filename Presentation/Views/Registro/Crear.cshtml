@@ -1,0 +1,616 @@
+@model List<Application.DTOs.Extension.Responses.ExtensionCarrerasResponse>
+
+@{
+    ViewBag.Title = "Registro de Estudiante";
+    Layout = "_Layout";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="text-primary">Registro de Estudiante</h2>
+            <p class="text-muted">Completa todos los datos requeridos para el registro de estudiante</p>
+        </div>
+    </div>
+
+    <!-- Mensajes de error de validación -->
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <h5 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>Errores de validación</h5>
+            <ul class="mb-0">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            </ul>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <form id="usuarioForm" asp-action="Crear" method="post">
+        @Html.AntiForgeryToken()
+        
+        <!-- Campo oculto para RolId = 4 (Estudiante) -->
+        <input type="hidden" name="RolId" value="4">
+
+        <!-- SECCIÓN 1: DATOS DE ACCESO -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-key"></i> Datos de Acceso
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="Correo" class="font-weight-bold required">Correo Electrónico:</label>
+                                    <input type="email" 
+                                           id="Correo" 
+                                           name="Correo" 
+                                           class="form-control" 
+                                           required
+                                           pattern="[a-zA-Z0-9._%+-]+[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                                           title="Por favor ingresa un correo electrónico válido (ejemplo: usuario@dominio.com)"
+                                           placeholder="ejemplo@dominio.com">
+                                    <small class="form-text text-muted">Será usado para iniciar sesión</small>
+                                    <div class="invalid-feedback">
+                                        Por favor ingresa un correo electrónico válido.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="Contrasena" class="font-weight-bold required">Contraseña:</label>
+                                    <input type="password" 
+                                           id="Contrasena" 
+                                           name="Contrasena" 
+                                           class="form-control" 
+                                           required
+                                           pattern=".{8,}"
+                                           title="La contraseña debe tener al menos 8 caracteres"
+                                           placeholder="Mínimo 8 caracteres">
+                                    <small class="form-text text-muted">Mínimo 8 caracteres</small>
+                                    <div class="invalid-feedback">
+                                        La contraseña debe tener al menos 8 caracteres.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 2: EXTENSIÓN Y CARRERA -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-university"></i> Extensión
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="ExtensionId" class="font-weight-bold required">Extensión:</label>
+                            <select id="ExtensionId" name="ExtensionId" class="form-control" required>
+                                <option value="">-- Selecciona una extensión --</option>
+                                @foreach (var extension in Model)
+                                {
+                                    <option value="@extension.ExtensionId"
+                                            data-carreras='@System.Text.Json.JsonSerializer.Serialize(extension.Carreras)'>
+                                        @extension.Nombre - @extension.Ciudad, @extension.Estado
+                                    </option>
+                                }
+                            </select>
+                            <div class="invalid-feedback">
+                                Por favor selecciona una extensión.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-graduation-cap"></i> Carrera
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="CarreraId" class="font-weight-bold required">Carrera:</label>
+                            <select id="CarreraId" name="DatosAcademicos.CarreraId" class="form-control" disabled required>
+                                <option value="">-- Primero selecciona una extensión --</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Por favor selecciona una carrera.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 3: DATOS PERSONALES -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-user"></i> Datos Personales
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="Nombres" class="font-weight-bold required">Cedula:</label>
+                                    <input type="text" 
+                                           id="Cedula" 
+                                           name="DatosPersonales.Cedula" 
+                                           class="form-control" 
+                                           required
+                                           title="La cedula solo pueden contener numeros"
+                                           placeholder="Ingresa la cedula">
+                                    <div class="invalid-feedback">
+                                        La cedula solo pueden contener numeros.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="Nombres" class="font-weight-bold required">Nombres:</label>
+                                    <input type="text"
+                                           id="Nombres"
+                                           name="DatosPersonales.Nombres"
+                                           class="form-control"
+                                           required
+                                           pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]{2,}"
+                                           title="Los nombres solo pueden contener letras y espacios (mínimo 2 caracteres)"
+                                           placeholder="Ingresa los nombres">
+                                    <div class="invalid-feedback">
+                                        Los nombres son requeridos y solo pueden contener letras (mínimo 2 caracteres).
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="Apellidos" class="font-weight-bold required">Apellidos:</label>
+                                    <input type="text"
+                                           id="Apellidos"
+                                           name="DatosPersonales.Apellidos"
+                                           class="form-control"
+                                           required
+                                           pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]{2,}"
+                                           title="Los apellidos solo pueden contener letras y espacios (mínimo 2 caracteres)"
+                                           placeholder="Ingresa los apellidos">
+                                    <div class="invalid-feedback">
+                                        Los apellidos son requeridos y solo pueden contener letras (mínimo 2 caracteres).
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="FechaNacimiento" class="font-weight-bold required">Fecha de Nacimiento:</label>
+                                    <input type="date" 
+                                           id="FechaNacimiento" 
+                                           name="DatosPersonales.FechaNacimiento" 
+                                           class="form-control" 
+                                           required
+                                           max="@DateTime.Now.ToString("yyyy-MM-dd")"
+                                           min="1900-01-01">
+                                    <div class="invalid-feedback">
+                                        Por favor ingresa una fecha de nacimiento válida.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="Sexo" class="font-weight-bold required">Sexo:</label>
+                                    <select id="Sexo" name="DatosPersonales.Sexo" class="form-control" required>
+                                        <option value="">-- Selecciona sexo --</option>
+                                        <option value="Masculino">Masculino</option>
+                                        <option value="Femenino">Femenino</option>
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Por favor selecciona un sexo.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 4: DATOS ACADÉMICOS -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-book"></i> Datos Académicos
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="TipoIngreso" class="font-weight-bold required">Tipo de Ingreso:</label>
+                                    <select id="TipoIngreso" name="DatosAcademicos.TipoIngreso" class="form-control" required>
+                                        <option value="">-- Selecciona tipo de ingreso --</option>
+                                        <option value="Nacional">Nacional</option>
+                                        <option value="Internacional">Internacional</option>
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Por favor selecciona un tipo de ingreso.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTONES DE ACCIÓN -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between">
+                    <a href="@Url.Action("Index")" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-user-plus"></i> Registrar Estudiante
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const extensionSelect = document.getElementById('ExtensionId');
+            const carreraSelect = document.getElementById('CarreraId');
+            const usuarioForm = document.getElementById('usuarioForm');
+
+            // Habilitar validación HTML5 nativa
+            usuarioForm.addEventListener('submit', function(event) {
+                // Validar primero el formulario HTML5
+                if (!usuarioForm.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                
+                // Validación personalizada para carrera
+                if (carreraSelect.disabled || !carreraSelect.value) {
+                    carreraSelect.setCustomValidity('Debes seleccionar una carrera');
+                    carreraSelect.classList.add('is-invalid');
+                    event.preventDefault();
+                    event.stopPropagation();
+                } else {
+                    carreraSelect.setCustomValidity('');
+                }
+                
+                // Mostrar todos los mensajes de validación
+                usuarioForm.classList.add('was-validated');
+            }, false);
+
+            // Manejar cambio en extensión para cargar carreras
+            extensionSelect.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                updateCarrerasSelect(selectedOption);
+            });
+
+            function updateCarrerasSelect(selectedOption) {
+                // Limpiar select de carreras
+                carreraSelect.innerHTML = '<option value="">-- Selecciona una carrera --</option>';
+                carreraSelect.disabled = true;
+                carreraSelect.setCustomValidity('');
+                carreraSelect.classList.remove('is-valid', 'is-invalid');
+
+                if (selectedOption.value) {
+                    const carrerasJson = selectedOption.getAttribute('data-carreras');
+                    
+                    if (carrerasJson) {
+                        try {
+                            const carreras = JSON.parse(carrerasJson);
+                            
+                            if (carreras && Array.isArray(carreras) && carreras.length > 0) {
+                                // Agregar carreras al select
+                                let carrerasAgregadas = 0;
+                                carreras.forEach(function(carrera) {
+                                    if (carrera) {
+                                        const option = document.createElement('option');
+                                        
+                                        // Buscar ID de carrera
+                                        let carreraId = '';
+                                        if (carrera.id) carreraId = carrera.id;
+                                        else if (carrera.Id) carreraId = carrera.Id;
+                                        else if (carrera.carreraId) carreraId = carrera.carreraId;
+                                        else if (carrera.CarreraId) carreraId = carrera.CarreraId;
+                                        
+                                        // Buscar nombre de carrera
+                                        let carreraNombre = '';
+                                        if (carrera.nombre) carreraNombre = carrera.nombre;
+                                        else if (carrera.Nombre) carreraNombre = carrera.Nombre;
+                                        else if (carrera.carrera) carreraNombre = carrera.carrera;
+                                        else if (carrera.Carrera) carreraNombre = carrera.Carrera;
+                                        else if (carrera.descripcion) carreraNombre = carrera.descripcion;
+                                        else if (carrera.Descripcion) carreraNombre = carrera.Descripcion;
+                                        
+                                        if (carreraId && carreraNombre) {
+                                            option.value = carreraId;
+                                            option.textContent = carreraNombre;
+                                            option.setAttribute('title', `Carrera: ${carreraNombre}`);
+                                            carreraSelect.appendChild(option);
+                                            carrerasAgregadas++;
+                                        }
+                                    }
+                                });
+
+                                if (carrerasAgregadas > 0) {
+                                    carreraSelect.disabled = false;
+                                    // Mostrar mensaje informativo
+                                    showToast(`Se cargaron ${carrerasAgregadas} carrera(s) disponibles`);
+                                } else {
+                                    carreraSelect.innerHTML = '<option value="">-- No hay carreras disponibles --</option>';
+                                    carreraSelect.setCustomValidity('No hay carreras disponibles para esta extensión');
+                                }
+                            } else {
+                                carreraSelect.innerHTML = '<option value="">-- No hay carreras disponibles --</option>';
+                                carreraSelect.setCustomValidity('No hay carreras disponibles para esta extensión');
+                            }
+                        } catch (e) {
+                            console.error('Error parseando JSON:', e);
+                            carreraSelect.innerHTML = '<option value="">-- Error cargando carreras --</option>';
+                            carreraSelect.setCustomValidity('Error cargando las carreras');
+                            showToast('Error al cargar las carreras', 'error');
+                        }
+                    } else {
+                        carreraSelect.innerHTML = '<option value="">-- No hay carreras disponibles --</option>';
+                        carreraSelect.setCustomValidity('No hay carreras disponibles para esta extensión');
+                    }
+                }
+            }
+
+            // Función para mostrar notificaciones toast
+            function showToast(message, type = 'info') {
+                // Crear elemento toast si no existe
+                let toastContainer = document.getElementById('toastContainer');
+                if (!toastContainer) {
+                    toastContainer = document.createElement('div');
+                    toastContainer.id = 'toastContainer';
+                    toastContainer.style.position = 'fixed';
+                    toastContainer.style.top = '20px';
+                    toastContainer.style.right = '20px';
+                    toastContainer.style.zIndex = '9999';
+                    document.body.appendChild(toastContainer);
+                }
+
+                const toast = document.createElement('div');
+                toast.className = `toast ${type === 'error' ? 'bg-danger' : 'bg-info'} text-white`;
+                toast.style.cssText = `
+                    padding: 12px 20px;
+                    margin-bottom: 10px;
+                    border-radius: 4px;
+                    animation: fadeIn 0.3s;
+                    max-width: 300px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                `;
+                
+                toast.innerHTML = `
+                    <div class="d-flex align-items-center">
+                        <i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'} me-2"></i>
+                        <span>${message}</span>
+                    </div>
+                `;
+                
+                toastContainer.appendChild(toast);
+                
+                // Auto-remover después de 3 segundos
+                setTimeout(() => {
+                    toast.style.animation = 'fadeOut 0.3s';
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            }
+
+            // Validación en tiempo real
+            const inputs = usuarioForm.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                // Validar al perder foco
+                input.addEventListener('blur', function() {
+                    validateField(this);
+                });
+                
+                // Para selects, validar al cambiar
+                if (input.tagName === 'SELECT') {
+                    input.addEventListener('change', function() {
+                        validateField(this);
+                    });
+                }
+                
+                // Validar al escribir (para inputs de texto)
+                if (input.type === 'text' || input.type === 'email' || input.type === 'password') {
+                    input.addEventListener('input', function() {
+                        // Esperar un poco antes de validar
+                        clearTimeout(this.validationTimeout);
+                        this.validationTimeout = setTimeout(() => {
+                            validateField(this);
+                        }, 500);
+                    });
+                }
+            });
+
+            function validateField(field) {
+                if (field.checkValidity()) {
+                    field.classList.remove('is-invalid');
+                    field.classList.add('is-valid');
+                } else {
+                    field.classList.remove('is-valid');
+                    field.classList.add('is-invalid');
+                }
+            }
+
+            // Validación especial para fecha de nacimiento
+            const fechaNacimiento = document.getElementById('FechaNacimiento');
+            fechaNacimiento.addEventListener('change', function() {
+                const fecha = new Date(this.value);
+                const hoy = new Date();
+                
+                if (fecha > hoy) {
+                    this.setCustomValidity('La fecha de nacimiento no puede ser futura');
+                    this.classList.add('is-invalid');
+                } else {
+                    this.setCustomValidity('');
+                    if (this.checkValidity()) {
+                        this.classList.remove('is-invalid');
+                        this.classList.add('is-valid');
+                    }
+                }
+            });
+
+            // Prevenir envío con Enter en inputs individuales
+            usuarioForm.querySelectorAll('input').forEach(input => {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                    }
+                });
+            });
+        });
+    </script>
+
+    <style>
+        .required::after {
+            content: " *";
+            color: #dc3545;
+        }
+        
+        .card {
+            margin-bottom: 20px;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border-radius: 0.5rem;
+        }
+        
+        .card-header {
+            border-bottom: 1px solid rgba(0,0,0,.125);
+            font-weight: 600;
+            border-radius: 0.5rem 0.5rem 0 0 !important;
+        }
+        
+        .form-control.is-valid {
+            border-color: #28a745;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+            padding-right: calc(1.5em + 0.75rem);
+        }
+        
+        .form-control.is-invalid {
+            border-color: #dc3545;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+            padding-right: calc(1.5em + 0.75rem);
+        }
+        
+        .invalid-feedback {
+            display: none;
+            width: 100%;
+            margin-top: 0.25rem;
+            font-size: 0.875em;
+            color: #dc3545;
+        }
+        
+        .was-validated .form-control:invalid ~ .invalid-feedback {
+            display: block;
+        }
+        
+        select:disabled {
+            background-color: #f8f9fa;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        .btn-success {
+            padding: 0.75rem 2.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+        
+        .btn-secondary {
+            padding: 0.75rem 2.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .alert-info {
+            background-color: #e7f3ff;
+            border-color: #b6d4fe;
+            color: #084298;
+            padding: 1rem;
+            border-radius: 0.375rem;
+        }
+        
+        /* Animaciones para toast */
+        @@keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @@keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-10px); }
+        }
+        
+        /* Mejoras visuales para los inputs */
+        .form-control {
+            padding: 0.75rem 1rem;
+            border-radius: 0.375rem;
+            transition: all 0.2s ease-in-out;
+            border: 2px solid #dee2e6;
+        }
+        
+        .form-control:focus {
+            border-color: #4dabf7;
+            box-shadow: 0 0 0 0.25rem rgba(77, 171, 247, 0.25);
+            outline: none;
+        }
+        
+        /* Estilos para los selects */
+        select.form-control {
+            background-color: white;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 16px 12px;
+            padding-right: 3rem;
+        }
+        
+        /* Responsive adjustments */
+
+    </style>
+}

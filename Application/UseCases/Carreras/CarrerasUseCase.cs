@@ -1,9 +1,10 @@
+using Application.Interfaces;
 using Domain.Entities;
 using Domain.Ports;
 
-namespace Application.UseCases;
+namespace Application.UseCases.Carreras;
 
-public class CarrerasUseCase(ICarreraRepository carreraRepository)
+public class CarrerasUseCase(ICarreraRepository carreraRepository)  :ICarrerasQueryUseCase
 {
     public async Task<Carrera> ExecuteByIdAsync(int id)
     {

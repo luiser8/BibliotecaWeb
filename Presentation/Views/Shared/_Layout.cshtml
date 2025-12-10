@@ -1,50 +1,516 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>@ViewData["Title"] - Presentation</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
-    <link rel="stylesheet" href="~/Presentation.styles.css" asp-append-version="true"/>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - @(ViewData["SiteTitle"] ?? "Biblioteca")</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <!-- Site CSS -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    
+    @await RenderSectionAsync("Styles", required: false)
+    
+    <style>
+        .navbar-nav .dropdown-menu {
+            border: none;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            margin-top: 0.5rem;
+        }
+        
+        .navbar-nav .dropdown-item {
+            padding: 0.5rem 1rem;
+            transition: all 0.2s ease;
+        }
+        
+        .navbar-nav .dropdown-item:hover {
+            background-color: #f8f9fa;
+            padding-left: 1.25rem;
+        }
+        
+        .navbar-nav .nav-link {
+            transition: all 0.2s ease;
+        }
+        
+        .navbar-nav .nav-link:hover {
+            color: #0d6efd !important;
+        }
+        
+        .navbar-nav .nav-link.active {
+            color: #0d6efd !important;
+        }
+        
+        .politicas-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .politica-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .politica-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        }
+        
+        .badge-politica {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+        }
+        
+        .user-dropdown-toggle {
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s ease;
+        }
+        
+        .user-dropdown-toggle:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .navbar-nav .nav-link.active {
+            background-color: rgba(13, 110, 253, 0.1);
+            border-radius: 0.375rem;
+        }
+        
+        .politicas-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            font-size: 0.6rem;
+            padding: 0.15rem 0.35rem;
+        }
+    </style>
 </head>
-<body>
-<header>
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-        <div class="container-fluid">
-            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Presentation</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                <ul class="navbar-nav flex-grow-1">
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                    </li>
-                </ul>
+<body class="bg-light d-flex flex-column min-vh-100">
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm">
+            <div class="container-fluid">
+                <a class="navbar-brand d-flex align-items-center" asp-controller="Home" asp-action="Index">
+                    <img src="~/images/logo.png" alt="Logo Biblioteca" class="me-2" style="height: 40px; width: auto;" />
+                    <span class="fw-semibold text-dark">@(ViewData["SiteTitle"] ?? "Biblioteca PSM")</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+                        aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="mainNavbar">
+                    <!-- Menú dinámico basado en políticas -->
+                    @await Component.InvokeAsync("Navbar")
+                    
+                    <!-- Menú de usuario -->
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0 small">
+                        @if (User?.Identity?.IsAuthenticated ?? false)
+                        {
+                            // Obtener datos del usuario de los claims
+                            var nombreCompleto = Context.User.FindFirstValue("NombreCompleto") 
+                                ?? Context.User.FindFirstValue(ClaimTypes.Name) 
+                                ?? $"{Context.User.FindFirstValue("Nombres")} {Context.User.FindFirstValue("Apellidos")}".Trim()
+                                ?? User.Identity?.Name 
+                                ?? "Usuario";
+                            var rol = Context.User.FindFirstValue("Rol") ?? "Usuario";
+                            var correo = Context.User.FindFirstValue(ClaimTypes.Email) ?? "";
+                            
+                            // Obtener cantidad de políticas
+                            var politicasCount = 0;
+                            var politicasJsonHeader = Context.User.FindFirstValue("PoliticasJson");
+                            if (!string.IsNullOrEmpty(politicasJsonHeader))
+                            {
+                                try
+                                {
+                                    var politicas = System.Text.Json.JsonSerializer.Deserialize<List<dynamic>>(politicasJsonHeader);
+                                    politicasCount = politicas?.Count ?? 0;
+                                }
+                                catch
+                                {
+                                    politicasCount = Context.User.FindAll("Politica").Count();
+                                }
+                            }
+                            else
+                            {
+                                politicasCount = Context.User.FindAll("Politica").Count();
+                            }
+                            
+                            @if (politicasCount > 0)
+                            {
+                                <li class="nav-item me-2">
+                                    <a class="nav-link text-dark position-relative" href="#" data-bs-toggle="modal" data-bs-target="#permisosModal" title="Ver mis políticas y permisos (@politicasCount políticas)">
+                                        <i class="fas fa-shield-alt me-1"></i>
+                                        <span>Mis Políticas</span>
+                                        <span class="badge bg-primary rounded-pill ms-1 politicas-badge">
+                                            @politicasCount
+                                        </span>
+                                    </a>
+                                </li>
+                            }
+                            
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark d-flex align-items-center user-dropdown-toggle" href="#" id="userDropdown" role="button"
+                                   data-bs-toggle="dropdown" aria-expanded="false">
+                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2 shadow-sm"
+                                         style="width: 38px; height: 38px; font-size: 1rem;">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="d-flex flex-column text-start me-2">
+                                        <span class="fw-semibold text-dark" style="font-size: 0.95rem; line-height: 1.2; white-space: nowrap;">@nombreCompleto</span>
+                                        <small class="text-muted" style="font-size: 0.8rem; line-height: 1;">@rol</small>
+                                    </div>
+                                    <i class="fas fa-chevron-down text-muted" style="font-size: 0.7rem;"></i>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                    <li class="dropdown-header">
+                                        <div class="d-flex flex-column">
+                                            <span class="fw-semibold text-dark">@nombreCompleto</span>
+                                            <small class="text-muted">
+                                                <i class="fas fa-envelope me-1"></i> @correo
+                                            </small>
+                                            <small class="text-muted mt-1">
+                                                <i class="fas fa-user-tag me-1"></i> @rol
+                                            </small>
+                                        </div>
+                                    </li>
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Perfil" asp-action="Index">
+                                            <i class="fas fa-user-edit me-1"></i> Mi Perfil
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#permisosModal">
+                                            <i class="fas fa-key me-1"></i> Ver Mis Permisos
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li>
+                                        <form asp-controller="Usuario" asp-action="Logout" method="post" class="px-3">
+                                            <button type="submit" class="btn btn-link dropdown-item text-danger p-0">
+                                                <i class="fas fa-sign-out-alt me-1"></i> Cerrar sesión
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="btn btn-sm btn-outline-dark ms-lg-2" asp-controller="Usuario" asp-action="Login">
+                                    <i class="fas fa-sign-in-alt me-1"></i> Iniciar sesión
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="flex-grow-1">
+        <div class="container py-4">
+            <!-- Mensajes de TempData -->
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            
+            @if (TempData["WarningMessage"] != null)
+            {
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    @TempData["WarningMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            
+            @if (TempData["InfoMessage"] != null)
+            {
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>
+                    @TempData["InfoMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            
+            @RenderBody()
+        </div>
+    </main>
+
+    <!-- Modal para mostrar todos los permisos -->
+    <div class="modal fade" id="permisosModal" tabindex="-1" aria-labelledby="permisosModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="permisosModalLabel">
+                        <i class="fas fa-shield-alt me-2"></i>Mis Políticas y Permisos
+                        @{
+                            var totalPoliticas = 0;
+                            var user = Context.User;
+                            var politicasJson = user.FindFirstValue("PoliticasJson");
+                            if (!string.IsNullOrEmpty(politicasJson))
+                            {
+                                try
+                                {
+                                    var politicas = System.Text.Json.JsonSerializer.Deserialize<List<dynamic>>(politicasJson);
+                                    totalPoliticas = politicas?.Count ?? 0;
+                                }
+                                catch
+                                {
+                                    totalPoliticas = user.FindAll("Politica").Count();
+                                }
+                            }
+                            else
+                            {
+                                totalPoliticas = user.FindAll("Politica").Count();
+                            }
+                        }
+                        @if (totalPoliticas > 0)
+                        {
+                            <span class="badge bg-light text-primary ms-2">@totalPoliticas</span>
+                        }
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @{
+                        var politicasList = new List<dynamic>();
+                        var userModal = Context.User;
+                        var politicasJsonModal = userModal.FindFirstValue("PoliticasJson");
+                        
+                        if (!string.IsNullOrEmpty(politicasJsonModal))
+                        {
+                            try
+                            {
+                                var options = new System.Text.Json.JsonSerializerOptions 
+                                { 
+                                    PropertyNameCaseInsensitive = true 
+                                };
+                                politicasList = System.Text.Json.JsonSerializer.Deserialize<List<dynamic>>(politicasJsonModal, options) ?? new List<dynamic>();
+                            }
+                            catch
+                            {
+                                var claims = userModal.FindAll("Politica");
+                                foreach (var claim in claims)
+                                {
+                                    var parts = claim.Value.Split('|');
+                                    if (parts.Length == 2)
+                                    {
+                                        politicasList.Add(new { Nombre = parts[0], Ruta = parts[1] });
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            var claims = userModal.FindAll("Politica");
+                            foreach (var claim in claims)
+                            {
+                                var parts = claim.Value.Split('|');
+                                if (parts.Length == 2)
+                                {
+                                    politicasList.Add(new { Nombre = parts[0], Ruta = parts[1] });
+                                }
+                            }
+                        }
+                    }
+                    
+                    @if (politicasList.Any())
+                    {
+                        <div class="politicas-list">
+                            <div class="row row-cols-1 row-cols-md-2 g-3">
+                                @foreach (var politica in politicasList)
+                                {
+                                    <div class="col">
+                                        <div class="card h-100 politica-card border-start border-start-3 border-start-primary shadow-sm">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-start mb-2">
+                                                    <i class="fas fa-check-circle text-success mt-1 me-2"></i>
+                                                    <div class="flex-grow-1">
+                                                        <h6 class="card-title fw-semibold mb-1 text-primary">
+                                                            @politica.Ruta
+                                                        </h6>
+                                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                                            <small class="text-muted">
+                                                                <i class="fas fa-route me-1"></i>
+                                                                <code class="text-dark">@politica.Ruta</code>
+                                                            </small>
+                                                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 badge-politica">
+                                                                Activo
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="mt-2">
+                                                    <a href="/@politica.Ruta" class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-external-link-alt me-1"></i> Ir a esta sección
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted py-5">
+                            <i class="fas fa-shield-alt fa-4x mb-3 opacity-50"></i>
+                            <h5 class="mb-2">No hay políticas asignadas</h5>
+                            <p class="small">Contacta al administrador del sistema para obtener permisos de acceso.</p>
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i> Cerrar
+                    </button>
+                    @if (politicasList.Any())
+                    {
+                        <button type="button" class="btn btn-primary" onclick="imprimirPermisos()">
+                            <i class="fas fa-print me-1"></i> Imprimir
+                        </button>
+                    }
+                </div>
             </div>
         </div>
-    </nav>
-</header>
-<div class="container">
-    <main role="main" class="pb-3">
-        @RenderBody()
-    </main>
-</div>
-
-<footer class="border-top footer text-muted">
-    <div class="container">
-        &copy; 2025 - Presentation - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
     </div>
-</footer>
-<script src="~/lib/jquery/dist/jquery.min.js"></script>
-<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-<script src="~/js/site.js" asp-append-version="true"></script>
-@await RenderSectionAsync("Scripts", required: false)
+
+    <footer class="border-top py-3 bg-white mt-auto">
+        <div class="container d-flex justify-content-between align-items-center">
+            <span class="text-muted">
+                © @DateTime.Now.Year Biblioteca Web - Todos los derechos reservados
+            </span>
+            <a asp-controller="Home" asp-action="Privacy" class="text-decoration-none small">
+                <i class="fas fa-shield-alt me-1"></i> Privacidad
+            </a>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Activar el modal si hay parámetro en URL
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('showPermissions') === 'true') {
+                const modal = new bootstrap.Modal(document.getElementById('permisosModal'));
+                modal.show();
+            }
+            
+            // Marcar menú activo basado en la ruta actual
+            const currentPath = window.location.pathname.toLowerCase();
+            document.querySelectorAll('.nav-link').forEach(link => {
+                const href = link.getAttribute('href')?.toLowerCase();
+                if (href && (currentPath === href || currentPath.startsWith(href + '/'))) {
+                    link.classList.add('active', 'fw-bold');
+                }
+            });
+        });
+        
+        function imprimirPermisos() {
+            const modalContent = document.querySelector('#permisosModal .modal-body').innerHTML;
+            const ventanaImpresion = window.open('', '_blank');
+            const fecha = new Date().toLocaleString('es-ES');
+            
+            ventanaImpresion.document.write(`
+                <!DOCTYPE html>
+                <html>
+                    <head>
+                        <title>Mis Políticas y Permisos - @User.Identity?.Name</title>
+                        <meta charset="utf-8">
+                        <style>
+                            body { 
+                                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+                                padding: 20px; 
+                                color: #333;
+                            }
+                            .header { 
+                                text-align: center; 
+                                margin-bottom: 30px; 
+                                border-bottom: 3px solid #0d6efd;
+                                padding-bottom: 20px;
+                            }
+                            .header h1 {
+                                color: #0d6efd;
+                                margin-bottom: 10px;
+                            }
+                            .politica-item { 
+                                margin-bottom: 20px; 
+                                padding: 15px; 
+                                border-left: 4px solid #0d6efd;
+                                background-color: #f8f9fa;
+                                border-radius: 4px;
+                            }
+                            .politica-nombre { 
+                                font-weight: bold; 
+                                color: #0d6efd; 
+                                font-size: 1.1em;
+                                margin-bottom: 8px;
+                            }
+                            .politica-ruta { 
+                                color: #666; 
+                                font-family: 'Courier New', monospace; 
+                                margin-top: 5px;
+                                background-color: white;
+                                padding: 5px 10px;
+                                border-radius: 3px;
+                                display: inline-block;
+                            }
+                            .fecha { 
+                                text-align: right; 
+                                color: #999; 
+                                font-size: 12px; 
+                                margin-top: 30px;
+                                border-top: 1px solid #ddd;
+                                padding-top: 10px;
+                            }
+                            @@media print {
+                                body { padding: 10px; }
+                                .politica-item { page-break-inside: avoid; }
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="header">
+                            <h1><i class="fas fa-shield-alt"></i> Mis Políticas y Permisos</h1>
+                            <p><strong>Usuario:</strong> @User.Identity?.Name</p>
+                            <p><strong>Fecha de generación:</strong> ${fecha}</p>
+                        </div>
+                        ${modalContent.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')}
+                        <div class="fecha">
+                            Documento generado el ${fecha}
+                        </div>
+                    </body>
+                </html>
+            `);
+            ventanaImpresion.document.close();
+            setTimeout(() => {
+                ventanaImpresion.print();
+            }, 250);
+        }
+    </script>
+    
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

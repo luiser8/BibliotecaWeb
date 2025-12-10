@@ -1,0 +1,16 @@
+@model List<Presentation.Componentes.NavbarItem>
+
+@if (Model != null && Model.Any())
+{
+    <ul class="navbar-nav me-auto mb-2 mb-lg-0 small">
+        @foreach (var item in Model)
+        {
+            <li class="nav-item">
+                <a class="nav-link @(item.IsActive ? "active fw-bold" : "text-dark")" 
+                   href="@item.Url" title="@item.Text">
+                    <i class="@item.Icon me-1"></i> @item.Text
+                </a>
+            </li>
+        }
+    </ul>
+}

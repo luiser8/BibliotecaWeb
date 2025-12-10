@@ -1,24 +1,50 @@
-using System.Diagnostics;
+using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
-using Presentation.Models;
+using Microsoft.Extensions.Options;
+using Presentation.Controllers;
 
-namespace Presentation.Controllers;
-
-public class HomeController : Controller
+public class HomeController : BaseController
 {
+    private readonly AppSettings _appSettings;
+    public HomeController(IOptions<AppSettings> appSettings) : base(appSettings)
+    {
+        _appSettings = appSettings?.Value;
+    }
+
     public IActionResult Index()
     {
-        return View();
+        SetViewDataFromSettings();
+        SetBreadcrumb(("Inicio", "Index", "Home"));
+        
+        // Obtener datos para el dashboard
+        var viewModel = new DashBoard
+        {
+            TotalBooks = 12500,
+            AvailableBooks = 8500,
+            ActiveLoans = 3200,
+            PendingReturns = 150
+        };
+        
+        return View(viewModel);
     }
 
     public IActionResult Privacy()
     {
+        SetViewDataFromSettings();
+        SetBreadcrumb(
+            ("Inicio", "Index", "Home"),
+            ("Privacidad", "", "")
+        );
         return View();
     }
 
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
+    public IActionResult Contact()
     {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        SetViewDataFromSettings();
+        SetBreadcrumb(
+            ("Inicio", "Index", "Home"),
+            ("Contacto", "", "")
+        );
+        return View();
     }
 }

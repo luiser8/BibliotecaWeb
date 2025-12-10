@@ -8,8 +8,8 @@ public class Extension
     public string Estado { get; set; }
     public string Ciudad { get; set; }
     public string Direccion { get; set; }
-    public bool Defecto { get; set; }
-    public bool Activo { get; set; }
+    public int Defecto { get; set; }
+    public int Activo { get; set; }
     public DateTime FechaCreado { get; set; }
     
     public ICollection<Usuario> Usuarios { get; set; }

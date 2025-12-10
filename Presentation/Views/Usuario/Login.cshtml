@@ -1,0 +1,100 @@
+@model Application.DTOs.Usuarios.Request.LoginDto
+@{
+    ViewData["Title"] = "Iniciar Sesión";
+    Layout = "_AuthLayout";
+}
+
+<form asp-action="Login" method="post" class="mt-2">
+    @Html.AntiForgeryToken()
+    
+    <div class="mb-4">
+        <h4 class="fw-semibold mb-1">Inicia sesión</h4>
+        <p class="text-muted small mb-0">Accede a tu cuenta de biblioteca universitaria.</p>
+    </div>
+    
+    <!-- Mensajes de error de validación -->
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <div>@error.ErrorMessage</div>
+            }
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    
+    <div class="mb-3">
+        <label for="Correo" class="form-label small text-muted text-uppercase fw-semibold">Correo electrónico</label>
+        <div class="input-group">
+            <span class="input-group-text bg-transparent border-end-0">
+                <i class="fas fa-envelope text-muted"></i>
+            </span>
+            <input type="email" 
+                   class="form-control border-start-0" 
+                   id="Correo" 
+                   name="Correo" 
+                   placeholder="usuario@universidad.edu"
+                   autocomplete="username"
+                   required>
+        </div>
+    </div>
+    
+    <div class="mb-3">
+        <label for="Contrasena" class="form-label small text-muted text-uppercase fw-semibold">Contraseña</label>
+        <div class="input-group">
+            <span class="input-group-text bg-transparent border-end-0">
+                <i class="fas fa-lock text-muted"></i>
+            </span>
+            <input type="password" 
+                   class="form-control border-start-0" 
+                   id="Contrasena" 
+                   name="Contrasena" 
+                   placeholder="••••••••"
+                   autocomplete="current-password"
+                   required>
+            <button class="btn btn-outline-secondary border-start-0" type="button" id="togglePassword">
+                <i class="fas fa-eye"></i>
+            </button>
+        </div>
+    </div>
+    
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="form-check mb-0">
+            <input type="checkbox" class="form-check-input" id="RememberMe" name="RememberMe">
+            <label class="form-check-label small" for="RememberMe">Recordar sesión</label>
+        </div>
+        <a href="/Account/ForgotPassword" class="login-link small">¿Olvidaste tu contraseña?</a>
+    </div>
+    
+    <button type="submit" class="btn btn-primary w-100 py-2 mb-3">
+        <i class="fas fa-arrow-right-to-bracket me-2"></i> Entrar
+    </button>
+    
+    <div class="text-center">
+        <p class="text-muted mb-2">¿Eres nuevo en la biblioteca?</p>
+        <a asp-controller="Registro" asp-action="Crear" class="btn btn-outline-primary w-100">
+            <i class="fas fa-user-plus me-2"></i> Crear Cuenta de Estudiante
+        </a>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle password visibility
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('Contrasena');
+            
+            togglePassword.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.querySelector('i').className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
+            });
+            
+            // Auto-focus email field
+            document.getElementById('Correo').focus();
+        });
+    </script>
+}
