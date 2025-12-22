@@ -1,0 +1,8 @@
+using Domain.Entities;
+
+namespace Application.Interfaces;
+
+public interface IPoliticasUsuarioUseCase
+{
+    Task<List<PoliticasUsuario>> GetPoliticasAsync(int rolId);
+}

@@ -16,12 +16,12 @@ namespace Infrastructure.Repositories;
         private DataTable? _dt;
         private readonly Hashtable _params;
         private readonly IPasswordHasher? _passwordHasher;
-        private readonly ILogger<UsuarioRepository> _logger;
+        private readonly ILogger<UsuarioRepository>? _logger;
         
         public UsuarioRepository(
             IDataTableExecute dataTableExecute, 
             IPasswordHasher? passwordHasher,
-            ILogger<UsuarioRepository> logger = null)
+            ILogger<UsuarioRepository>? logger = null)
         {
             _dt = new DataTable();
             _dbCon = dataTableExecute ?? throw new ArgumentNullException(nameof(dataTableExecute));

@@ -1,19 +1,22 @@
 // Controllers/BaseController.cs
 
+using Application.Interfaces;
+using Application.UseCases.Politicas;
 using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Presentation.Models;
 
 namespace Presentation.Controllers
 {
     public abstract class BaseController : Controller
     {
         private readonly AppSettings _appSettings;
+        private readonly IPoliticasUsuarioUseCase _politicasUsuarioUseCase;
 
-        protected BaseController(IOptions<AppSettings> appSettings)
+        protected BaseController(IOptions<AppSettings> appSettings, IPoliticasUsuarioUseCase politicasUsuarioUseCase)
         {
             _appSettings = appSettings?.Value;
+            _politicasUsuarioUseCase = politicasUsuarioUseCase;
         }
 
         /// <summary>

@@ -12,12 +12,4 @@ public class AuthUsuario
     public string? Rol { get; set; }
     public string? Extension { get; set; }
     public string? Carrera { get; set; }
-    //public List<PoliticasUsuario>? Politicas { get; set; }
-}
-
-public class PoliticasUsuario
-{
-    public int PoliticaId { get; set; }
-    public string? Nombre { get; set; }
-    public string? Ruta { get; set; }
 }
