@@ -1,28 +1,23 @@
 using Application.DTOs.Usuarios.Request;
 using Application.Interfaces;
-using Domain.Entities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 
 namespace Presentation.Controllers;
 
-public class UsuarioController : BaseController
+public class UsuarioController : Controller
 {
-    private readonly AppSettings? _appSettings;
     private readonly IAuthUseCase _authUseCase;
 
-    public UsuarioController(IOptions<AppSettings> appSettings, IAuthUseCase authUseCase) : base(appSettings)
+    public UsuarioController(IAuthUseCase authUseCase)
     {
-        _appSettings = appSettings?.Value;
         _authUseCase = authUseCase;
     }
 
     // GET: /Account/Login
     public IActionResult Login(string? returnUrl = null)
     {
-        SetViewDataFromSettings();
         ViewData["ReturnUrl"] = returnUrl;
 
         // Si ya está autenticado, redirigir al home
@@ -39,8 +34,6 @@ public class UsuarioController : BaseController
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginDto model, string? returnUrl = null)
     {
-        SetViewDataFromSettings();
-
         if (!ModelState.IsValid)
         {
             return View(model);

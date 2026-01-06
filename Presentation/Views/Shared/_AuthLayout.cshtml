@@ -168,16 +168,6 @@
                 
                 <!-- Footer del login -->
                 <div class="text-center mt-4 text-muted auth-footer-text">
-                    <p class="mb-2">
-                        @if (ViewContext.RouteData.Values["Action"]?.ToString() == "Login")
-                        {
-                            <span>¿No tienes cuenta? <a asp-controller="Registro" asp-action="Create" class="login-link">Regístrate aquí</a></span>
-                        }
-                        else
-                        {
-                            <span>¿Ya tienes cuenta? <a asp-controller="Usuario" asp-action="Login" class="login-link">Inicia sesión aquí</a></span>
-                        }
-                    </p>
                     <p class="mb-0 text-muted">
                         <i class="fas fa-copyright me-1"></i> 
                         @(ViewData["FooterText"] ?? "© 2025 Biblioteca Universitaria")
