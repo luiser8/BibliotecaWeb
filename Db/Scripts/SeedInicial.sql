@@ -102,7 +102,7 @@ INSERT INTO Politicas (Tipo, Nombre, Ruta) VALUES
 
 -- Módulo Catalogos de Libros para Estudiantes
 ('Header', 'Catalogos', 'Catalogos/Index'),
-('Header', 'Mis prestamos', 'MisPrestamos/Index'),
+('Header', 'Mis prestamos', 'Prestamos/Usuario'),
 
 -- Módulo Libros
 ('Menu', 'Libros', 'Libros/Index'),
