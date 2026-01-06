@@ -5,11 +5,15 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
+
+    <ItemGroup>
+      <Compile Remove="Pages\**" />
+      <Content Remove="Pages\**" />
+      <EmbeddedResource Remove="Pages\**" />
+      <None Remove="Pages\**" />
+    </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\Application\Application.csproj" />
         <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
-    </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Pages\" />
     </ItemGroup>
 </Project>

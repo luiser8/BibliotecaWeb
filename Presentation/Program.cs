@@ -1,6 +1,7 @@
 using Application.Interfaces;
 using Application.UseCases.Carreras;
 using Application.UseCases.Extension;
+using Application.UseCases.Politicas;
 using Application.UseCases.Usuarios;
 using Domain.Entities;
 using Domain.Ports;
@@ -8,6 +9,7 @@ using Infrastructure.Configurations;
 using Infrastructure.Repositories;
 using Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Presentation.Filters;
 using Presentation.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -42,7 +44,13 @@ if (string.IsNullOrEmpty(connectionString))
     );
 }
 
-builder.Services.AddControllersWithViews();
+//builder.Services.AddControllersWithViews();
+
+builder.Services.AddScoped<CargarPoliticasFilter>();
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.Add<CargarPoliticasFilter>();
+});
 
 builder.Services.AddScoped<IConnectionFactory>(provider => new ConnectionFactory(connectionString));
 builder.Services.AddScoped<IDataTableExecute, DataTableExecute>();
@@ -53,12 +61,16 @@ builder.Services.AddScoped<IExtensionRepository, ExtensionRepository>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IDatosPersonalesRepository, DatosPersonalesRepository>();
 builder.Services.AddScoped<IDatosAcademicosRepository, DatosAcademicosRepository>();
+builder.Services.AddScoped<IPoliticasUsuarioRepository, PoliticasUsuarioRepository>();
 
 builder.Services.AddScoped<IExtensionQueryUseCase, ExtensionQueryUseCase>();
 builder.Services.AddScoped<ICarrerasQueryUseCase, CarrerasUseCase>();
 builder.Services.AddScoped<IUsuarioQueryUseCase, UsuarioQueryUseCase>();
 builder.Services.AddScoped<IUsuarioCommandUseCase, UsuarioCommandUseCase>();
+builder.Services.AddScoped<IPoliticasUsuarioUseCase, PoliticasUsuariosUseCase>();
 builder.Services.AddScoped<IAuthUseCase, AuthUseCase>();
+
+builder.Services.AddHttpContextAccessor();
 
 // Servicios de presentación
 builder.Services.AddScoped<ExceptionHandlerService>();

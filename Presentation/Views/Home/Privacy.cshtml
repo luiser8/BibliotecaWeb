@@ -1,6 +1,181 @@
-﻿@{
-    ViewData["Title"] = "Privacy Policy";
+﻿@model Domain.Entities.DashBoard
+@{
+    ViewData["Title"] = "Política de Privacidad";
+    Layout = "_Layout";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+                <div class="card-body p-4">
+                    <div class="mb-4">
+                        <h4 class="text-primary mb-3">
+                            <i class="fas fa-info-circle me-2"></i>Nuestro Compromiso con su Privacidad
+                        </h4>
+                        <p class="lead">
+                            En <strong>@(ViewData["SiteTitle"] ?? "Biblioteca PSM")</strong>, nos comprometemos a proteger la privacidad
+                            de nuestros usuarios. Esta política describe cómo recopilamos, usamos y protegemos su información.
+                        </p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5 class="text-primary mb-3">
+                            <i class="fas fa-database me-2"></i>Información que Recopilamos
+                        </h5>
+                        <ul class="list-group list-group-flush mb-3">
+                            <li class="list-group-item">
+                                <i class="fas fa-user text-primary me-2"></i>
+                                <strong>Información personal:</strong> Nombre, correo electrónico, número de identificación
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-book text-primary me-2"></i>
+                                <strong>Información académica:</strong> Carrera, semestre, préstamos activos
+                            </li>
+                            <li class="list-group-item">
+                                <i class="fas fa-history text-primary me-2"></i>
+                                <strong>Datos de uso:</strong> Historial de préstamos, búsquedas, preferencias
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5 class="text-primary mb-3">
+                            <i class="fas fa-lock me-2"></i>Cómo Protegemos su Información
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100 border-primary border-start border-start-3">
+                                    <div class="card-body">
+                                        <h6 class="card-title text-primary">
+                                            <i class="fas fa-shield me-2"></i>Seguridad Técnica
+                                        </h6>
+                                        <p class="card-text small">
+                                            Utilizamos encriptación SSL, firewalls y sistemas de autenticación seguros
+                                            para proteger sus datos.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100 border-success border-start border-start-3">
+                                    <div class="card-body">
+                                        <h6 class="card-title text-success">
+                                            <i class="fas fa-user-shield me-2"></i>Control de Acceso
+                                        </h6>
+                                        <p class="card-text small">
+                                            Implementamos políticas de acceso basadas en roles para garantizar que solo
+                                            personal autorizado acceda a información sensible.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5 class="text-primary mb-3">
+                            <i class="fas fa-share-alt me-2"></i>Compartición de Información
+                        </h5>
+                        <p>
+                            <strong>No compartimos su información personal</strong> con terceros, excepto cuando:
+                        </p>
+                        <ol class="ps-3">
+                            <li class="mb-2">Sea requerido por ley o procesos legales</li>
+                            <li class="mb-2">Sea necesario para proteger nuestros derechos legales</li>
+                            <li class="mb-2">Usted dé su consentimiento explícito</li>
+                        </ol>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5 class="text-primary mb-3">
+                            <i class="fas fa-cookie me-2"></i>Cookies y Tecnologías Similares
+                        </h5>
+                        <p>
+                            Utilizamos cookies para mejorar su experiencia en nuestro sitio web.
+                            Puede controlar el uso de cookies a través de la configuración de su navegador.
+                        </p>
+                    </div>
+
+                    <div class="mb-4">
+                        <h5 class="text-primary mb-3">
+                            <i class="fas fa-user-edit me-2"></i>Sus Derechos
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <i class="fas fa-eye text-primary me-2"></i>
+                                        Derecho a acceder a sus datos
+                                    </li>
+                                    <li class="list-group-item">
+                                        <i class="fas fa-edit text-primary me-2"></i>
+                                        Derecho a rectificar información
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <i class="fas fa-trash text-primary me-2"></i>
+                                        Derecho a eliminar sus datos
+                                    </li>
+                                    <li class="list-group-item">
+                                        <i class="fas fa-ban text-primary me-2"></i>
+                                        Derecho a oponerse al tratamiento
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <div class="d-flex">
+                            <i class="fas fa-clock fa-2x me-3 mt-1"></i>
+                            <div>
+                                <h5 class="alert-heading mb-2">Actualizaciones de la Política</h5>
+                                <p class="mb-0">
+                                    Esta política de privacidad puede actualizarse periódicamente.
+                                    Le notificaremos sobre cambios importantes mediante un aviso en nuestro sitio web
+                                    o por correo electrónico.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-5">
+                        <h5 class="text-primary mb-3">
+                            <i class="fas fa-question-circle me-2"></i>¿Preguntas o Consultas?
+                        </h5>
+                        <p>
+                            Si tiene preguntas sobre esta política de privacidad o sobre el tratamiento de sus datos,
+                            por favor contáctenos:
+                        </p>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card border-0 bg-light">
+                                    <div class="card-body">
+                                        <h6 class="card-title">
+                                            <i class="fas fa-envelope me-2 text-primary"></i>Correo Electrónico
+                                        </h6>
+                                        <p class="card-text mb-0">
+                                            <a href="mailto:privacidad@biblioteca.edu" class="text-decoration-none">
+                                                privacidad@biblioteca.edu
+                                            </a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card border-0 bg-light">
+                                    <div class="card-body">
+                                        <h6 class="card-title">
+                                            <i class="fas fa-phone me-2 text-primary"></i>Teléfono
+                                        </h6>
+                                        <p class="card-text mb-0">
+                                            <a href="tel:+1234567890" class="text-decoration-none">
+                                                +1 (234) 567-890
+                                            </a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>

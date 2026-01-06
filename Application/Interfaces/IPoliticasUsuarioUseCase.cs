@@ -4,5 +4,5 @@ namespace Application.Interfaces;
 
 public interface IPoliticasUsuarioUseCase
 {
-    Task<List<PoliticasUsuario>> GetPoliticasAsync(int rolId);
+    Task<List<PoliticasUsuario>> GetPoliticasAsync(int rolId, string tipos);
 }

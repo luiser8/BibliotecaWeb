@@ -87,70 +87,88 @@ INSERT INTO Roles (Nombre) VALUES
 ('Profesor');
 
 -- POLÍTICAS CON RUTAS
-INSERT INTO Politicas (Nombre, Ruta) VALUES
+INSERT INTO Politicas (Tipo, Nombre, Ruta) VALUES
+
+-- Módulo Home
+('Header', 'Inicio', 'Home/Index'),
+
 -- Módulo Usuarios
-('UsuariosVer', 'Usuarios/Index'),
-('UsuariosCrear', 'Usuarios/Crear'),
-('UsuariosEditar', 'Usuarios/Editar'),
-('UsuariosEliminar', 'Usuarios/Eliminar'),
-('UsuariosConsultar', 'Usuarios/Consultar'),
-('UsuariosAsignarRoles', 'Usuarios/AsignarRoles'),
+('Menu', 'Usuarios', 'Usuarios/Index'),
+('Boton', 'UsuariosCrear', 'Usuarios/Crear'),
+('Boton', 'UsuariosEditar', 'Usuarios/Editar'),
+('Boton', 'UsuariosEliminar', 'Usuarios/Eliminar'),
+('Boton', 'UsuariosConsultar', 'Usuarios/Consultar'),
+('Boton', 'UsuariosAsignarRoles', 'Usuarios/AsignarRoles'),
+
+-- Módulo Catalogos de Libros para Estudiantes
+('Header', 'Catalogos', 'Catalogos/Index'),
+('Header', 'Mis prestamos', 'MisPrestamos/Index'),
 
 -- Módulo Libros
-('LibrosCrear', 'Libros/Crear'),
-('LibrosEditar', 'Libros/Editar'),
-('LibrosEliminar', 'Libros/Eliminar'),
-('LibrosConsultar', 'Libros/Consultar'),
-('LibrosPrestar', 'Libros/Prestar'),
-('LibrosDevolver', 'Libros/Devolver'),
+('Menu', 'Libros', 'Libros/Index'),
+('Boton', 'LibrosCrear', 'Libros/Crear'),
+('Boton', 'LibrosEditar', 'Libros/Editar'),
+('Boton', 'LibrosEliminar', 'Libros/Eliminar'),
+('Boton', 'LibrosConsultar', 'Libros/Consultar'),
+('Boton', 'LibrosPrestar', 'Libros/Prestar'),
+('Boton', 'LibrosDevolver', 'Libros/Devolver'),
 
 -- Módulo Préstamos
-('PrestamosCrear', 'Prestamos/Crear'),
-('PrestamosEditar', 'Prestamos/Editar'),
-('PrestamosCancelar', 'Prestamos/Cancelar'),
-('PrestamosConsultar', 'Prestamos/Consultar'),
-('PrestamosReportes', 'Prestamos/Reportes'),
+('Menu', 'Prestamos', 'Prestamos/Index'),
+('Boton', 'PrestamosCrear', 'Prestamos/Crear'),
+('Boton', 'PrestamosEditar', 'Prestamos/Editar'),
+('Boton', 'PrestamosCancelar', 'Prestamos/Cancelar'),
+('Boton', 'PrestamosConsultar', 'Prestamos/Consultar'),
+('Boton', 'PrestamosReportes', 'Prestamos/Reportes'),
 
 -- Módulo Extensiones
-('ExtensionesCrear', 'Extensiones/Crear'),
-('ExtensionesEditar', 'Extensiones/Editar'),
-('ExtensionesEliminar', 'Extensiones/Eliminar'),
-('ExtensionesConsultar', 'Extensiones/Consultar'),
+('Menu', 'Extensiones', 'Extensiones/Index'),
+('Boton', 'ExtensionesCrear', 'Extensiones/Crear'),
+('Boton', 'ExtensionesEditar', 'Extensiones/Editar'),
+('Boton', 'ExtensionesEliminar', 'Extensiones/Eliminar'),
+('Boton', 'ExtensionesConsultar', 'Extensiones/Consultar'),
 
 -- Módulo Carreras
-('CarrerasCrear', 'Carreras/Crear'),
-('CarrerasEditar', 'Carreras/Editar'),
-('CarrerasEliminar', 'Carreras/Eliminar'),
-('CarrerasConsultar', 'Carreras/Consultar'),
+('Menu', 'Carreras', 'Carreras/Index'),
+('Boton', 'CarrerasCrear', 'Carreras/Crear'),
+('Boton', 'CarrerasEditar', 'Carreras/Editar'),
+('Boton', 'CarrerasEliminar', 'Carreras/Eliminar'),
+('Boton', 'CarrerasConsultar', 'Carreras/Consultar'),
 
 -- Módulo Seguridad
-('RolesCrear', '/Roles/Crear'),
-('RolesEditar', 'Roles/Editar'),
-('RolesEliminar', 'Roles/Eliminar'),
-('RolesConsultar', 'Roles/Consultar'),
-('RolesAsignar', 'Roles/Asignar'),
+('Menu', 'Roles', 'Roles/Index'),
+('Boton', 'RolesCrear', '/Roles/Crear'),
+('Boton', 'RolesEditar', 'Roles/Editar'),
+('Boton', 'RolesEliminar', 'Roles/Eliminar'),
+('Boton', 'RolesConsultar', 'Roles/Consultar'),
+('Boton', 'RolesAsignar', 'Roles/Asignar'),
 
 -- Módulo Politicas
-('PoliticasCrear', 'Prestamos/Crear'),
-('PoliticasEditar', 'Prestamos/Editar'),
-('PoliticasConsultar', 'Prestamos/Consultar'),
-('PoliticasEliminar', 'Prestamos/Eliminar'),
+('Menu', 'Politicas', 'Politicas/Index'),
+('Boton', 'PoliticasCrear', 'Prestamos/Crear'),
+('Boton', 'PoliticasEditar', 'Prestamos/Editar'),
+('Boton', 'PoliticasConsultar', 'Prestamos/Consultar'),
+('Boton', 'PoliticasEliminar', 'Prestamos/Eliminar'),
 
 -- Módulo Reportes
-('ReportesGenerar', 'Reportes/Generar'),
-('ReportesConsultar', 'Reportes/Consultar'),
+('Menu', 'Reportes', 'Reportes/Index'),
+('Boton', 'ReportesGenerar', 'Reportes/Generar'),
+('Boton', 'ReportesConsultar', 'Reportes/Consultar'),
 
 -- Módulo Auditoria
-('AuditoriaConsultar', 'Auditoria/Consultar'),
-('AuditoriaUsuario', 'Auditoria/Usuario/Id'),
+('Menu', 'Auditoria', 'Auditoria/Index'),
+('Boton', 'AuditoriaConsultar', 'Auditoria/Consultar'),
+('Boton', 'AuditoriaUsuario', 'Auditoria/Usuario/Id'),
 
 -- Módulo Morosidad
-('MorosidadConsultar', 'Morosidad/Consultar'),
-('MorosidadUsuario', 'Morosidad/Usuario/Id'),
+('Menu', 'Morosidad', 'Morosidad/Index'),
+('Boton', 'MorosidadConsultar', 'Morosidad/Consultar'),
+('Boton', 'MorosidadUsuario', 'Morosidad/Usuario/Id'),
 
 -- Módulo Perfil
-('PerfilConsultar', 'Perfil/Consultar'),
-('PerfilEditar', 'Perfil/Editar');
+('Menu', 'Perfil', 'Perfil/Index'),
+('Boton', 'PerfilConsultar', 'Perfil/Consultar'),
+('Boton', 'PerfilEditar', 'Perfil/Editar');
 
 --ROL POLITICAS
 -- 1. Obtener IDs de roles
@@ -161,15 +179,58 @@ DECLARE @ProfesorId INT = (SELECT Id FROM Roles WHERE Nombre = 'Profesor');
 DECLARE @EstudianteId INT = (SELECT Id FROM Roles WHERE Nombre = 'Estudiante');
 
 -- 2. Obtener IDs de políticas (ASEGÚRATE DE QUE EXISTAN)
+DECLARE @HomeIndex INT = (SELECT Id FROM Politicas WHERE Nombre = 'Home');
+DECLARE @CatalogosIndex INT = (SELECT Id FROM Politicas WHERE Nombre = 'Catalogos');
+DECLARE @LibrosIndex INT = (SELECT Id FROM Politicas WHERE Nombre = 'Libros');
 DECLARE @LibrosConsultar INT = (SELECT Id FROM Politicas WHERE Nombre = 'LibrosConsultar');
 DECLARE @LibrosPrestar INT = (SELECT Id FROM Politicas WHERE Nombre = 'LibrosPrestar');
+DECLARE @LibrosCrear INT = (SELECT Id FROM Politicas WHERE Nombre = 'LibrosCrear');
+DECLARE @LibrosEditar INT = (SELECT Id FROM Politicas WHERE Nombre = 'LibrosEditar');
+DECLARE @LibrosEliminar INT = (SELECT Id FROM Politicas WHERE Nombre = 'LibrosEliminar');
+DECLARE @LibrosDevolver INT = (SELECT Id FROM Politicas WHERE Nombre = 'LibrosDevolver');
+
+DECLARE @MisPrestamosIndex INT = (SELECT Id FROM Politicas WHERE Nombre = 'Mis prestamos');
+DECLARE @PrestamosIndex INT = (SELECT Id FROM Politicas WHERE Nombre = 'Prestamos');
 DECLARE @PrestamosCrear INT = (SELECT Id FROM Politicas WHERE Nombre = 'PrestamosCrear');
 DECLARE @PrestamosEditar INT = (SELECT Id FROM Politicas WHERE Nombre = 'PrestamosEditar');
 DECLARE @PrestamosCancelar INT = (SELECT Id FROM Politicas WHERE Nombre = 'PrestamosCancelar');
 DECLARE @PrestamosConsultar INT = (SELECT Id FROM Politicas WHERE Nombre = 'PrestamosConsultar');
 DECLARE @PrestamosReportes INT = (SELECT Id FROM Politicas WHERE Nombre = 'PrestamosReportes');
+
+DECLARE @PerfilIndex INT = (SELECT Id FROM Politicas WHERE Nombre = 'Perfil');
 DECLARE @PerfilConsultar INT = (SELECT Id FROM Politicas WHERE Nombre = 'PerfilConsultar');
 DECLARE @PerfilEditar INT = (SELECT Id FROM Politicas WHERE Nombre = 'PerfilEditar');
+
+DECLARE @UsuariosIndex INT = (SELECT Id FROM Politicas WHERE Nombre = 'Usuarios');
+DECLARE @UsuariosConsultar INT = (SELECT Id FROM Politicas WHERE Nombre = 'UsuariosConsultar');
+DECLARE @UsuariosCrear INT = (SELECT Id FROM Politicas WHERE Nombre = 'UsuariosCrear');
+DECLARE @UsuariosEditar INT = (SELECT Id FROM Politicas WHERE Nombre = 'UsuariosEditar');
+DECLARE @UsuariosEliminar INT = (SELECT Id FROM Politicas WHERE Nombre = 'UsuariosEliminar');
+DECLARE @UsuariosAsignarRoles INT = (SELECT Id FROM Politicas WHERE Nombre = 'UsuariosAsignarRoles');
+
+DECLARE @ExtensionesIndex INT = (SELECT Id FROM Politicas WHERE Nombre = 'Extensiones');
+DECLARE @ExtensionesConsultar INT = (SELECT Id FROM Politicas WHERE Nombre = 'ExtensionesConsultar');
+DECLARE @ExtensionesCrear INT = (SELECT Id FROM Politicas WHERE Nombre = 'ExtensionesCrear');
+DECLARE @ExtensionesEditar INT = (SELECT Id FROM Politicas WHERE Nombre = 'ExtensionesEditar');
+DECLARE @ExtensionesEliminar INT = (SELECT Id FROM Politicas WHERE Nombre = 'ExtensionesEliminar');
+
+DECLARE @CarrerasIndex INT = (SELECT Id FROM Politicas WHERE Nombre = 'Carreras');
+DECLARE @CarrerasConsultar INT = (SELECT Id FROM Politicas WHERE Nombre = 'CarrerasConsultar');
+DECLARE @CarrerasCrear INT = (SELECT Id FROM Politicas WHERE Nombre = 'CarrerasCrear');
+DECLARE @CarrerasEditar INT = (SELECT Id FROM Politicas WHERE Nombre = 'CarrerasEditar');
+DECLARE @CarrerasEliminar INT = (SELECT Id FROM Politicas WHERE Nombre = 'CarrerasEliminar');
+
+DECLARE @ReportesIndex INT = (SELECT Id FROM Politicas WHERE Nombre = 'Reportes');
+DECLARE @ReportesGenerar INT = (SELECT Id FROM Politicas WHERE Nombre = 'ReportesGenerar');
+DECLARE @ReportesConsultar INT = (SELECT Id FROM Politicas WHERE Nombre = 'ReportesConsultar');
+
+DECLARE @AuditoriaIndex INT = (SELECT Id FROM Politicas WHERE Nombre = 'Auditoria');
+DECLARE @AuditoriaConsultar INT = (SELECT Id FROM Politicas WHERE Nombre = 'AuditoriaConsultar');
+DECLARE @AuditoriaUsuario INT = (SELECT Id FROM Politicas WHERE Nombre = 'AuditoriaUsuario');
+
+DECLARE @MorosidadIndex INT = (SELECT Id FROM Politicas WHERE Nombre = 'Morosidad');
+DECLARE @MorosidadConsultar INT = (SELECT Id FROM Politicas WHERE Nombre = 'MorosidadConsultar');
+DECLARE @MorosidadUsuario INT = (SELECT Id FROM Politicas WHERE Nombre = 'MorosidadUsuario');
 
 -- 3. Limpiar asignaciones anteriores (opcional)
 DELETE FROM RolPoliticas;
@@ -199,6 +260,7 @@ ORDER BY Id;
 
 -- 7. PROFESOR: Solo políticas específicas
 INSERT INTO RolPoliticas (RolId, PoliticaId) VALUES
+(@ProfesorId, @HomeIndex),
 (@ProfesorId, @LibrosConsultar),
 (@ProfesorId, @LibrosPrestar),
 (@ProfesorId, @PrestamosCrear),
@@ -211,11 +273,15 @@ INSERT INTO RolPoliticas (RolId, PoliticaId) VALUES
 
 -- 8. ESTUDIANTE: Igual que profesor
 INSERT INTO RolPoliticas (RolId, PoliticaId) VALUES
+(@EstudianteId, @HomeIndex),
+(@EstudianteId, @CatalogosIndex),
 (@EstudianteId, @LibrosConsultar),
 (@EstudianteId, @LibrosPrestar),
+(@EstudianteId, @MisPrestamosIndex),
 (@EstudianteId, @PrestamosCrear),
 (@EstudianteId, @PrestamosEditar),
 (@EstudianteId, @PrestamosCancelar),
 (@EstudianteId, @PrestamosConsultar),
+(@EstudianteId, @PerfilIndex),
 (@EstudianteId, @PerfilConsultar),
 (@EstudianteId, @PerfilEditar);

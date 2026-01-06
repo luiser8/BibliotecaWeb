@@ -49,6 +49,7 @@ public class AuthUseCase : IAuthUseCase
                 UsuarioId = usuario.UsuarioId,
                 Correo = usuario.Correo ?? string.Empty,
                 NombreCompleto = usuario.Nombres + " " + usuario.Apellidos,
+                RolId = usuario.RolId,
                 Rol = rol,
                 Claims = claims,
                 RememberMe = loginDto.RememberMe,

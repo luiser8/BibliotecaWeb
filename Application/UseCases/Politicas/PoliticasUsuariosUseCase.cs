@@ -13,8 +13,8 @@ public class PoliticasUsuariosUseCase : IPoliticasUsuarioUseCase
         _politicasUsuarioRepository = politicasUsuarioRepository;
     }
     
-    public Task<List<PoliticasUsuario>> GetPoliticasAsync(int rolId)
+    public Task<List<PoliticasUsuario>> GetPoliticasAsync(int rolId, string tipos)
     {
-        return _politicasUsuarioRepository.GetPoliticasAsync(rolId);
+        return _politicasUsuarioRepository.GetPoliticasAsync(rolId, tipos);
     }
 }

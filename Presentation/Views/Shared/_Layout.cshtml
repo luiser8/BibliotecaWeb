@@ -1,92 +1,21 @@
-﻿<!DOCTYPE html>
+﻿@using Domain.Entities
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - @(ViewData["SiteTitle"] ?? "Biblioteca")</title>
-    
+
     <!-- Bootstrap 5 CSS -->
-    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="~/lib/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Site CSS -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    
+
     @await RenderSectionAsync("Styles", required: false)
-    
-    <style>
-        .navbar-nav .dropdown-menu {
-            border: none;
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-            margin-top: 0.5rem;
-        }
-        
-        .navbar-nav .dropdown-item {
-            padding: 0.5rem 1rem;
-            transition: all 0.2s ease;
-        }
-        
-        .navbar-nav .dropdown-item:hover {
-            background-color: #f8f9fa;
-            padding-left: 1.25rem;
-        }
-        
-        .navbar-nav .nav-link {
-            transition: all 0.2s ease;
-        }
-        
-        .navbar-nav .nav-link:hover {
-            color: #0d6efd !important;
-        }
-        
-        .navbar-nav .nav-link.active {
-            color: #0d6efd !important;
-        }
-        
-        .politicas-list {
-            max-height: 500px;
-            overflow-y: auto;
-        }
-        
-        .politica-card {
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        
-        .politica-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-        }
-        
-        .badge-politica {
-            font-size: 0.75rem;
-            padding: 0.25rem 0.5rem;
-        }
-        
-        .user-dropdown-toggle {
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.5rem;
-            transition: background-color 0.2s ease;
-        }
-        
-        .user-dropdown-toggle:hover {
-            background-color: #f8f9fa;
-        }
-        
-        .navbar-nav .nav-link.active {
-            background-color: rgba(13, 110, 253, 0.1);
-            border-radius: 0.375rem;
-        }
-        
-        .politicas-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            font-size: 0.6rem;
-            padding: 0.15rem 0.35rem;
-        }
-    </style>
 </head>
 <body class="bg-light d-flex flex-column min-vh-100">
     <header>
@@ -102,55 +31,62 @@
                 </button>
 
                 <div class="collapse navbar-collapse" id="mainNavbar">
-                    <!-- Menú dinámico basado en políticas -->
-                    @await Component.InvokeAsync("Navbar")
-                    
-                    <!-- Menú de usuario -->
+                    <!-- Menú principal - SOLO políticas de tipo HEADER -->
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <!-- Inicio siempre visible -->
+
+                        @if (User?.Identity?.IsAuthenticated ?? false)
+                        {
+                                // Obtener políticas de ViewData - manejo robusto
+                                IEnumerable<dynamic> politicasBasicas = ViewData["PoliticasBasicas"] as IEnumerable<dynamic>;
+                                
+                                // Si es null, crear lista vacía
+                                politicasBasicas ??= Enumerable.Empty<dynamic>();
+
+                                // Filtrar solo las de tipo Header para el menú principal
+                                var politicasHeader = politicasBasicas
+                                    .Where(p => p?.Tipo?.ToString() == "Header")
+                                    .ToList();
+
+                            @if (politicasHeader.Any())
+                            {
+                                @foreach (var politica in politicasHeader)
+                                {
+                                    <li class="nav-item">
+                                        <a class="nav-link @IsActiveMenu(politica.Ruta ?? "")"
+                                           href="/@(politica.Ruta ?? "#")">
+                                            <i class="@GetPolicyIcon(politica.Nombre ?? "") me-1"></i>
+                                            @(politica.Nombre ?? "Sin nombre")
+                                        </a>
+                                    </li>
+                                }
+                            }
+                        }
+                    </ul>
+
+                    <!-- Menú de usuario - Incluye políticas de tipo MENU en el dropdown -->
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0 small">
                         @if (User?.Identity?.IsAuthenticated ?? false)
                         {
-                            // Obtener datos del usuario de los claims
-                            var nombreCompleto = Context.User.FindFirstValue("NombreCompleto") 
-                                ?? Context.User.FindFirstValue(ClaimTypes.Name) 
-                                ?? $"{Context.User.FindFirstValue("Nombres")} {Context.User.FindFirstValue("Apellidos")}".Trim()
-                                ?? User.Identity?.Name 
-                                ?? "Usuario";
-                            var rol = Context.User.FindFirstValue("Rol") ?? "Usuario";
-                            var correo = Context.User.FindFirstValue(ClaimTypes.Email) ?? "";
-                            
-                            // Obtener cantidad de políticas
-                            var politicasCount = 0;
-                            var politicasJsonHeader = Context.User.FindFirstValue("PoliticasJson");
-                            if (!string.IsNullOrEmpty(politicasJsonHeader))
-                            {
-                                try
-                                {
-                                    var politicas = System.Text.Json.JsonSerializer.Deserialize<List<dynamic>>(politicasJsonHeader);
-                                    politicasCount = politicas?.Count ?? 0;
-                                }
-                                catch
-                                {
-                                    politicasCount = Context.User.FindAll("Politica").Count();
-                                }
-                            }
-                            else
-                            {
-                                politicasCount = Context.User.FindAll("Politica").Count();
-                            }
-                            
-                            @if (politicasCount > 0)
-                            {
-                                <li class="nav-item me-2">
-                                    <a class="nav-link text-dark position-relative" href="#" data-bs-toggle="modal" data-bs-target="#permisosModal" title="Ver mis políticas y permisos (@politicasCount políticas)">
-                                        <i class="fas fa-shield-alt me-1"></i>
-                                        <span>Mis Políticas</span>
-                                        <span class="badge bg-primary rounded-pill ms-1 politicas-badge">
-                                            @politicasCount
-                                        </span>
-                                    </a>
-                                </li>
-                            }
-                            
+                                var politicasBasicas = ViewData["PoliticasBasicas"] as IEnumerable<dynamic> 
+                                    ?? Enumerable.Empty<dynamic>();
+                                var politicasCount = politicasBasicas.Count();
+
+                                // Filtrar políticas de tipo Menu para el dropdown
+                                var politicasMenu = politicasBasicas
+                                    .Where(p => p?.Tipo?.ToString() == "Menu")
+                                    .ToList();
+
+                                var nombreCompleto = Context.User.FindFirstValue("NombreCompleto")
+                                    ?? Context.User.FindFirstValue(System.Security.Claims.ClaimTypes.Name)
+                                    ?? User.Identity?.Name
+                                    ?? "Usuario";
+                                var rol = Context.User.FindFirstValue("Rol")
+                                    ?? Context.User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value
+                                    ?? "Usuario";
+                                var correo = Context.User.FindFirstValue(System.Security.Claims.ClaimTypes.Email)
+                                    ?? "";
+
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle text-dark d-flex align-items-center user-dropdown-toggle" href="#" id="userDropdown" role="button"
                                    data-bs-toggle="dropdown" aria-expanded="false">
@@ -165,26 +101,25 @@
                                     <i class="fas fa-chevron-down text-muted" style="font-size: 0.7rem;"></i>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                    <li class="dropdown-header">
-                                        <div class="d-flex flex-column">
-                                            <span class="fw-semibold text-dark">@nombreCompleto</span>
-                                            <small class="text-muted">
-                                                <i class="fas fa-envelope me-1"></i> @correo
-                                            </small>
-                                            <small class="text-muted mt-1">
-                                                <i class="fas fa-user-tag me-1"></i> @rol
-                                            </small>
-                                        </div>
-                                    </li>
-                                    <li><hr class="dropdown-divider" /></li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Perfil" asp-action="Index">
-                                            <i class="fas fa-user-edit me-1"></i> Mi Perfil
-                                        </a>
-                                    </li>
+                                    @* Mostrar políticas de tipo MENU en el dropdown *@
+                                    @if (politicasMenu.Any())
+                                    {
+                                        @foreach (var politica in politicasMenu)
+                                        {
+                                            <li>
+                                                <a class="dropdown-item" href="/@(politica.Ruta ?? "#")">
+                                                    <i class="@GetPolicyIcon(politica.Nombre ?? "") me-1"></i>
+                                                    @(politica.Nombre ?? "Sin nombre")
+                                                </a>
+                                            </li>
+                                        }
+                                        <li><hr class="dropdown-divider" /></li>
+                                    }
+
+                                    @* Opciones comunes del sistema *@
                                     <li>
                                         <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#permisosModal">
-                                            <i class="fas fa-key me-1"></i> Ver Mis Permisos
+                                            <i class="fas fa-key me-1"></i> Mis Permisos
                                         </a>
                                     </li>
                                     <li><hr class="dropdown-divider" /></li>
@@ -223,7 +158,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             }
-            
+
             @if (TempData["ErrorMessage"] != null)
             {
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -232,7 +167,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             }
-            
+
             @if (TempData["WarningMessage"] != null)
             {
                 <div class="alert alert-warning alert-dismissible fade show" role="alert">
@@ -241,7 +176,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             }
-            
+
             @if (TempData["InfoMessage"] != null)
             {
                 <div class="alert alert-info alert-dismissible fade show" role="alert">
@@ -250,7 +185,8 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             }
-            
+
+            <!-- Renderizar contenido principal -->
             @RenderBody()
         </div>
     </main>
@@ -263,25 +199,9 @@
                     <h5 class="modal-title" id="permisosModalLabel">
                         <i class="fas fa-shield-alt me-2"></i>Mis Políticas y Permisos
                         @{
-                            var totalPoliticas = 0;
-                            var user = Context.User;
-                            var politicasJson = user.FindFirstValue("PoliticasJson");
-                            if (!string.IsNullOrEmpty(politicasJson))
-                            {
-                                try
-                                {
-                                    var politicas = System.Text.Json.JsonSerializer.Deserialize<List<dynamic>>(politicasJson);
-                                    totalPoliticas = politicas?.Count ?? 0;
-                                }
-                                catch
-                                {
-                                    totalPoliticas = user.FindAll("Politica").Count();
-                                }
-                            }
-                            else
-                            {
-                                totalPoliticas = user.FindAll("Politica").Count();
-                            }
+                            var politicasModal = ViewData["PoliticasBasicas"] as IEnumerable<dynamic>
+                                ?? Enumerable.Empty<dynamic>();
+                            var totalPoliticas = politicasModal.Count();
                         }
                         @if (totalPoliticas > 0)
                         {
@@ -291,78 +211,62 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    @{
-                        var politicasList = new List<dynamic>();
-                        var userModal = Context.User;
-                        var politicasJsonModal = userModal.FindFirstValue("PoliticasJson");
-                        
-                        if (!string.IsNullOrEmpty(politicasJsonModal))
-                        {
-                            try
-                            {
-                                var options = new System.Text.Json.JsonSerializerOptions 
-                                { 
-                                    PropertyNameCaseInsensitive = true 
-                                };
-                                politicasList = System.Text.Json.JsonSerializer.Deserialize<List<dynamic>>(politicasJsonModal, options) ?? new List<dynamic>();
-                            }
-                            catch
-                            {
-                                var claims = userModal.FindAll("Politica");
-                                foreach (var claim in claims)
-                                {
-                                    var parts = claim.Value.Split('|');
-                                    if (parts.Length == 2)
-                                    {
-                                        politicasList.Add(new { Nombre = parts[0], Ruta = parts[1] });
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            var claims = userModal.FindAll("Politica");
-                            foreach (var claim in claims)
-                            {
-                                var parts = claim.Value.Split('|');
-                                if (parts.Length == 2)
-                                {
-                                    politicasList.Add(new { Nombre = parts[0], Ruta = parts[1] });
-                                }
-                            }
-                        }
-                    }
-                    
-                    @if (politicasList.Any())
+                    @if (politicasModal.Any())
                     {
                         <div class="politicas-list">
                             <div class="row row-cols-1 row-cols-md-2 g-3">
-                                @foreach (var politica in politicasList)
+                                @foreach (dynamic politica in politicasModal)
                                 {
                                     <div class="col">
-                                        <div class="card h-100 politica-card border-start border-start-3 border-start-primary shadow-sm">
+                                        <div class="card h-100 politica-card border-start border-start-3
+                                                     @(politica.Tipo?.ToString() == "Header" ? "border-start-primary" :
+                                                       politica.Tipo?.ToString() == "Menu" ? "border-start-success" :
+                                                       "border-start-secondary") shadow-sm">
                                             <div class="card-body">
                                                 <div class="d-flex align-items-start mb-2">
                                                     <i class="fas fa-check-circle text-success mt-1 me-2"></i>
                                                     <div class="flex-grow-1">
-                                                        <h6 class="card-title fw-semibold mb-1 text-primary">
-                                                            @politica.Ruta
+                                                        <h6 class="card-title fw-semibold mb-1
+                                                                    @(politica.Tipo?.ToString() == "Header" ? "text-primary" :
+                                                                      politica.Tipo?.ToString() == "Menu" ? "text-success" :
+                                                                      "text-secondary")">
+                                                            @(politica.Nombre ?? "Sin nombre")
                                                         </h6>
                                                         <div class="d-flex justify-content-between align-items-center mb-2">
-                                                            <small class="text-muted">
-                                                                <i class="fas fa-route me-1"></i>
-                                                                <code class="text-dark">@politica.Ruta</code>
-                                                            </small>
+                                                            <div class="d-flex align-items-center">
+                                                                <span class="badge bg-secondary me-2">ID: @(politica.PoliticaId ?? "N/A")</span>
+                                                                <span class="badge
+                                                                            @(politica.Tipo?.ToString() == "Header" ? "bg-primary" :
+                                                                              politica.Tipo?.ToString() == "Menu" ? "bg-success" :
+                                                                              "bg-secondary") me-2">
+                                                                    @(politica.Tipo ?? "Sin tipo")
+                                                                </span>
+                                                            </div>
                                                             <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 badge-politica">
                                                                 Activo
                                                             </span>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="mt-2">
-                                                    <a href="/@politica.Ruta" class="btn btn-sm btn-outline-primary">
-                                                        <i class="fas fa-external-link-alt me-1"></i> Ir a esta sección
-                                                    </a>
+                                                <div class="mt-3">
+                                                    <small class="text-muted d-block">
+                                                        <i class="fas fa-code me-1"></i> Nombre interno:
+                                                        <code class="text-dark">@(politica.Nombre ?? "N/A")</code>
+                                                    </small>
+                                                    @if (!string.IsNullOrEmpty(politica.Ruta?.ToString()))
+                                                    {
+                                                        <small class="text-muted d-block mt-1">
+                                                            <i class="fas fa-link me-1"></i> Ruta:
+                                                            <code class="text-dark">@politica.Ruta</code>
+                                                        </small>
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(politica.Rol?.ToString()))
+                                                    {
+                                                        <small class="text-muted d-block mt-1">
+                                                            <i class="fas fa-user-tag me-1"></i> Rol:
+                                                            <span class="text-dark">@politica.Rol</span>
+                                                        </small>
+                                                    }
                                                 </div>
                                             </div>
                                         </div>
@@ -384,135 +288,138 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         <i class="fas fa-times me-1"></i> Cerrar
                     </button>
-                    @if (politicasList.Any())
-                    {
-                        <button type="button" class="btn btn-primary" onclick="imprimirPermisos()">
-                            <i class="fas fa-print me-1"></i> Imprimir
-                        </button>
-                    }
                 </div>
             </div>
         </div>
     </div>
 
-    <footer class="border-top py-3 bg-white mt-auto">
+    <footer class="border-top py-4 bg-white mt-auto">
         <div class="container d-flex justify-content-between align-items-center">
             <span class="text-muted">
                 © @DateTime.Now.Year Biblioteca Web - Todos los derechos reservados
             </span>
-            <a asp-controller="Home" asp-action="Privacy" class="text-decoration-none small">
-                <i class="fas fa-shield-alt me-1"></i> Privacidad
-            </a>
+            <div>
+                <a asp-controller="Home" asp-action="Privacy" class="text-decoration-none small me-3">
+                    <i class="fas fa-shield-alt me-1"></i> Privacidad
+                </a>
+                <a asp-controller="Home" asp-action="About" class="text-decoration-none small me-3">
+                    <i class="fas fa-info-circle me-1"></i> Acerca de
+                </a>
+                <a asp-controller="Home" asp-action="Contact" class="text-decoration-none small">
+                    <i class="fas fa-envelope me-1"></i> Contacto
+                </a>
+            </div>
         </div>
     </footer>
 
     <!-- Scripts -->
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/lib/fontawesome/js/all.min.js"></script>
-    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+
     <script>
-        // Activar el modal si hay parámetro en URL
         document.addEventListener('DOMContentLoaded', function() {
+            // Mostrar modal si hay parámetro en URL
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('showPermissions') === 'true') {
                 const modal = new bootstrap.Modal(document.getElementById('permisosModal'));
                 modal.show();
             }
-            
+
             // Marcar menú activo basado en la ruta actual
             const currentPath = window.location.pathname.toLowerCase();
-            document.querySelectorAll('.nav-link').forEach(link => {
+            
+            // Para enlaces del navbar
+            document.querySelectorAll('.navbar-nav .nav-link').forEach(link => {
                 const href = link.getAttribute('href')?.toLowerCase();
                 if (href && (currentPath === href || currentPath.startsWith(href + '/'))) {
                     link.classList.add('active', 'fw-bold');
                 }
             });
+
+            // Para dropdowns, marcar el padre si algún hijo está activo
+            document.querySelectorAll('.dropdown-toggle').forEach(dropdown => {
+                const dropdownMenu = dropdown.nextElementSibling;
+                if (dropdownMenu && dropdownMenu.classList.contains('dropdown-menu')) {
+                    const hasActiveChild = Array.from(dropdownMenu.querySelectorAll('a'))
+                        .some(link => {
+                            const href = link.getAttribute('href')?.toLowerCase();
+                            return href && (currentPath === href || currentPath.startsWith(href + '/'));
+                        });
+                    
+                    if (hasActiveChild) {
+                        dropdown.classList.add('active');
+                    }
+                }
+            });
         });
-        
-        function imprimirPermisos() {
-            const modalContent = document.querySelector('#permisosModal .modal-body').innerHTML;
-            const ventanaImpresion = window.open('', '_blank');
-            const fecha = new Date().toLocaleString('es-ES');
-            
-            ventanaImpresion.document.write(`
-                <!DOCTYPE html>
-                <html>
-                    <head>
-                        <title>Mis Políticas y Permisos - @User.Identity?.Name</title>
-                        <meta charset="utf-8">
-                        <style>
-                            body { 
-                                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-                                padding: 20px; 
-                                color: #333;
-                            }
-                            .header { 
-                                text-align: center; 
-                                margin-bottom: 30px; 
-                                border-bottom: 3px solid #0d6efd;
-                                padding-bottom: 20px;
-                            }
-                            .header h1 {
-                                color: #0d6efd;
-                                margin-bottom: 10px;
-                            }
-                            .politica-item { 
-                                margin-bottom: 20px; 
-                                padding: 15px; 
-                                border-left: 4px solid #0d6efd;
-                                background-color: #f8f9fa;
-                                border-radius: 4px;
-                            }
-                            .politica-nombre { 
-                                font-weight: bold; 
-                                color: #0d6efd; 
-                                font-size: 1.1em;
-                                margin-bottom: 8px;
-                            }
-                            .politica-ruta { 
-                                color: #666; 
-                                font-family: 'Courier New', monospace; 
-                                margin-top: 5px;
-                                background-color: white;
-                                padding: 5px 10px;
-                                border-radius: 3px;
-                                display: inline-block;
-                            }
-                            .fecha { 
-                                text-align: right; 
-                                color: #999; 
-                                font-size: 12px; 
-                                margin-top: 30px;
-                                border-top: 1px solid #ddd;
-                                padding-top: 10px;
-                            }
-                            @@media print {
-                                body { padding: 10px; }
-                                .politica-item { page-break-inside: avoid; }
-                            }
-                        </style>
-                    </head>
-                    <body>
-                        <div class="header">
-                            <h1><i class="fas fa-shield-alt"></i> Mis Políticas y Permisos</h1>
-                            <p><strong>Usuario:</strong> @User.Identity?.Name</p>
-                            <p><strong>Fecha de generación:</strong> ${fecha}</p>
-                        </div>
-                        ${modalContent.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')}
-                        <div class="fecha">
-                            Documento generado el ${fecha}
-                        </div>
-                    </body>
-                </html>
-            `);
-            ventanaImpresion.document.close();
-            setTimeout(() => {
-                ventanaImpresion.print();
-            }, 250);
-        }
     </script>
-    
+
+    <!-- Funciones de ayuda para el menú -->
+    @{
+        // Función para verificar si el menú está activo
+        string IsActiveMenu(string ruta)
+        {
+            if (string.IsNullOrEmpty(ruta)) return "";
+
+            // Si la ruta no comienza con "/", agregarlo para comparación
+            var rutaComparar = ruta;
+            if (!rutaComparar.StartsWith("/"))
+            {
+                rutaComparar = "/" + rutaComparar;
+            }
+
+            var currentPath = ViewContext.HttpContext.Request.Path.ToString().ToLower();
+            var rutaPath = rutaComparar.ToLower();
+
+            // Si la ruta es exactamente la actual
+            if (currentPath == rutaPath) return "active";
+
+            // Si la ruta es parte de la ruta actual (para subpáginas)
+            if (!string.IsNullOrEmpty(rutaPath) && currentPath.StartsWith(rutaPath + "/"))
+                return "active";
+
+            // Para enlaces del home
+            if (rutaPath == "/home/index" && currentPath == "/")
+                return "active";
+
+            return "";
+        }
+
+        // Función para obtener iconos basados en el nombre de la política
+        string GetPolicyIcon(string policyName)
+        {
+            if (string.IsNullOrEmpty(policyName)) return "fas fa-link";
+
+            var iconMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["Libros"] = "fas fa-book",
+                ["Prestamos"] = "fas fa-book-reader",
+                ["Préstamos"] = "fas fa-book-reader",
+                ["Morosidad"] = "fas fa-clock",
+                ["Perfil"] = "fas fa-user",
+                ["Usuario"] = "fas fa-users",
+                ["Configuración"] = "fas fa-cog",
+                ["Configuracion"] = "fas fa-cog",
+                ["Ayuda"] = "fas fa-question-circle",
+                ["Reportes"] = "fas fa-chart-bar",
+                ["Dashboard"] = "fas fa-tachometer-alt",
+                ["Administración"] = "fas fa-cogs",
+                ["Catalogos"] = "fas fa-book-open",
+                ["Categorias"] = "fas fa-tags",
+                ["Autores"] = "fas fa-pen-nib"
+            };
+
+            foreach (var kvp in iconMap)
+            {
+                if (policyName.Contains(kvp.Key, StringComparison.OrdinalIgnoreCase))
+                    return kvp.Value;
+            }
+
+            return "fas fa-link";
+        }
+    }
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

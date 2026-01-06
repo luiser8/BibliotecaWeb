@@ -1,0 +1,378 @@
+﻿@{
+    ViewData["Title"] = "Ayuda y Soporte";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <h1 class="display-4 fw-bold text-primary mb-4">
+                    <i class="fas fa-life-ring me-2"></i>@ViewData["Title"]
+                </h1>
+                <p class="lead text-muted mb-4">
+                    Encuentre respuestas a sus preguntas y aprenda a usar todas las funcionalidades del sistema.
+                </p>
+                <div class="input-group input-group-lg mb-4">
+                    <span class="input-group-text bg-primary text-white">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text" class="form-control" placeholder="¿En qué podemos ayudarle?">
+                    <button class="btn btn-primary" type="button">Buscar</button>
+                </div>
+            </div>
+
+            <!-- Categorías de ayuda -->
+            <div class="row mb-5">
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 border-0 shadow-sm text-center hover-card">
+                        <div class="card-body p-4">
+                            <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                                 style="width: 80px; height: 80px;">
+                                <i class="fas fa-user-circle fa-2x text-primary"></i>
+                            </div>
+                            <h5 class="card-title text-primary">Cuenta y Perfil</h5>
+                            <p class="card-text">
+                                Gestione su cuenta, actualice su perfil y configure preferencias.
+                            </p>
+                            <a href="#cuenta" class="btn btn-outline-primary btn-sm">
+                                Ver guías <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 border-0 shadow-sm text-center hover-card">
+                        <div class="card-body p-4">
+                            <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                                 style="width: 80px; height: 80px;">
+                                <i class="fas fa-book fa-2x text-success"></i>
+                            </div>
+                            <h5 class="card-title text-success">Préstamos y Reservas</h5>
+                            <p class="card-text">
+                                Aprenda a gestionar préstamos, renovaciones y reservas de libros.
+                            </p>
+                            <a href="#prestamos" class="btn btn-outline-success btn-sm">
+                                Ver guías <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 border-0 shadow-sm text-center hover-card">
+                        <div class="card-body p-4">
+                            <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                                 style="width: 80px; height: 80px;">
+                                <i class="fas fa-shield-alt fa-2x text-info"></i>
+                            </div>
+                            <h5 class="card-title text-info">Permisos y Acceso</h5>
+                            <p class="card-text">
+                                Entienda el sistema de políticas y cómo solicitar permisos especiales.
+                            </p>
+                            <a href="#permisos" class="btn btn-outline-info btn-sm">
+                                Ver guías <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Guías detalladas -->
+            <div class="mb-5">
+                <h2 class="text-primary mb-4" id="cuenta">
+                    <i class="fas fa-user-circle me-2"></i>Cuenta y Perfil
+                </h2>
+                <div class="accordion mb-4" id="accordionCuenta">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                <i class="fas fa-key me-2"></i>¿Cómo cambio mi contraseña?
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne">
+                            <div class="accordion-body">
+                                <ol>
+                                    <li>Haga clic en su nombre en la esquina superior derecha</li>
+                                    <li>Seleccione "Mi Perfil" en el menú desplegable</li>
+                                    <li>En la sección "Seguridad", haga clic en "Cambiar contraseña"</li>
+                                    <li>Ingrese su contraseña actual y la nueva contraseña</li>
+                                    <li>Confirme la nueva contraseña y haga clic en "Guardar"</li>
+                                </ol>
+                                <div class="alert alert-info mt-3">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Nota:</strong> La contraseña debe tener al menos 8 caracteres, incluyendo mayúsculas, minúsculas y números.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingTwo">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                <i class="fas fa-user-edit me-2"></i>¿Cómo actualizo mi información personal?
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo">
+                            <div class="accordion-body">
+                                <p>Para actualizar su información personal:</p>
+                                <ol>
+                                    <li>Acceda a "Mi Perfil" desde el menú de usuario</li>
+                                    <li>Haga clic en el botón "Editar Perfil"</li>
+                                    <li>Actualice los campos que desee modificar</li>
+                                    <li>Haga clic en "Guardar cambios"</li>
+                                </ol>
+                                <p class="mt-3">
+                                    <strong>Campos que puede actualizar:</strong>
+                                </p>
+                                <ul>
+                                    <li>Correo electrónico</li>
+                                    <li>Número de teléfono</li>
+                                    <li>Dirección</li>
+                                    <li>Foto de perfil</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="text-success mb-4 mt-5" id="prestamos">
+                    <i class="fas fa-book me-2"></i>Préstamos y Reservas
+                </h2>
+                <div class="accordion mb-4" id="accordionPrestamos">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingThree">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                                <i class="fas fa-sync-alt me-2"></i>¿Cómo renuevo un préstamo?
+                            </button>
+                        </h2>
+                        <div id="collapseThree" class="accordion-collapse collapse show" aria-labelledby="headingThree">
+                            <div class="accordion-body">
+                                <p>Puede renovar sus préstamos de dos formas:</p>
+
+                                <h6 class="mt-3">Opción 1: Desde "Mis Préstamos"</h6>
+                                <ol>
+                                    <li>Acceda a la sección "Mis Préstamos"</li>
+                                    <li>Busque el préstamo que desea renovar</li>
+                                    <li>Haga clic en el botón "Renovar"</li>
+                                    <li>Confirme la renovación</li>
+                                </ol>
+
+                                <h6 class="mt-3">Opción 2: Desde el Dashboard</h6>
+                                <ol>
+                                    <li>En el Dashboard principal, busque el widget "Mis Préstamos"</li>
+                                    <li>Haga clic en "Ver todos los préstamos"</li>
+                                    <li>Seleccione el préstamo a renovar</li>
+                                    <li>Haga clic en "Renovar"</li>
+                                </ol>
+
+                                <div class="alert alert-warning mt-3">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong>Importante:</strong> Cada préstamo puede renovarse máximo 2 veces, siempre que no haya reservas pendientes para ese libro.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingFour">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                <i class="fas fa-calendar-check me-2"></i>¿Cómo reservo un libro?
+                            </button>
+                        </h2>
+                        <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour">
+                            <div class="accordion-body">
+                                <p>Para reservar un libro que actualmente está prestado:</p>
+                                <ol>
+                                    <li>Busque el libro en el catálogo</li>
+                                    <li>Si el libro está prestado, verá el botón "Reservar"</li>
+                                    <li>Haga clic en "Reservar"</li>
+                                    <li>Seleccione la fecha máxima hasta la que desea esperar</li>
+                                    <li>Confirme la reserva</li>
+                                </ol>
+
+                                <div class="alert alert-info mt-3">
+                                    <i class="fas fa-bell me-2"></i>
+                                    <strong>Notificación:</strong> Recibirá una notificación por correo electrónico cuando el libro esté disponible.
+                                    Tiene 48 horas para recogerlo antes de que la reserva expire.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="text-info mb-4 mt-5" id="permisos">
+                    <i class="fas fa-shield-alt me-2"></i>Permisos y Acceso
+                </h2>
+                <div class="accordion mb-4" id="accordionPermisos">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingFive">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseFive" aria-expanded="true" aria-controls="collapseFive">
+                                <i class="fas fa-eye me-2"></i>¿Cómo veo mis permisos actuales?
+                            </button>
+                        </h2>
+                        <div id="collapseFive" class="accordion-collapse collapse show" aria-labelledby="headingFive">
+                            <div class="accordion-body">
+                                <p>Puede ver sus permisos actuales de dos formas:</p>
+
+                                <h6 class="mt-3">Opción 1: Desde el menú principal</h6>
+                                <ol>
+                                    <li>En la barra de navegación, haga clic en "Mis Políticas"</li>
+                                    <li>Se abrirá un modal con todas sus políticas activas</li>
+                                    <li>Puede ver el nombre y la ruta de cada política</li>
+                                </ol>
+
+                                <h6 class="mt-3">Opción 2: Desde su perfil</h6>
+                                <ol>
+                                    <li>Acceda a "Mi Perfil"</li>
+                                    <li>Haga clic en la pestaña "Permisos"</li>
+                                    <li>Verá una lista completa de sus políticas y permisos</li>
+                                </ol>
+
+                                <div class="alert alert-primary mt-3">
+                                    <i class="fas fa-lightbulb me-2"></i>
+                                    <strong>Consejo:</strong> Si no ve algunas funcionalidades que necesita, es posible que necesite permisos adicionales.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingSix">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+                                <i class="fas fa-user-plus me-2"></i>¿Cómo solicito permisos adicionales?
+                            </button>
+                        </h2>
+                        <div id="collapseSix" class="accordion-collapse collapse" aria-labelledby="headingSix">
+                            <div class="accordion-body">
+                                <p>Para solicitar permisos adicionales:</p>
+                                <ol>
+                                    <li>Acceda a la página de "Contacto"</li>
+                                    <li>Complete el formulario de contacto</li>
+                                    <li>Seleccione "Solicitud de permisos" en el campo "Asunto"</li>
+                                    <li>Describa qué permisos necesita y por qué</li>
+                                    <li>Envié el formulario</li>
+                                </ol>
+
+                                <div class="alert alert-success mt-3">
+                                    <i class="fas fa-clock me-2"></i>
+                                    <strong>Tiempo de respuesta:</strong> Las solicitudes de permisos son procesadas dentro de 3-5 días hábiles.
+                                    Recibirá una notificación por correo electrónico cuando su solicitud sea aprobada o rechazada.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contacto rápido -->
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-question-circle me-2"></i>¿No encontró lo que buscaba?
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h6 class="text-primary mb-3">Contáctenos directamente</h6>
+                            <p>
+                                Si no encontró respuesta a su pregunta en esta sección de ayuda,
+                                nuestro equipo de soporte está listo para asistirle.
+                            </p>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-envelope text-primary me-2"></i>
+                                    <strong>Correo:</strong> soporte@biblioteca.edu
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-phone text-primary me-2"></i>
+                                    <strong>Teléfono:</strong> (555) 123-4567
+                                </li>
+                                <li>
+                                    <i class="fas fa-clock text-primary me-2"></i>
+                                    <strong>Horario:</strong> Lunes a Viernes, 8:00 AM - 8:00 PM
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center p-4 mb-3">
+                                <i class="fas fa-headset fa-3x text-primary"></i>
+                            </div>
+                            <a asp-controller="Home" asp-action="Contact" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-1"></i> Ir a Contacto
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-card {
+        transition: transform 0.3s ease;
+    }
+
+        .hover-card:hover {
+            transform: translateY(-5px);
+        }
+
+    .accordion-button:not(.collapsed) {
+        background-color: rgba(13, 110, 253, 0.1);
+        color: #0d6efd;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Búsqueda en las preguntas frecuentes
+            const searchInput = document.querySelector('input[type="text"]');
+            const accordionItems = document.querySelectorAll('.accordion-item');
+
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase();
+
+                    accordionItems.forEach(item => {
+                        const question = item.querySelector('.accordion-button').textContent.toLowerCase();
+                        const answer = item.querySelector('.accordion-body').textContent.toLowerCase();
+
+                        if (question.includes(searchTerm) || answer.includes(searchTerm)) {
+                            item.style.display = 'block';
+                            // Expandir si coincide
+                            const button = item.querySelector('.accordion-button');
+                            if (!button.classList.contains('collapsed')) {
+                                button.click();
+                            }
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+            }
+
+            // Animar acordeones
+            const accordionButtons = document.querySelectorAll('.accordion-button');
+            accordionButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const icon = this.querySelector('i');
+                    if (this.classList.contains('collapsed')) {
+                        icon.style.transform = 'rotate(0deg)';
+                    } else {
+                        icon.style.transform = 'rotate(180deg)';
+                    }
+                });
+            });
+        });
+    </script>
+}

@@ -10,6 +10,7 @@ public class AuthResult
     public int UsuarioId { get; set; }
     public string Correo { get; set; } = string.Empty;
     public string NombreCompleto { get; set; } = string.Empty;
+    public int RolId { get; set; }
     public string Rol { get; set; } = string.Empty;
     public int TipoUsuarioId { get; set; }
     public List<Claim> Claims { get; set; } = [];

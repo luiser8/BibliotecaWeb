@@ -4,5 +4,5 @@ namespace Domain.Ports;
 
 public interface IPoliticasUsuarioRepository
 {
-    Task<List<PoliticasUsuario>> GetPoliticasAsync(int rolId);
+    Task<List<PoliticasUsuario>> GetPoliticasAsync(int rolId, string tipos);
 }

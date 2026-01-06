@@ -1,22 +1,143 @@
 // Controllers/BaseController.cs
-
 using Application.Interfaces;
-using Application.UseCases.Politicas;
 using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
+using System.Security.Claims;
 
 namespace Presentation.Controllers
 {
     public abstract class BaseController : Controller
     {
         private readonly AppSettings _appSettings;
-        private readonly IPoliticasUsuarioUseCase _politicasUsuarioUseCase;
 
-        protected BaseController(IOptions<AppSettings> appSettings, IPoliticasUsuarioUseCase politicasUsuarioUseCase)
+        // Propiedad para acceder a las políticas desde controladores hijos
+        protected List<PoliticasUsuario> PoliticasUsuario =>
+            ViewData["PoliticasUsuario"] as List<PoliticasUsuario> ?? new List<PoliticasUsuario>();
+
+        // Constructor que solo recibe AppSettings
+        protected BaseController(IOptions<AppSettings> appSettings)
         {
             _appSettings = appSettings?.Value;
-            _politicasUsuarioUseCase = politicasUsuarioUseCase;
+        }
+
+        /// <summary>
+        /// Se ejecuta antes de cada acción
+        /// </summary>
+        public override async Task OnActionExecutionAsync(
+            ActionExecutingContext context,
+            ActionExecutionDelegate next)
+        {
+            await CargarPoliticasUsuario();
+            await base.OnActionExecutionAsync(context, next);
+        }
+
+        /// <summary>
+        /// Carga las políticas del usuario actual
+        /// </summary>
+        private async Task CargarPoliticasUsuario()
+        {
+            try
+            {
+                if (User?.Identity?.IsAuthenticated != true)
+                {
+                    ViewData["PoliticasUsuario"] = new List<PoliticasUsuario>();
+                    return;
+                }
+
+                // Obtener el servicio de políticas dinámicamente
+                var politicasService = HttpContext.RequestServices
+                    .GetService<IPoliticasUsuarioUseCase>();
+
+                if (politicasService == null)
+                {
+                    ViewData["PoliticasUsuario"] = new List<PoliticasUsuario>();
+                    return;
+                }
+
+                var userId = GetCurrentUserId();
+                var userRole = User?.FindFirst(ClaimTypes.Role)?.Value;
+
+                if (userId.HasValue && !string.IsNullOrEmpty(userRole))
+                {
+                    var politicas = await politicasService.GetPoliticasAsync(4, "Header");
+
+                    ViewData["PoliticasUsuario"] = politicas;
+                    ViewBag.PoliticasUsuario = politicas;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log del error
+                Console.WriteLine($"Error cargando políticas: {ex.Message}");
+                ViewData["PoliticasUsuario"] = new List<PoliticasUsuario>();
+            }
+        }
+
+        /// <summary>
+        /// Verifica si el usuario tiene acceso a una ruta específica
+        /// </summary>
+        protected bool TieneAccesoRuta(string ruta)
+        {
+            if (string.IsNullOrEmpty(ruta))
+                return true;
+
+            return PoliticasUsuario.Any(p =>
+                !string.IsNullOrEmpty(p.Ruta) &&
+                p.Ruta.Equals(ruta, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
+        /// Verifica si el usuario tiene una política por nombre
+        /// </summary>
+        protected bool TienePolitica(string nombrePolitica)
+        {
+            return PoliticasUsuario.Any(p =>
+                !string.IsNullOrEmpty(p.Nombre) &&
+                p.Nombre.Equals(nombrePolitica, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
+        /// Verifica si el usuario tiene alguna de las políticas especificadas
+        /// </summary>
+        protected bool TieneAlgunaPolitica(params string[] nombresPoliticas)
+        {
+            return PoliticasUsuario.Any(p =>
+                !string.IsNullOrEmpty(p.Nombre) &&
+                nombresPoliticas.Contains(p.Nombre, StringComparer.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
+        /// Filtra una lista de items de navegación según las políticas del usuario
+        /// </summary>
+        protected List<NavbarItem> FiltrarNavbarPorPoliticas(List<NavbarItem> navbarItems)
+        {
+            if (navbarItems == null || !navbarItems.Any())
+                return new List<NavbarItem>();
+
+            return navbarItems.Where(item =>
+            {
+                // Si no requiere política específica, mostrar siempre
+                if (string.IsNullOrEmpty(item.RequiredPolicy))
+                    return true;
+
+                // Verificar si el usuario tiene la política requerida
+                return TienePolitica(item.RequiredPolicy) ||
+                       TieneAccesoRuta($"/{item.Controller}/{item.Action}");
+            }).ToList();
+        }
+
+        /// <summary>
+        /// Obtiene las rutas permitidas para el usuario actual
+        /// </summary>
+        protected List<string> ObtenerRutasPermitidas()
+        {
+            return PoliticasUsuario
+                .Where(p => !string.IsNullOrEmpty(p.Ruta))
+                .Select(p => p.Ruta)
+                .Distinct()
+                .ToList();
         }
 
         /// <summary>
@@ -26,7 +147,6 @@ namespace Presentation.Controllers
         {
             if (_appSettings == null)
             {
-                // Valores por defecto si no hay configuración
                 SetDefaultViewData();
                 return;
             }
@@ -42,9 +162,9 @@ namespace Presentation.Controllers
             ViewData["SupportPhone"] = _appSettings.SupportPhone;
             ViewData["LibraryHours"] = _appSettings.LibraryHours;
 
-            // Items de navegación
-            ViewData["NavbarItems"] = _appSettings.NavbarItems;
-            ViewData["AdminNavbarItems"] = _appSettings.AdminNavbarItems;
+            // Items de navegación filtrados por políticas
+            ViewData["NavbarItems"] = FiltrarNavbarPorPoliticas(_appSettings.NavbarItems);
+            ViewData["AdminNavbarItems"] = FiltrarNavbarPorPoliticas(_appSettings.AdminNavbarItems);
             ViewData["QuickLinks"] = _appSettings.QuickLinks;
         }
 
@@ -55,85 +175,17 @@ namespace Presentation.Controllers
         {
             ViewData["SiteTitle"] = "Sistema de Biblioteca";
             ViewData["LibraryName"] = "Biblioteca Universitaria";
-            ViewData["LibraryLogo"] = "/images/library-logo.png";
-            ViewData["LibraryLogoAlt"] = "Logo Biblioteca";
-            ViewData["LibrarySlogan"] = "Conocimiento al alcance de todos";
-            ViewData["FooterText"] = "© 2025 Biblioteca Universitaria - Todos los derechos reservados";
-            ViewData["SupportEmail"] = "biblioteca@universidad.edu";
-            ViewData["SupportPhone"] = "+1 (555) 123-4567";
-            ViewData["LibraryHours"] = "Lunes a Viernes: 8:00 AM - 8:00 PM | Sábados: 9:00 AM - 2:00 PM";
+            // ... resto de valores por defecto
 
-            // Items de navegación por defecto
-            ViewData["NavbarItems"] = new List<NavbarItem>
+            // Items de navegación por defecto filtrados
+            var defaultNavbar = new List<NavbarItem>
             {
                 new NavbarItem { Text = "Inicio", Controller = "Home", Action = "Index", Icon = "fas fa-home" },
                 new NavbarItem { Text = "Catálogo", Controller = "Catalogo", Action = "Index", Icon = "fas fa-book" },
-                new NavbarItem { Text = "Mis Préstamos", Controller = "Prestamos", Action = "Index", Icon = "fas fa-book-reader" }
+                new NavbarItem { Text = "Mis Préstamos", Controller = "Prestamos", Action = "Index", Icon = "fas fa-book-reader", RequiredPolicy = "VerPrestamos" }
             };
 
-            ViewData["AdminNavbarItems"] = new List<NavbarItem>
-            {
-                new NavbarItem { Text = "Dashboard", Controller = "Admin", Action = "Dashboard", Icon = "fas fa-chart-line" },
-                new NavbarItem { Text = "Gestión Libros", Controller = "Admin", Action = "Libros", Icon = "fas fa-book-medical" }
-            };
-
-            ViewData["QuickLinks"] = new List<QuickLink>
-            {
-                new QuickLink { Text = "Reglamento", Url = "/reglamento", Icon = "fas fa-file-alt" },
-                new QuickLink { Text = "Recursos Digitales", Url = "/recursos", Icon = "fas fa-laptop" }
-            };
-        }
-
-        /// <summary>
-        /// Establece el breadcrumb para la vista actual
-        /// </summary>
-        protected void SetBreadcrumb(params (string Text, string Action, string Controller)[] items)
-        {
-            if (items == null || items.Length == 0) return;
-
-            var breadcrumbHtml = "";
-            for (int i = 0; i < items.Length; i++)
-            {
-                var item = items[i];
-                if (string.IsNullOrEmpty(item.Action))
-                {
-                    // Último item (activo)
-                    breadcrumbHtml += $@"<li class=""breadcrumb-item active"" aria-current=""page"">{item.Text}</li>";
-                }
-                else
-                {
-                    // Item con enlace
-                    breadcrumbHtml += $@"<li class=""breadcrumb-item""><a asp-controller=""{item.Controller}"" asp-action=""{item.Action}"">{item.Text}</a></li>";
-                }
-            }
-
-            ViewData["Breadcrumb"] = breadcrumbHtml;
-        }
-
-        /// <summary>
-        /// Redirige con mensaje de éxito
-        /// </summary>
-        protected IActionResult RedirectWithSuccess(string action, string controller, string message)
-        {
-            TempData["SuccessMessage"] = message;
-            return RedirectToAction(action, controller);
-        }
-
-        /// <summary>
-        /// Redirige con mensaje de error
-        /// </summary>
-        protected IActionResult RedirectWithError(string action, string controller, string message)
-        {
-            TempData["ErrorMessage"] = message;
-            return RedirectToAction(action, controller);
-        }
-
-        /// <summary>
-        /// Verifica si el usuario actual tiene un rol específico
-        /// </summary>
-        protected bool UserHasRole(string role)
-        {
-            return User?.IsInRole(role) ?? false;
+            ViewData["NavbarItems"] = FiltrarNavbarPorPoliticas(defaultNavbar);
         }
 
         /// <summary>
@@ -141,12 +193,29 @@ namespace Presentation.Controllers
         /// </summary>
         protected int? GetCurrentUserId()
         {
-            var userIdClaim = User?.FindFirst("UserId");
+            var userIdClaim = User?.FindFirst("UserId") ?? User?.FindFirst(ClaimTypes.NameIdentifier);
             if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
             {
                 return userId;
             }
             return null;
         }
+
+        /// <summary>
+        /// Redirige al usuario si no tiene acceso a la ruta actual
+        /// </summary>
+        protected IActionResult RedirigirSiNoTieneAcceso(string rutaRequerida = null)
+        {
+            var rutaActual = rutaRequerida ?? $"{ControllerContext.RouteData.Values["controller"]}/{ControllerContext.RouteData.Values["action"]}";
+
+            if (!TieneAccesoRuta(rutaActual))
+            {
+                TempData["ErrorMessage"] = "No tiene permisos para acceder a esta sección.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            return null;
+        }
+
     }
 }

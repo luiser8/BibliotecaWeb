@@ -1,12 +1,12 @@
 -- Insertar el usuario estudiante
 INSERT INTO Usuarios (ExtensionId, RolId, Correo, Contrasena) 
-VALUES (1, 4, 'estudiante.ejemplo@psm.edu.ve', 'hashed_password_123');
+VALUES (1, 1, 'admin@psm.edu.ve', 'hashed_password_123');
 
 -- Obtener el ID del usuario insertado (asumamos que es 1)
 
 -- Insertar datos personales del estudiante
 INSERT INTO DatosPersonales (UsuarioId, Cedula, Nombres, Apellidos, FechaNacimiento, Sexo)
-VALUES (3, '32432424', 'María Fernanda', 'González Pérez', '2000-05-15', 'Femenino');
+VALUES (2, '32432425', 'Admin', 'Admin', '2000-05-15', 'Masculino');
 
 -- Insertar datos académicos del estudiante (cursando Arquitectura)
 INSERT INTO DatosAcademicos (UsuarioId, CarreraId, TipoIngreso)

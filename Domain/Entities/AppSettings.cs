@@ -16,15 +16,17 @@ public class AppSettings
         public List<QuickLink> QuickLinks { get; set; }
 }
 
-    public class NavbarItem
-    {
-        public string Text { get; set; }
-        public string Controller { get; set; }
-        public string Action { get; set; }
-        public string Icon { get; set; }
-    }
+// En Domain.Entities o donde tengas NavbarItem
+public class NavbarItem
+{
+    public string Text { get; set; }
+    public string Controller { get; set; }
+    public string Action { get; set; }
+    public string Icon { get; set; }
+    public string RequiredPolicy { get; set; } // Nueva propiedad
+}
 
-    public class QuickLink
+public class QuickLink
     {
         public string Text { get; set; }
         public string Url { get; set; }
