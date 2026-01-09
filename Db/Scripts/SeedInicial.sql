@@ -93,12 +93,12 @@ INSERT INTO Politicas (Tipo, Nombre, Ruta) VALUES
 ('Header', 'Inicio', 'Home/Index'),
 
 -- Módulo Usuarios
-('Menu', 'Usuarios', 'Usuarios/Index'),
-('Boton', 'UsuariosCrear', 'Usuarios/Crear'),
-('Boton', 'UsuariosEditar', 'Usuarios/Editar'),
-('Boton', 'UsuariosEliminar', 'Usuarios/Eliminar'),
-('Boton', 'UsuariosConsultar', 'Usuarios/Consultar'),
-('Boton', 'UsuariosAsignarRoles', 'Usuarios/AsignarRoles'),
+('Menu', 'Usuarios', 'Usuario/Index'),
+('Boton', 'UsuariosCrear', 'Usuario/Crear'),
+('Boton', 'UsuariosEditar', 'Usuario/Editar'),
+('Boton', 'UsuariosEliminar', 'Usuario/Eliminar'),
+('Boton', 'UsuariosConsultar', 'Usuario/Consultar'),
+('Boton', 'UsuariosAsignarRoles', 'Usuario/AsignarRoles'),
 
 -- Módulo Catalogos de Libros para Estudiantes
 ('Header', 'Catalogos', 'Catalogos/Index'),

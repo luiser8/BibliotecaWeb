@@ -15,6 +15,18 @@ public class UsuarioController : Controller
         _authUseCase = authUseCase;
     }
 
+    [HttpGet]
+    public IActionResult Index()
+    {
+        return View();
+    }
+
+    [HttpGet]
+    public IActionResult AccesoDenegado()
+    {
+        return View();
+    }
+
     // GET: /Account/Login
     public IActionResult Login(string? returnUrl = null)
     {
@@ -77,6 +89,7 @@ public class UsuarioController : Controller
     public async Task<IActionResult> Logout()
     {
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        HttpContext.Session.Clear();
         TempData["SuccessMessage"] = "Sesión cerrada exitosamente";
         return RedirectToAction("Login", "Usuario");
     }

@@ -10,6 +10,7 @@ using Infrastructure.Repositories;
 using Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Presentation.Filters;
+using Presentation.Middleware;
 using Presentation.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,6 +22,16 @@ builder.Services.Configure<AppSettings>(
 // Agregar servicios de controladores con vistas
 builder.Services.AddControllersWithViews();
 
+// Agregar sesión (ESENCIAL para almacenar recursos)
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(60);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.Cookie.IsEssential = true;
+});
+
 // Agregar autenticación
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -28,34 +39,38 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.LoginPath = "/Usuario/Login";
         options.LogoutPath = "/Usuario/Logout";
         options.AccessDeniedPath = "/Usuario/AccesoDenegado";
+        options.SlidingExpiration = true;
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
     });
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 if (string.IsNullOrEmpty(connectionString))
 {
-    // Mensaje más descriptivo para debugging
     var availableConnections = builder.Configuration.GetSection("ConnectionStrings").GetChildren();
     var connectionNames = string.Join(", ", availableConnections.Select(c => c.Key));
-
     throw new InvalidOperationException(
         $"Connection string 'DefaultConnection' not found in configuration. " +
         $"Available connection strings: {connectionNames}"
     );
 }
 
-//builder.Services.AddControllersWithViews();
-
+// Configurar filtros
 builder.Services.AddScoped<CargarPoliticasFilter>();
+builder.Services.AddScoped<ValidarAccesoFilter>(); // Nuevo filtro
+
 builder.Services.AddControllersWithViews(options =>
 {
     options.Filters.Add<CargarPoliticasFilter>();
+    options.Filters.Add<ValidarAccesoFilter>(); // Filtro de validación global
 });
 
+// Registrar servicios de infraestructura
 builder.Services.AddScoped<IConnectionFactory>(provider => new ConnectionFactory(connectionString));
 builder.Services.AddScoped<IDataTableExecute, DataTableExecute>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 
+// Repositorios
 builder.Services.AddScoped<ICarreraRepository, CarreraRepository>();
 builder.Services.AddScoped<IExtensionRepository, ExtensionRepository>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
@@ -63,6 +78,7 @@ builder.Services.AddScoped<IDatosPersonalesRepository, DatosPersonalesRepository
 builder.Services.AddScoped<IDatosAcademicosRepository, DatosAcademicosRepository>();
 builder.Services.AddScoped<IPoliticasUsuarioRepository, PoliticasUsuarioRepository>();
 
+// Casos de uso
 builder.Services.AddScoped<IExtensionQueryUseCase, ExtensionQueryUseCase>();
 builder.Services.AddScoped<ICarrerasQueryUseCase, CarrerasUseCase>();
 builder.Services.AddScoped<IUsuarioQueryUseCase, UsuarioQueryUseCase>();
@@ -70,9 +86,11 @@ builder.Services.AddScoped<IUsuarioCommandUseCase, UsuarioCommandUseCase>();
 builder.Services.AddScoped<IPoliticasUsuarioUseCase, PoliticasUsuariosUseCase>();
 builder.Services.AddScoped<IAuthUseCase, AuthUseCase>();
 
-builder.Services.AddHttpContextAccessor();
+// **REMOVER esta línea - NO registrar middleware en DI**
+// builder.Services.AddScoped<AccesoMiddleware>(); // <- ELIMINAR ESTA LÍNEA
 
-// Servicios de presentación
+// Otros servicios
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ExceptionHandlerService>();
 
 var app = builder.Build();
@@ -81,15 +99,20 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseRouting();
 
+// IMPORTANTE: El orden correcto
+app.UseSession(); // <-- Agregar esto ANTES de Authentication
 app.UseAuthentication();
 app.UseAuthorization();
+
+// **Mantener esta línea - Usar el middleware directamente**
+app.UseMiddleware<AccesoMiddleware>();
 
 app.MapStaticAssets();
 

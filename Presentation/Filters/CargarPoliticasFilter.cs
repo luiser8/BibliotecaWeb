@@ -1,7 +1,8 @@
-﻿// Filters/CargarPoliticasFilter.cs
+﻿// Presentation/Filters/CargarPoliticasFilter.cs (modificado)
 using Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Presentation.Extensions;
 using System.Security.Claims;
 
 namespace Presentation.Filters
@@ -19,11 +20,14 @@ namespace Presentation.Filters
             ActionExecutingContext context,
             ActionExecutionDelegate next)
         {
+            var httpContext = context.HttpContext;
+            var session = httpContext.Session;
+
             // Obtener el controlador actual
             if (context.Controller is Controller controller)
             {
                 // Verificar si el usuario está autenticado
-                if (controller.User?.Identity?.IsAuthenticated ?? false)
+                if (controller.User?.Identity?.IsAuthenticated == true)
                 {
                     try
                     {
@@ -52,10 +56,20 @@ namespace Presentation.Filters
                                 PoliticaId = p.PoliticaId,
                                 Nombre = p.Nombre,
                                 Tipo = p.Tipo,
-                                Ruta = p.Ruta,
+                                Ruta = p.Ruta?.ToLower(), // Normalizar a minúsculas
                                 Rol = rolNombre
                             })
                             .ToList();
+
+                        // Extraer solo las rutas para validación
+                        var rutasPermitidas = politicasBasicas
+                            .Select(p => p.Ruta?.ToLower())
+                            .Where(r => !string.IsNullOrEmpty(r))
+                            .ToList();
+
+                        // Guardar en sesión para validación de acceso
+                        session.SetStringList("RutasPermitidas", rutasPermitidas);
+                        session.SetObject("PoliticasCompletas", politicasBasicas);
 
                         // Pasar a ViewData y ViewBag
                         controller.ViewData["PoliticasBasicas"] = politicasBasicas;
@@ -64,15 +78,17 @@ namespace Presentation.Filters
                     catch (Exception ex)
                     {
                         // Loggear error pero continuar
-                        Console.WriteLine($"Error cargando políticas: {ex.Message}");
+                        var logger = httpContext.RequestServices.GetService<ILogger<CargarPoliticasFilter>>();
+                        logger?.LogError(ex, "Error cargando políticas");
                         controller.ViewData["PoliticasBasicas"] = new List<dynamic>();
                     }
                 }
                 else
                 {
-                    // Usuario no autenticado
+                    // Usuario no autenticado - limpiar sesión
+                    session.Remove("RutasPermitidas");
+                    session.Remove("PoliticasCompletas");
                     controller.ViewData["PoliticasBasicas"] = new List<dynamic>();
-                    controller.ViewBag.PoliticasBasicas = new List<dynamic>();
                 }
             }
 
