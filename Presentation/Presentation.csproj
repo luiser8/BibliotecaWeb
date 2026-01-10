@@ -5,7 +5,9 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
-
+    <PropertyGroup>
+        <InvariantGlobalization>false</InvariantGlobalization>
+    </PropertyGroup>
     <ItemGroup>
       <Compile Remove="Pages\**" />
       <Content Remove="Pages\**" />
