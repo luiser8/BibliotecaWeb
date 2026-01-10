@@ -54,7 +54,10 @@ namespace Presentation.Filters
                     "usuario/accesodenegado",
                     "usuario/error",
                     "home/index",
-                    "home/error"
+                    "home/error",
+                    "home/privacy",
+                    "home/about",
+                    "home/contact"
                 };
 
                 // Verificar acceso

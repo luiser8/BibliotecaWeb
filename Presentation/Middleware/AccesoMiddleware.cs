@@ -34,6 +34,9 @@ namespace Presentation.Middleware
                 "/usuario/accesodenegado",
                 "/home/index",
                 "/home/error",
+                "home/privacy",
+                "home/about",
+                "home/contact",
                 "/error"
             };
 
