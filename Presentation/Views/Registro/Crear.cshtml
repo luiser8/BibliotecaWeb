@@ -47,15 +47,15 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="Correo" class="font-weight-bold required">Correo Electrónico:</label>
+                                    <label for="Correo" class="font-weight-bold required">Correo Institucional:</label>
                                     <input type="email" 
                                            id="Correo" 
                                            name="Correo" 
                                            class="form-control" 
                                            required
                                            pattern="[a-zA-Z0-9._%+-]+[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-                                           title="Por favor ingresa un correo electrónico válido (ejemplo: usuario@dominio.com)"
-                                           placeholder="ejemplo@dominio.com">
+                                           title="Por favor ingresa un correo electrónico válido (ejemplo: usuario@psm.edu.ve)"
+                                           placeholder="ejemplo@psm.edu.ve">
                                     <small class="form-text text-muted">Será usado para iniciar sesión</small>
                                     <div class="invalid-feedback">
                                         Por favor ingresa un correo electrónico válido.
@@ -195,6 +195,19 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="Sexo" class="font-weight-bold required">Sexo:</label>
+                                    <select id="Sexo" name="DatosPersonales.Sexo" class="form-control" required>
+                                        <option value="">-- Selecciona sexo --</option>
+                                        <option value="Masculino">Masculino</option>
+                                        <option value="Femenino">Femenino</option>
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Por favor selecciona un sexo.
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="row">
@@ -213,36 +226,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="Sexo" class="font-weight-bold required">Sexo:</label>
-                                    <select id="Sexo" name="DatosPersonales.Sexo" class="form-control" required>
-                                        <option value="">-- Selecciona sexo --</option>
-                                        <option value="Masculino">Masculino</option>
-                                        <option value="Femenino">Femenino</option>
-                                    </select>
-                                    <div class="invalid-feedback">
-                                        Por favor selecciona un sexo.
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- SECCIÓN 4: DATOS ACADÉMICOS -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header bg-dark text-white">
-                        <h5 class="card-title mb-0">
-                            <i class="fas fa-book"></i> Datos Académicos
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="TipoIngreso" class="font-weight-bold required">Tipo de Ingreso:</label>
@@ -266,7 +250,7 @@
         <div class="row mb-4">
             <div class="col-12">
                 <div class="d-flex justify-content-between">
-                    <a href="@Url.Action("Index")" class="btn btn-secondary">
+                    <a href="/" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i> Cancelar
                     </a>
                     <button type="submit" class="btn btn-success">

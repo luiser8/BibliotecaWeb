@@ -24,29 +24,55 @@ namespace Presentation.Middleware
                 return;
             }
 
-            // Rutas que siempre están permitidas (inicio, login, logout, error)
+            // Rutas públicas que SIEMPRE están permitidas (incluso sin sesión)
             var path = context.Request.Path.Value?.ToLower();
-            var rutasPermitidas = new[]
+            var rutasPublicas = new[]
             {
-                "/",
-                "/usuario/login",
-                "/usuario/logout",
-                "/usuario/accesodenegado",
-                "/home/index",
-                "/home/error",
-                "home/privacy",
-                "home/about",
-                "home/contact",
-                "/error"
+                "/",                          // Raíz
+                "/usuario/login",             // Login
+                "/usuario/logout",            // Logout
+                "/registro/crear",            // Registro de usuario
+                "/usuario/recuperacion",      // Recuperación de contraseña
+                "/usuario/accesodenegado",    // Página de acceso denegado
+                "/home/error",                // Página de error
+                "/error",                     // Error genérico
+                "/home/privacy",
+                "/home/about",
+                "/home/contact",
             };
 
-            if (rutasPermitidas.Any(r => path?.StartsWith(r) == true))
+            // Verificar si la ruta actual es pública
+            bool esRutaPublica = false;
+            if (!string.IsNullOrEmpty(path))
+            {
+                foreach (var rutaPublica in rutasPublicas)
+                {
+                    if (path == rutaPublica ||
+                        path.StartsWith(rutaPublica + "/") || // Para rutas con parámetros
+                        (rutaPublica == "/" && path == "/"))
+                    {
+                        esRutaPublica = true;
+                        break;
+                    }
+                }
+            }
+
+            // Si es ruta pública, permitir acceso
+            if (esRutaPublica)
             {
                 await _next(context);
                 return;
             }
 
-            // Verificar autenticación
+            // Si NO es ruta pública, VERIFICAR SI HAY SESIÓN ACTIVA
+            if (!TieneSesionActiva(context))
+            {
+                // Redirigir al login si no hay sesión
+                context.Response.Redirect("/Usuario/Login");
+                return;
+            }
+
+            // Si tiene sesión, aplicar la lógica original de permisos
             if (context.User?.Identity?.IsAuthenticated == true)
             {
                 var session = context.Session;
@@ -78,6 +104,26 @@ namespace Presentation.Middleware
             }
 
             await _next(context);
+        }
+
+        private bool TieneSesionActiva(HttpContext context)
+        {
+            // Verificar autenticación por cookies (Identity)
+            if (context.User?.Identity?.IsAuthenticated == true)
+            {
+                return true;
+            }
+
+            // Verificar sesión personalizada
+            var session = context.Session;
+            var userId = session.GetString("UserId");
+            var userName = session.GetString("UserName");
+            var isLoggedIn = session.GetString("IsLoggedIn");
+
+            // Si tiene datos de sesión, está autenticado
+            return (!string.IsNullOrEmpty(userId) &&
+                    !string.IsNullOrEmpty(userName) &&
+                    isLoggedIn == "true");
         }
 
         private string GetMvcRoute(string path)
