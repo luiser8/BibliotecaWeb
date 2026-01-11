@@ -9,11 +9,11 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Index()
     {
-        // El filter CargarPoliticasFilter ya cargó ViewData["PoliticasBasicas"]
-        // automáticamente antes de llegar aquí
+        // El filter CargarPoliticasFilter ya cargï¿½ ViewData["PoliticasBasicas"]
+        // automï¿½ticamente antes de llegar aquï¿½
 
-        // Solo carga otros datos específicos de la página de inicio
-        //SetViewDataFromSettings(); // Si tienes este método
+        // Solo carga otros datos especï¿½ficos de la pï¿½gina de inicio
+        //SetViewDataFromSettings(); // Si tienes este mï¿½todo
 
         // Obtener datos del usuario para personalizar la vista
         var nombreUsuario = User?.FindFirstValue("NombreCompleto")
@@ -24,7 +24,7 @@ public class HomeController : Controller
                        ?? User?.FindFirst(ClaimTypes.Role)?.Value
                        ?? "Usuario";
 
-        // Puedes acceder a las políticas ya cargadas por el filter
+        // Puedes acceder a las polï¿½ticas ya cargadas por el filter
         var politicasBasicas = ViewData["PoliticasBasicas"] as IEnumerable<dynamic>
                               ?? Enumerable.Empty<dynamic>();
 
@@ -84,7 +84,7 @@ public class HomeController : Controller
             ViewData["RutaIntentada"] = rutaIntentada;
         }
 
-        // Si es administrador, mostrar más detalles
+        // Si es administrador, mostrar mï¿½s detalles
         if (User.IsInRole("Administrador"))
         {
             ViewData["PoliticasUsuario"] = ViewData["PoliticasUsuario"] as List<PoliticasUsuario> ?? new List<PoliticasUsuario>();
@@ -95,8 +95,15 @@ public class HomeController : Controller
     }
 
     [HttpGet]
-    public IActionResult Dashboard()
+    public IActionResult Error()
     {
+        var statusCode = HttpContext.Response.StatusCode;
+        ViewBag.StatusCode = statusCode;
+
+        ViewBag.ErrorMessage = statusCode == 404
+            ? "La pÃ¡gina que buscas no existe o fue escrita incorrectamente."
+            : "OcurriÃ³ un error inesperado.";
+
         return View();
     }
 }

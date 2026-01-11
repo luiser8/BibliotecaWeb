@@ -66,7 +66,7 @@ builder.Services.AddControllersWithViews(options =>
 });
 
 // Registrar servicios de infraestructura
-builder.Services.AddScoped<IConnectionFactory>(provider => new ConnectionFactory(connectionString));
+builder.Services.AddScoped<IConnectionFactory>(_ => new ConnectionFactory(connectionString));
 builder.Services.AddScoped<IDataTableExecute, DataTableExecute>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 
@@ -102,6 +102,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.UseStatusCodePagesWithReExecute("/Home/Error", "?statusCode={0}");
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
@@ -111,8 +112,8 @@ app.UseSession(); // <-- Agregar esto ANTES de Authentication
 app.UseAuthentication();
 app.UseAuthorization();
 
-// **Mantener esta línea - Usar el middleware directamente**
 app.UseMiddleware<AccesoMiddleware>();
+app.UseMiddleware<RutaInvalidaMiddleware>();
 
 app.MapStaticAssets();
 
@@ -121,4 +122,17 @@ app.MapControllerRoute(
         pattern: "{controller=Usuario}/{action=Login}/{id?}")
     .WithStaticAssets();
 
-app.Run();
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Usuario}/{action=Login}/{id?}",
+    constraints: new { id = @"\d*" }
+).WithStaticAssets();
+
+app.MapControllerRoute(
+    name: "catchall",
+    pattern: "{*url}",
+    defaults: new { controller = "Home", action = "Error" }
+);
+
+app.MapFallbackToController("Error", "Home");
+await app.RunAsync();
