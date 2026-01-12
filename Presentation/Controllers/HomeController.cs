@@ -9,12 +9,6 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Index()
     {
-        // El filter CargarPoliticasFilter ya carg� ViewData["PoliticasBasicas"]
-        // autom�ticamente antes de llegar aqu�
-
-        // Solo carga otros datos espec�ficos de la p�gina de inicio
-        //SetViewDataFromSettings(); // Si tienes este m�todo
-
         // Obtener datos del usuario para personalizar la vista
         var nombreUsuario = User?.FindFirstValue("NombreCompleto")
                           ?? User?.Identity?.Name
@@ -46,35 +40,26 @@ public class HomeController : Controller
 
     public IActionResult Privacy()
     {
-        //SetViewDataFromSettings();
         return View();
     }
 
     public IActionResult Contact()
     {
-        //SetViewDataFromSettings();
-
-        //ViewData["PuedeContactarSoporte"] = TienePolitica("ContactarSoporte");
-        //ViewData["PuedeContactarAdministrador"] = TienePolitica("ContactarAdministrador");
-
         return View();
     }
 
     public IActionResult About()
     {
-       // SetViewDataFromSettings();
         return View();
     }
 
     public IActionResult Help()
     {
-        //SetViewDataFromSettings();
         return View();
     }
 
     public IActionResult AccesoDenegado()
     {
-        //SetViewDataFromSettings();
         ViewData["Title"] = "Acceso Denegado";
 
         // Obtener la ruta que intentaba acceder
@@ -88,7 +73,6 @@ public class HomeController : Controller
         if (User.IsInRole("Administrador"))
         {
             ViewData["PoliticasUsuario"] = ViewData["PoliticasUsuario"] as List<PoliticasUsuario> ?? new List<PoliticasUsuario>();
-           // ViewData["RutasPermitidas"] = ObtenerRutasPermitidas();
         }
 
         return View();

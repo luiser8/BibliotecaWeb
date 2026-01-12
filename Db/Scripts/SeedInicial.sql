@@ -179,7 +179,7 @@ DECLARE @ProfesorId INT = (SELECT Id FROM Roles WHERE Nombre = 'Profesor');
 DECLARE @EstudianteId INT = (SELECT Id FROM Roles WHERE Nombre = 'Estudiante');
 
 -- 2. Obtener IDs de políticas (ASEGÚRATE DE QUE EXISTAN)
-DECLARE @HomeIndex INT = (SELECT Id FROM Politicas WHERE Nombre = 'Home');
+DECLARE @HomeIndex INT = (SELECT Id FROM Politicas WHERE Nombre = 'Inicio');
 DECLARE @CatalogosIndex INT = (SELECT Id FROM Politicas WHERE Nombre = 'Catalogos');
 DECLARE @LibrosIndex INT = (SELECT Id FROM Politicas WHERE Nombre = 'Libros');
 DECLARE @LibrosConsultar INT = (SELECT Id FROM Politicas WHERE Nombre = 'LibrosConsultar');
@@ -271,7 +271,7 @@ INSERT INTO RolPoliticas (RolId, PoliticaId) VALUES
 (@ProfesorId, @PerfilConsultar),
 (@ProfesorId, @PerfilEditar);
 
--- 8. ESTUDIANTE: Igual que profesor
+-- 8. ESTUDIANTE
 INSERT INTO RolPoliticas (RolId, PoliticaId) VALUES
 (@EstudianteId, @HomeIndex),
 (@EstudianteId, @CatalogosIndex),
