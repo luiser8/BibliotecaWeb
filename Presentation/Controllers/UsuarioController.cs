@@ -93,10 +93,4 @@ public class UsuarioController : Controller
         TempData["SuccessMessage"] = "Sesión cerrada exitosamente";
         return RedirectToAction("Login", "Usuario");
     }
-
-    // GET: /Account/AccessDenied
-    public IActionResult AccessDenied()
-    {
-        return View();
-    }
 }

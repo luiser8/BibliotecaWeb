@@ -3,11 +3,11 @@ using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
+namespace Presentation.Controllers;
+
 public class HomeController : Controller
 {
-    //private readonly AppSettings _appSettings;
-
-    public async Task<IActionResult> Index()
+    public IActionResult Index()
     {
         // Obtener datos del usuario para personalizar la vista
         var nombreUsuario = User?.FindFirstValue("NombreCompleto")
@@ -26,16 +26,7 @@ public class HomeController : Controller
         ViewData["RolUsuario"] = rolUsuario;
         ViewData["PoliticasCount"] = politicasBasicas.Count();
 
-        // Preparar datos para el dashboard (si es necesario)
-        var dashboard = new DashBoard
-        {
-            TotalBooks = 12500,
-            AvailableBooks = 8500,
-            ActiveLoans = 3200,
-            PendingReturns = 150
-        };
-
-        return View(dashboard);
+        return View();
     }
 
     public IActionResult Privacy()

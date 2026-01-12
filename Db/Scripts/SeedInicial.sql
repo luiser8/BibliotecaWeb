@@ -261,13 +261,13 @@ ORDER BY Id;
 -- 7. PROFESOR: Solo políticas específicas
 INSERT INTO RolPoliticas (RolId, PoliticaId) VALUES
 (@ProfesorId, @HomeIndex),
+(@ProfesorId, @CatalogosIndex),
 (@ProfesorId, @LibrosConsultar),
 (@ProfesorId, @LibrosPrestar),
 (@ProfesorId, @PrestamosCrear),
 (@ProfesorId, @PrestamosEditar),
 (@ProfesorId, @PrestamosCancelar),
 (@ProfesorId, @PrestamosConsultar),
-(@ProfesorId, @PrestamosReportes),
 (@ProfesorId, @PerfilConsultar),
 (@ProfesorId, @PerfilEditar);
 

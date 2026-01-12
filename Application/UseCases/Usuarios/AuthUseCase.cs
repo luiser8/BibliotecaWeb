@@ -100,25 +100,6 @@ public class AuthUseCase : IAuthUseCase
             new Claim(ClaimTypes.Email, usuario.Correo ?? "")
         };
 
-        // Agregar políticas
-        // if (usuario.Politicas != null && usuario.Politicas.Any())
-        // {
-        //     var jsonOptions = new JsonSerializerOptions
-        //     {
-        //         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        //         WriteIndented = false
-        //     };
-        //
-        //     var politicasJson = JsonSerializer.Serialize(usuario.Politicas, jsonOptions);
-        //     claims.Add(new Claim("PoliticasJson", politicasJson));
-        //
-        //     // Agregar individualmente
-        //     foreach (var p in usuario.Politicas)
-        //     {
-        //         claims.Add(new Claim("Politica", $"{p.Nombre}|{p.Ruta}"));
-        //     }
-        // }
-
         return claims;
     }
 

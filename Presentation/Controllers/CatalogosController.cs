@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace Presentation.Controllers
-{
+namespace Presentation.Controllers;
     public class CatalogosController : Controller
     {
         public IActionResult Index()
@@ -9,4 +8,3 @@ namespace Presentation.Controllers
             return View();
         }
     }
-}

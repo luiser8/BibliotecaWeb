@@ -10,12 +10,11 @@ public class PasswordHasher : IPasswordHasher
     
     public string HashSimplePasswordAsync(string password)
     {
-        using var sha = SHA256.Create();
         var passwordBytes = Encoding.UTF8.GetBytes(password);
-        var hash = sha.ComputeHash(passwordBytes);
+        var hash = SHA256.HashData(passwordBytes);
         return Convert.ToBase64String(hash);
     }
-    
+
     public string HashPasswordAsync(string? password)
     {
         var salt = new byte[SaltSize];
@@ -24,16 +23,12 @@ public class PasswordHasher : IPasswordHasher
             rng.GetBytes(salt);
         }
 
-        var passwordBytes = Encoding.UTF8.GetBytes(password);
+        var passwordBytes = Encoding.UTF8.GetBytes(password ?? throw new ArgumentNullException(nameof(password)));
         var saltedPassword = new byte[salt.Length + passwordBytes.Length];
         Buffer.BlockCopy(salt, 0, saltedPassword, 0, salt.Length);
         Buffer.BlockCopy(passwordBytes, 0, saltedPassword, salt.Length, passwordBytes.Length);
-
-        using (var sha = SHA256.Create())
-        {
-            var hash = sha.ComputeHash(saltedPassword);
-            return $"{Convert.ToBase64String(salt)}:{Convert.ToBase64String(hash)}";
-        }
+        var hash = SHA256.HashData(saltedPassword);
+        return $"{Convert.ToBase64String(salt)}:{Convert.ToBase64String(hash)}";
     }
 
     public bool VerifyPasswordAsync(string password, string hashedPassword)
@@ -48,9 +43,7 @@ public class PasswordHasher : IPasswordHasher
         var saltedPassword = new byte[salt.Length + passwordBytes.Length];
         Buffer.BlockCopy(salt, 0, saltedPassword, 0, salt.Length);
         Buffer.BlockCopy(passwordBytes, 0, saltedPassword, salt.Length, passwordBytes.Length);
-
-        using var sha = SHA256.Create();
-        var hashComputed = sha.ComputeHash(saltedPassword);
+        var hashComputed = SHA256.HashData(saltedPassword);
         return CryptographicOperations.FixedTimeEquals(hashStored, hashComputed);
     }
 }

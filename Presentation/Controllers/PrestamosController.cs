@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace Presentation.Controllers
-{
+namespace Presentation.Controllers;
     public class PrestamosController : Controller
     {
         public IActionResult Index()
@@ -14,4 +13,3 @@ namespace Presentation.Controllers
             return View();
         }
     }
-}
