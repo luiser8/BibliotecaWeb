@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using System.Text.Json;
 using Application.DTOs.Usuarios.Request;
 using Application.DTOs.Usuarios.Responses;
 using Application.Interfaces;
@@ -38,9 +37,6 @@ public class AuthUseCase : IAuthUseCase
             // Generar Claims basados en el usuario
             var claims = GenerateClaims(usuario);
 
-            // Determinar el rol basado en TipoUsuarioId
-            var rol = DetermineRole(usuario.RolId);
-            
             // Calcular fecha de expiración
             var expiresUtc = DateTimeOffset.UtcNow.AddHours(8);
 
@@ -50,7 +46,7 @@ public class AuthUseCase : IAuthUseCase
                 Correo = usuario.Correo ?? string.Empty,
                 NombreCompleto = usuario.Nombres + " " + usuario.Apellidos,
                 RolId = usuario.RolId,
-                Rol = rol,
+                Rol = usuario.Rol ?? string.Empty,
                 Claims = claims,
                 RememberMe = loginDto.RememberMe,
                 ExpiresUtc = expiresUtc
@@ -95,28 +91,14 @@ public class AuthUseCase : IAuthUseCase
             new Claim(ClaimTypes.Name, nombreCompleto), // También como ClaimTypes.Name
             new Claim("RolId", usuario.RolId.ToString()),
             new Claim("Rol", usuario.Rol ?? ""),
+            new Claim("ExtensionId", usuario.ExtensionId.ToString()),
             new Claim("Extension", usuario.Extension ?? ""),
+            new Claim("CarreraId", usuario.CarreraId.ToString()),
             new Claim("Carrera", usuario.Carrera ?? ""),
             new Claim(ClaimTypes.Email, usuario.Correo ?? "")
         };
 
         return claims;
-    }
-
-    /// <summary>
-    /// Determina el rol del usuario basado en su TipoUsuarioId
-    /// </summary>
-    private string DetermineRole(int rolId)
-    {
-        return rolId switch
-        {
-            1 => "Administrador",
-            2 => "Director",
-            3 => "Bibliotecario",
-            4 => "Estudiante",
-            5 => "Profesor",
-            _ => throw new ArgumentOutOfRangeException(nameof(rolId), rolId, null)
-        };
     }
 }
 

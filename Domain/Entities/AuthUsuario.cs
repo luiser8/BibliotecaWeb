@@ -10,6 +10,8 @@ public class AuthUsuario
     public string? Apellidos { get; set; }
     public int RolId { get; set; }
     public string? Rol { get; set; }
+    public int ExtensionId { get; set; }
     public string? Extension { get; set; }
+    public int CarreraId { get; set; }
     public string? Carrera { get; set; }
 }

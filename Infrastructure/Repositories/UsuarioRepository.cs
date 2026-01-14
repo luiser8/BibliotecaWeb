@@ -1,6 +1,5 @@
 using System.Data;
 using System.Collections;
-using System.Text.Json;
 using Domain.Commands;
 using Domain.Entities;
 using Domain.Ports;
@@ -243,15 +242,11 @@ namespace Infrastructure.Repositories;
                 Apellidos = row["Apellidos"]?.ToString() ?? string.Empty,
                 RolId = row["RolId"] != DBNull.Value ? Convert.ToInt32(row["RolId"]) : 0,
                 Rol = row["Rol"]?.ToString() ?? string.Empty,
+                ExtensionId = row["ExtensionId"] != DBNull.Value ? Convert.ToInt32(row["ExtensionId"]) : 0,
                 Extension = row["Extension"]?.ToString() ?? string.Empty,
+                CarreraId = row["CarreraId"] != DBNull.Value ? Convert.ToInt32(row["CarreraId"]) : 0,
                 Carrera = row["Carrera"]?.ToString() ?? string.Empty
             };
-            
-            // if (row.Table.Columns.Contains("Politicas") && row["Politicas"] != DBNull.Value)
-            // {
-            //     var politicasJson = row["Politicas"].ToString();
-            //     if (politicasJson != null) authUsuario.Politicas = DeserializarPoliticas(politicasJson);
-            // }
 
             return authUsuario;
         }
@@ -260,32 +255,6 @@ namespace Infrastructure.Repositories;
             _logger?.LogError(ex, "Error al mapear DataRow a AuthUsuario");
             throw new RepositoryException("MAPPING_ERROR", 
                 "Error al convertir los datos del auth usuario: " + ex.Message);
-        }
-    }
-
-    private List<PoliticasUsuario> DeserializarPoliticas(string politicasJson)
-    {
-        try
-        {
-            if (string.IsNullOrWhiteSpace(politicasJson))
-                return [];
-            
-            var jsonCorregido = politicasJson.Replace("\\/", "/");
-        
-            var options = new JsonSerializerOptions()
-            {
-                PropertyNameCaseInsensitive = true,
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-        
-            var politicas = JsonSerializer.Deserialize<List<PoliticasUsuario>>(jsonCorregido, options);
-        
-            return politicas ?? [];
-        }
-        catch (Exception ex)
-        {
-            _logger?.LogError(ex, "Error al deserializar políticas JSON: {Json}", politicasJson);
-            return [];
         }
     }
         

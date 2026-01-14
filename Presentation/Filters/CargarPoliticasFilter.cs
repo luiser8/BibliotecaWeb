@@ -43,6 +43,10 @@ namespace Presentation.Filters
                                       ?? user.FindFirstValue("Rol")
                                       ?? "Usuario";
 
+                        var extensionNombre = user.FindFirst("Extension")?.Value
+                                             ?? user.FindFirstValue("Extension")
+                                             ?? "Extension";
+
                         // Obtener todas las políticas del usuario (Header y Menu)
                         var policies = await _politicasUsuarioUseCase.GetPoliticasAsync(
                             Convert.ToInt16(rolIdClaim),
@@ -53,23 +57,27 @@ namespace Presentation.Filters
                         var politicasBasicas = policies
                             .Select(p => new
                             {
-                                PoliticaId = p.PoliticaId,
-                                Nombre = p.Nombre,
-                                Tipo = p.Tipo,
-                                Ruta = p.Ruta?.ToLower(), // Normalizar a minúsculas
-                                Rol = rolNombre
+                                p.PoliticaId,
+                                p.Nombre,
+                                p.Tipo,
+                                Ruta = p.Ruta?.ToLower(),
+                                Rol = rolNombre,
+                                //Extension = extensionNombre
                             })
                             .ToList();
 
                         // Extraer solo las rutas para validación
+                        // Reemplazar la asignación de rutasPermitidas para asegurar que sea List<string> y no List<string?>
                         var rutasPermitidas = politicasBasicas
                             .Select(p => p.Ruta?.ToLower())
                             .Where(r => !string.IsNullOrEmpty(r))
+                            .Cast<string>() // Asegura que la lista sea de tipo List<string>
                             .ToList();
 
                         // Guardar en sesión para validación de acceso
                         session.SetStringList("RutasPermitidas", rutasPermitidas);
                         session.SetObject("PoliticasCompletas", politicasBasicas);
+                        session.SetString("Extension", extensionNombre);
 
                         // Pasar a ViewData y ViewBag
                         controller.ViewData["PoliticasBasicas"] = politicasBasicas;
