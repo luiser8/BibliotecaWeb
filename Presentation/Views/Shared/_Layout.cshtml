@@ -66,7 +66,7 @@
                                     <li class="nav-item">
                                         <a class="nav-link @IsActiveMenu(politica.Ruta ?? "")"
                                            href="/@(politica.Ruta ?? "#")">
-                                            <i class="@GetPolicyIcon(politica.Nombre ?? "") me-1"></i>
+                                            <i class="@GetPolicyIcon(politica.Nombre ?? "")"></i>
                                             @(politica.Nombre ?? "Sin nombre")
                                         </a>
                                     </li>
@@ -130,7 +130,7 @@
                                     @* Opciones comunes del sistema *@
                                     <li>
                                         <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#permisosModal">
-                                            <i class="fas fa-key me-1"></i> Mis Permisos
+                                            <i class="fas fa-gears"></i> Mis Permisos
                                         </a>
                                     </li>
                                     <li><hr class="dropdown-divider" /></li>
@@ -406,19 +406,22 @@
             {
                 ["Libros"] = "fas fa-book",
                 ["Prestamos"] = "fas fa-book-reader",
-                ["Préstamos"] = "fas fa-book-reader",
+                ["Inicio"] = "fas fa-home",
                 ["Morosidad"] = "fas fa-clock",
+                ["Auditoria"] = "fas fa-eye",
                 ["Perfil"] = "fas fa-user",
                 ["Usuario"] = "fas fa-users",
                 ["Configuración"] = "fas fa-cog",
-                ["Configuracion"] = "fas fa-cog",
+                ["Mis Permisos"] = "fas fa-gears",
                 ["Ayuda"] = "fas fa-question-circle",
                 ["Reportes"] = "fas fa-chart-bar",
-                ["Dashboard"] = "fas fa-tachometer-alt",
+                ["Carreras"] = "fas fa-user-graduate",
                 ["Administración"] = "fas fa-cogs",
                 ["Catalogos"] = "fas fa-book-open",
-                ["Categorias"] = "fas fa-tags",
-                ["Autores"] = "fas fa-pen-nib"
+                ["Autores"] = "fas fa-pen-nib",
+                ["Roles"] = "fas fa-key",
+                ["Politicas"] = "fas fa-lock",
+                ["Extensiones"] = "fas fa-building-flag"
             };
 
             foreach (var kvp in iconMap)
