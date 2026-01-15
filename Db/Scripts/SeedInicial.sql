@@ -1,6 +1,6 @@
 --EXTENSIONES
 INSERT INTO Extensiones (Nombre, Descripcion, Estado, Ciudad, Direccion) VALUES
-('Sede principal Barcelona', 'PSM Barcelona', 'Anzoátegui', 'Barcelona', 'Dirección no especificada'),
+('Sede Barcelona', 'PSM Barcelona', 'Anzoátegui', 'Barcelona', 'Dirección no especificada'),
 ('Extensión Valencia', 'PSM Valencia', 'Carabobo', 'Valencia', 'Dirección no especificada'),
 ('Extensión Cabimas', 'PSM Cabimas', 'Zulia', 'Cabimas', 'Dirección no especificada'),
 ('Extensión Maracaibo', 'PSM Maracaibo', 'Zulia', 'Maracaibo', 'Dirección no especificada'),
@@ -78,6 +78,20 @@ INSERT INTO ExtensionCarreras (ExtensionId, CarreraId) VALUES
 INSERT INTO ExtensionCarreras (ExtensionId, CarreraId) VALUES
 (5, 12);
 
+--Tipos materiales
+INSERT INTO TiposMateriales (Tipo) VALUES
+('Físico'),
+('Digital');
+
+--Categoria materiales
+INSERT INTO CategoriaMateriales (Categoria) VALUES
+('Libro'),
+('Tesis'),
+('Informe de Pasantía'),
+('Servicio Comunitario'),
+('Revista'),
+('Proyecto de Investigación');
+
 --ROLES
 INSERT INTO Roles (Nombre) VALUES
 ('Administrador'),
@@ -104,14 +118,14 @@ INSERT INTO Politicas (Tipo, Nombre, Ruta) VALUES
 ('Header', 'Catalogos', 'Catalogos/Index'),
 ('Header', 'Mis prestamos', 'Prestamos/Usuario'),
 
--- Módulo Libros
-('Menu', 'Libros', 'Libros/Index'),
-('Boton', 'LibrosCrear', 'Libros/Crear'),
-('Boton', 'LibrosEditar', 'Libros/Editar'),
-('Boton', 'LibrosEliminar', 'Libros/Eliminar'),
-('Boton', 'LibrosConsultar', 'Libros/Consultar'),
-('Boton', 'LibrosPrestar', 'Libros/Prestar'),
-('Boton', 'LibrosDevolver', 'Libros/Devolver'),
+-- Módulo Materiales (Libros, Tesis, Informes de pasantia, Revistas, Servicio comunitario)
+('Menu', 'Materiales', 'Materiales/Index'),
+('Boton', 'MaterialesCrear', 'Materiales/Crear'),
+('Boton', 'MaterialesEditar', 'Materiales/Editar'),
+('Boton', 'MaterialesEliminar', 'Materiales/Eliminar'),
+('Boton', 'MaterialesConsultar', 'Materiales/Consultar'),
+('Boton', 'MaterialesPrestar', 'Materiales/Prestar'),
+('Boton', 'MaterialesDevolver', 'Materiales/Devolver'),
 
 -- Módulo Préstamos
 ('Menu', 'Prestamos', 'Prestamos/Index'),
@@ -181,13 +195,13 @@ DECLARE @EstudianteId INT = (SELECT Id FROM Roles WHERE Nombre = 'Estudiante');
 -- 2. Obtener IDs de políticas (ASEGÚRATE DE QUE EXISTAN)
 DECLARE @HomeIndex INT = (SELECT Id FROM Politicas WHERE Nombre = 'Inicio');
 DECLARE @CatalogosIndex INT = (SELECT Id FROM Politicas WHERE Nombre = 'Catalogos');
-DECLARE @LibrosIndex INT = (SELECT Id FROM Politicas WHERE Nombre = 'Libros');
-DECLARE @LibrosConsultar INT = (SELECT Id FROM Politicas WHERE Nombre = 'LibrosConsultar');
-DECLARE @LibrosPrestar INT = (SELECT Id FROM Politicas WHERE Nombre = 'LibrosPrestar');
-DECLARE @LibrosCrear INT = (SELECT Id FROM Politicas WHERE Nombre = 'LibrosCrear');
-DECLARE @LibrosEditar INT = (SELECT Id FROM Politicas WHERE Nombre = 'LibrosEditar');
-DECLARE @LibrosEliminar INT = (SELECT Id FROM Politicas WHERE Nombre = 'LibrosEliminar');
-DECLARE @LibrosDevolver INT = (SELECT Id FROM Politicas WHERE Nombre = 'LibrosDevolver');
+DECLARE @MaterialesIndex INT = (SELECT Id FROM Politicas WHERE Nombre = 'Materiales');
+DECLARE @MaterialesConsultar INT = (SELECT Id FROM Politicas WHERE Nombre = 'MaterialesConsultar');
+DECLARE @MaterialesPrestar INT = (SELECT Id FROM Politicas WHERE Nombre = 'MaterialesPrestar');
+DECLARE @MaterialesCrear INT = (SELECT Id FROM Politicas WHERE Nombre = 'MaterialesCrear');
+DECLARE @MaterialesEditar INT = (SELECT Id FROM Politicas WHERE Nombre = 'MaterialesEditar');
+DECLARE @MaterialesEliminar INT = (SELECT Id FROM Politicas WHERE Nombre = 'MaterialesEliminar');
+DECLARE @MaterialesDevolver INT = (SELECT Id FROM Politicas WHERE Nombre = 'MaterialesDevolver');
 
 DECLARE @MisPrestamosIndex INT = (SELECT Id FROM Politicas WHERE Nombre = 'Mis prestamos');
 DECLARE @PrestamosIndex INT = (SELECT Id FROM Politicas WHERE Nombre = 'Prestamos');
@@ -239,19 +253,17 @@ DELETE FROM RolPoliticas;
 INSERT INTO RolPoliticas (RolId, PoliticaId)
 SELECT @AdminId, Id FROM Politicas ORDER BY Id;
 
--- 5. DIRECTIVO: Todo menos auditoria, seguridad y roles
+-- 5. DIRECTIVO: Todo menos seguridad y roles
 INSERT INTO RolPoliticas (RolId, PoliticaId)
-SELECT @DirectivoId, Id FROM Politicas 
-WHERE Nombre NOT LIKE '%Auditoria%' 
-  AND Nombre NOT LIKE 'Roles%'
+SELECT @DirectivoId, Id FROM Politicas
+WHERE Nombre NOT LIKE 'Roles%'
   AND Ruta NOT LIKE 'Seguridad%'
 ORDER BY Id;
 
--- 6. BIBLIOTECARIO: Todo menos auditoria, seguridad, roles, políticas, extensiones, carreras, usuarios
+-- 6. BIBLIOTECARIO: Todo menos seguridad, roles, políticas, extensiones, carreras, usuarios
 INSERT INTO RolPoliticas (RolId, PoliticaId)
-SELECT @BibliotecarioId, Id FROM Politicas 
-WHERE Nombre NOT LIKE '%Auditoria%'
-  AND Nombre NOT LIKE 'Roles%'
+SELECT @BibliotecarioId, Id FROM Politicas
+WHERE Nombre NOT LIKE 'Roles%'
   AND Ruta NOT LIKE 'Seguridad%'
   AND Nombre NOT LIKE '%Extensiones%'
   AND Nombre NOT LIKE '%Carreras%'
@@ -262,12 +274,15 @@ ORDER BY Id;
 INSERT INTO RolPoliticas (RolId, PoliticaId) VALUES
 (@ProfesorId, @HomeIndex),
 (@ProfesorId, @CatalogosIndex),
-(@ProfesorId, @LibrosConsultar),
-(@ProfesorId, @LibrosPrestar),
+(@ProfesorId, @MaterialesConsultar),
+(@ProfesorId, @MaterialesPrestar),
+(@ProfesorId, @MaterialesDevolver),
+(@ProfesorId, @MisPrestamosIndex),
 (@ProfesorId, @PrestamosCrear),
 (@ProfesorId, @PrestamosEditar),
 (@ProfesorId, @PrestamosCancelar),
 (@ProfesorId, @PrestamosConsultar),
+(@ProfesorId, @PerfilIndex),
 (@ProfesorId, @PerfilConsultar),
 (@ProfesorId, @PerfilEditar);
 
@@ -275,8 +290,9 @@ INSERT INTO RolPoliticas (RolId, PoliticaId) VALUES
 INSERT INTO RolPoliticas (RolId, PoliticaId) VALUES
 (@EstudianteId, @HomeIndex),
 (@EstudianteId, @CatalogosIndex),
-(@EstudianteId, @LibrosConsultar),
-(@EstudianteId, @LibrosPrestar),
+(@EstudianteId, @MaterialesConsultar),
+(@EstudianteId, @MaterialesPrestar),
+(@EstudianteId, @MaterialesDevolver),
 (@EstudianteId, @MisPrestamosIndex),
 (@EstudianteId, @PrestamosCrear),
 (@EstudianteId, @PrestamosEditar),

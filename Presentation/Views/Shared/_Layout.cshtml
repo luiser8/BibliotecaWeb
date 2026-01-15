@@ -50,7 +50,7 @@
                         {
                                 // Obtener políticas de ViewData - manejo robusto
                                 IEnumerable<dynamic> politicasBasicas = ViewData["PoliticasBasicas"] as IEnumerable<dynamic>;
-                                
+
                                 // Si es null, crear lista vacía
                                 politicasBasicas ??= Enumerable.Empty<dynamic>();
 
@@ -404,7 +404,7 @@
 
             var iconMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             {
-                ["Libros"] = "fas fa-book",
+                ["Materiales"] = "fas fa-book",
                 ["Prestamos"] = "fas fa-book-reader",
                 ["Inicio"] = "fas fa-home",
                 ["Morosidad"] = "fas fa-clock",
