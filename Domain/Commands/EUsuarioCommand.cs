@@ -7,5 +7,6 @@ public enum EUsuarioCommand
     SPUsuarioGetByIdCommand,
     SPUsuarioGetAllCommand,
     SPUsuarioUpdateCommand,
-    SPUsuarioDeleteCommand
+    SPUsuarioDeleteCommand,
+    SPUsuarioUpdatePasswordCommand
 }

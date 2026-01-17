@@ -182,7 +182,7 @@ INSERT INTO Politicas (Tipo, Nombre, Ruta) VALUES
 -- Módulo Perfil
 ('Menu', 'Perfil', 'Perfil/Index'),
 ('Boton', 'PerfilConsultar', 'Perfil/Consultar'),
-('Boton', 'PerfilEditar', 'Perfil/Editar');
+('Boton', 'PerfilEditar', 'Perfil/CambiarContrasena');
 
 --ROL POLITICAS
 -- 1. Obtener IDs de roles

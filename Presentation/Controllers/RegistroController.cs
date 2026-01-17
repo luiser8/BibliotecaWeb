@@ -21,14 +21,14 @@ public class RegistroController : Controller
         _exceptionHandler = exceptionHandler;
     }
 
-    // GET: Mostrar formulario de creación
+    // GET: Mostrar formulario de creación de estudiante
     public async Task<IActionResult> Crear()
     {
         var response = await _extensionUseCase.ExecuteAllWithExtensionAsync();
         return View(response);
     }
 
-    // POST: Procesar el formulario
+    // POST: Procesar el formulario de estudiante
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Crear(UsuarioCreateDto usuario)
@@ -43,7 +43,7 @@ public class RegistroController : Controller
 
         if (result.Success)
         {
-            TempData["SuccessMessage"] = "Usuario creado exitosamente";
+            TempData["SuccessMessage"] = "Registro creado exitosamente";
             return RedirectToAction("Login", "Usuario");
         }
 
@@ -57,10 +57,10 @@ public class RegistroController : Controller
         }
         else
         {
-            ModelState.AddModelError("", result.ErrorMessage ?? "Error al crear usuario");
+            ModelState.AddModelError("", result.ErrorMessage ?? "Error al intentar registrarse");
         }
 
-        TempData["ErrorMessage"] = result.ErrorMessage ?? "Error al crear usuario";
+        TempData["ErrorMessage"] = result.ErrorMessage ?? "Error al intentar registrarse";
         
         var viewResponse = await _extensionUseCase.ExecuteAllWithExtensionAsync();
         return View(viewResponse);

@@ -1,6 +1,7 @@
 using Application.Interfaces;
 using Application.UseCases.Carreras;
 using Application.UseCases.Extension;
+using Application.UseCases.Perfil;
 using Application.UseCases.Politicas;
 using Application.UseCases.Usuarios;
 using Domain.Entities;
@@ -77,6 +78,7 @@ builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IDatosPersonalesRepository, DatosPersonalesRepository>();
 builder.Services.AddScoped<IDatosAcademicosRepository, DatosAcademicosRepository>();
 builder.Services.AddScoped<IPoliticasUsuarioRepository, PoliticasUsuarioRepository>();
+builder.Services.AddScoped<IUsuarioPerfilRepository, UsuarioPerfilRepository>();
 
 // Casos de uso
 builder.Services.AddScoped<IExtensionQueryUseCase, ExtensionQueryUseCase>();
@@ -84,6 +86,7 @@ builder.Services.AddScoped<ICarrerasQueryUseCase, CarrerasUseCase>();
 builder.Services.AddScoped<IUsuarioQueryUseCase, UsuarioQueryUseCase>();
 builder.Services.AddScoped<IUsuarioCommandUseCase, UsuarioCommandUseCase>();
 builder.Services.AddScoped<IPoliticasUsuarioUseCase, PoliticasUsuariosUseCase>();
+builder.Services.AddScoped<IUsuarioPerfilUseCase, UsuarioPerfilUseCase>();
 builder.Services.AddScoped<IAuthUseCase, AuthUseCase>();
 
 // **REMOVER esta línea - NO registrar middleware en DI**

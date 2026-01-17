@@ -50,7 +50,7 @@ namespace Presentation.Filters
                         // Obtener todas las políticas del usuario (Header y Menu)
                         var policies = await _politicasUsuarioUseCase.GetPoliticasAsync(
                             Convert.ToInt16(rolIdClaim),
-                            "Header,Menu"
+                            "Header,Menu,Boton"
                         );
 
                         // Preparar las políticas para la vista

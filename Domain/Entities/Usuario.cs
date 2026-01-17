@@ -17,4 +17,32 @@ public class Usuario
 
     public ICollection<Auditoria>? Auditorias { get; set; }
     public ICollection<Prestamo>? Prestamos { get; set; }
+
+    // Métodos de validación
+    public void ValidarId()
+    {
+        if (Id <= 0)
+            throw new ArgumentException("El Id debe ser mayor que 0", nameof(Id));
+    }
+
+    public void ValidarRolId()
+    {
+        if (RolId <= 0)
+            throw new ArgumentException("El RolId debe ser mayor que 0", nameof(RolId));
+    }
+
+    public void ValidarExtensionId()
+    {
+        if (ExtensionId.HasValue && ExtensionId <= 0)
+            throw new ArgumentException("El ExtensionId debe ser mayor que 0 si está presente", nameof(ExtensionId));
+    }
+
+    public void ValidarCorreo()
+    {
+        if (string.IsNullOrWhiteSpace(Correo))
+            throw new ArgumentException("El correo es requerido", nameof(Correo));
+
+        if (!Correo.Contains("@"))
+            throw new ArgumentException("El correo no tiene un formato válido", nameof(Correo));
+    }
 }

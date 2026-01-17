@@ -31,14 +31,14 @@ namespace Presentation.Middleware
                 "/",                          // Raíz
                 "/usuario/login",             // Login
                 "/usuario/logout",            // Logout
-                "/registro/crear",            // Registro de usuario
+                "/registro/crear",            // Registro de estudiante
                 "/usuario/recuperacion",      // Recuperación de contraseña
                 "/usuario/accesodenegado",    // Página de acceso denegado
                 "/home/error",                // Página de error
                 "/error",                     // Error genérico
                 "/home/privacy",
                 "/home/about",
-                "/home/contact",
+                "/home/contact"
             };
 
             // Verificar si la ruta actual es pública

@@ -84,7 +84,9 @@ public class AuthUseCase : IAuthUseCase
         var claims = new List<Claim>
         {
             new Claim("UsuarioId", usuario.UsuarioId.ToString()),
+            new Claim("Correo", usuario.Correo ?? ""),
             new Claim("Cedula", usuario.Cedula ?? ""),
+            new Claim("Contrasena", usuario.Contrasena ?? ""),
             new Claim("Nombres", usuario.Nombres ?? ""),
             new Claim("Apellidos", usuario.Apellidos ?? ""),
             new Claim("NombreCompleto", nombreCompleto), // Agregar nombre completo como claim
