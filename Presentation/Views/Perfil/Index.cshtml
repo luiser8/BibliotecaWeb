@@ -8,7 +8,7 @@
         <div class="col-md-8 col-lg-6">
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-4">
-                    <!-- Header con avatar e información -->
+                    <!-- Header con avatar e informaciï¿½n -->
                     <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
                         <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-3" style="width: 72px; height: 72px;">
                             <span class="fs-3 text-secondary fw-medium">
@@ -26,11 +26,11 @@
                     <div class="mb-4">
                         <div class="list-group list-group-flush">
                             <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-3 border-0">
-                                <span class="text-muted">Cédula</span>
+                                <span class="text-muted">Cï¿½dula</span>
                                 <span class="fw-medium">@ViewData["CedulaUsuario"]</span>
                             </div>
                             <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-3 border-0">
-                                <span class="text-muted">Extensión</span>
+                                <span class="text-muted">Extensiï¿½n</span>
                                 <span class="fw-medium">@ViewData["ExtensionUsuario"]</span>
                             </div>
                             <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-3 border-0">
@@ -40,14 +40,14 @@
                         </div>
                     </div>
 
-                    <!-- Botón para cambiar contraseña -->
+                    <!-- Botï¿½n para cambiar contraseï¿½a -->
                     <div class="pt-3 border-top">
                         <button type="button" class="btn btn-outline-dark w-100" data-bs-toggle="modal" data-bs-target="#passwordModal">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-2">
                                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                             </svg>
-                            Cambiar Contraseña
+                            Cambiar Contraseï¿½a
                         </button>
                     </div>
                 </div>
@@ -56,18 +56,18 @@
     </div>
 </div>
 
-<!-- Modal para cambiar contraseña -->
+<!-- Modal para cambiar contraseï¿½a -->
 <div class="modal fade" id="passwordModal" tabindex="-1" aria-labelledby="passwordModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header border-bottom">
-                <h5 class="modal-title" id="passwordModalLabel">Cambiar Contraseña</h5>
+                <h5 class="modal-title" id="passwordModalLabel">Cambiar Contraseï¿½a</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="passwordForm" method="post" asp-action="CambiarContrasena">
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="currentPassword" class="form-label">Contraseña Actual</label>
+                        <label for="currentPassword" class="form-label">Contraseï¿½a Actual</label>
                         <div class="input-group">
                             <input type="password"
                                    class="form-control"
@@ -84,7 +84,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="newPassword" class="form-label">Nueva Contraseña</label>
+                        <label for="newPassword" class="form-label">Nueva Contraseï¿½a</label>
                         <div class="input-group">
                             <input type="password"
                                    class="form-control"
@@ -99,11 +99,11 @@
                                 </svg>
                             </button>
                         </div>
-                        <div class="form-text">Mínimo 8 caracteres</div>
+                        <div class="form-text">Mï¿½nimo 8 caracteres</div>
                     </div>
 
                     <div class="mb-3">
-                        <label for="confirmPassword" class="form-label">Confirmar Nueva Contraseña</label>
+                        <label for="confirmPassword" class="form-label">Confirmar Nueva Contraseï¿½a</label>
                         <div class="input-group">
                             <input type="password"
                                    class="form-control"
@@ -120,7 +120,7 @@
                     </div>
 
                     <div id="passwordError" class="alert alert-danger d-none" role="alert">
-                        Las contraseñas no coinciden
+                        Las contraseï¿½as no coinciden
                     </div>
                 </div>
                 <div class="modal-footer border-top">

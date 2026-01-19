@@ -13,6 +13,10 @@ public class UsuarioCommandUseCase(IUsuarioRepository usuarioRepository, IDatosP
     {
         try
         {
+            var cedulaExists = await datosPersonalesRepository.ExistsByCedula(usuario.DatosPersonales.Cedula);
+            if (cedulaExists)
+                return OperationResult<int>.Error("Cedula duplicada, ya existe", "400");
+                
             var saveUsuario = await usuarioRepository.AddAsync(new Usuario
             {
                 ExtensionId =  usuario.ExtensionId,
@@ -24,20 +28,20 @@ public class UsuarioCommandUseCase(IUsuarioRepository usuarioRepository, IDatosP
             await datosPersonalesRepository.AddAsync(new DatosPersonales
             {
                 UsuarioId = saveUsuario,
-                Cedula = usuario.DatosPersonales.Cedula,
-                Nombres = usuario.DatosPersonales.Nombres,
-                Apellidos = usuario.DatosPersonales.Apellidos,
-                FechaNacimiento = usuario.DatosPersonales.FechaNacimiento,
-                Sexo = usuario.DatosPersonales.Sexo,
+                Cedula = usuario.DatosPersonales?.Cedula,
+                Nombres = usuario.DatosPersonales?.Nombres,
+                Apellidos = usuario.DatosPersonales?.Apellidos,
+                FechaNacimiento = usuario.DatosPersonales?.FechaNacimiento,
+                Sexo = usuario.DatosPersonales?.Sexo,
             });
-            
+
             if(usuario.DatosPersonales != null && usuario.RolId == 4)
             {
                 await datosAcademicosRepository.AddAsync(new DatosAcademicos
                 {
                     UsuarioId = saveUsuario,
                     CarreraId = usuario.DatosAcademicos.CarreraId,
-                    TipoIngreso =  usuario.DatosAcademicos.TipoIngreso,
+                    TipoIngreso =  usuario.DatosAcademicos?.TipoIngreso,
                 });
             }
             

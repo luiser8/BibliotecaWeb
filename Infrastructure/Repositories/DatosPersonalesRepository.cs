@@ -18,7 +18,24 @@ public class DatosPersonalesRepository : IDatosPersonalesRepository
         _dbCon = dataTableExecute ?? throw new ArgumentNullException(nameof(dataTableExecute));
         _params = [];
     }
-    
+
+    public async Task<bool> ExistsByCedula(string cedula)
+    {
+        try
+        {
+            _params.Clear();
+            _params.Add("@Cedula", cedula);
+            
+            _dt = await _dbCon.ExecuteAsync(nameof(EDatosPersonalesCommand.SPDatosPersonalesExistsCommand), _params);
+            return _dt.Rows.Count != 0;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
     public async Task<int> AddAsync(DatosPersonales datosPersonales)
     {
         try

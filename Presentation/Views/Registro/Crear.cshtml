@@ -17,7 +17,7 @@
     @if (!ViewData.ModelState.IsValid)
     {
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <h5 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>Errores de validación</h5>
+            @* <h5 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>Errores de validación</h5> *@
             <ul class="mb-0">
                 @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
                 {
@@ -27,6 +27,8 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
+
+    <!-- Quitar el bloque original que muestra todos los errores del ModelState -->
 
     <form id="usuarioForm" asp-action="Crear" method="post">
         @Html.AntiForgeryToken()
@@ -394,14 +396,7 @@
                     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
                 `;
                 
-                toast.innerHTML = `
-                    <div class="d-flex align-items-center">
-                        <i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'} me-2"></i>
-                        <span>${message}</span>
-                    </div>
-                `;
-                
-                toastContainer.appendChild(toast);
+                //toastContainer.appendChild(toast);
                 
                 // Auto-remover después de 3 segundos
                 setTimeout(() => {

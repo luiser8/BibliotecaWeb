@@ -1,0 +1,13 @@
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[SPDatosPersonalesExistsCommand]
+	@Cedula VARCHAR(155) = NULL
+AS
+SET NOCOUNT ON;
+BEGIN
+    DECLARE @SCOPEIDENTITY INT;
+        SELECT Id FROM dbo.DatosPersonales WHERE Cedula = @Cedula
+END
+GO
