@@ -14,4 +14,5 @@ public class AuthUsuario
     public string? Extension { get; set; }
     public int CarreraId { get; set; }
     public string? Carrera { get; set; }
+    public bool Activo { get; set; }
 }

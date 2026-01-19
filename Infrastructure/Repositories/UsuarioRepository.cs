@@ -106,7 +106,10 @@ namespace Infrastructure.Repositories;
         
                 if (string.IsNullOrEmpty(contrasenaAlmacenada))
                     throw new UnauthorizedAccessException("Credenciales inválidas");
-        
+
+                if (!usuario.Activo)
+                    throw new UnauthorizedAccessException("Usuario inactivo");
+
                 // 2. Verificar contraseña en código C#
                 bool esValida = false;
         
@@ -245,7 +248,8 @@ namespace Infrastructure.Repositories;
                 ExtensionId = row["ExtensionId"] != DBNull.Value ? Convert.ToInt32(row["ExtensionId"]) : 0,
                 Extension = row["Extension"]?.ToString() ?? string.Empty,
                 CarreraId = row["CarreraId"] != DBNull.Value ? Convert.ToInt32(row["CarreraId"]) : 0,
-                Carrera = row["Carrera"]?.ToString() ?? string.Empty
+                Carrera = row["Carrera"]?.ToString() ?? string.Empty,
+                Activo = row["Activo"] != DBNull.Value && Convert.ToByte(row["Activo"]) == 1,
             };
 
             return authUsuario;
