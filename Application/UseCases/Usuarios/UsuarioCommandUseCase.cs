@@ -13,6 +13,8 @@ public class UsuarioCommandUseCase(IUsuarioRepository usuarioRepository, IDatosP
     {
         try
         {
+            if(string.IsNullOrEmpty(usuario?.DatosPersonales?.Cedula))
+                return OperationResult<int>.Error("Cedula es obligatorio", "400");
             var cedulaExists = await datosPersonalesRepository.ExistsByCedula(usuario.DatosPersonales.Cedula);
             if (cedulaExists)
                 return OperationResult<int>.Error("Cedula duplicada, ya existe", "400");
@@ -35,8 +37,10 @@ public class UsuarioCommandUseCase(IUsuarioRepository usuarioRepository, IDatosP
                 Sexo = usuario.DatosPersonales?.Sexo,
             });
 
-            if(usuario.DatosPersonales != null && usuario.RolId == 4)
+            if (usuario.DatosPersonales != null && usuario.RolId == 4)
             {
+                if (usuario?.DatosAcademicos?.CarreraId == null || usuario.DatosAcademicos.CarreraId == 0)
+                    return OperationResult<int>.Error("Id de carrera es obligatorio", "400");
                 await datosAcademicosRepository.AddAsync(new DatosAcademicos
                 {
                     UsuarioId = saveUsuario,
