@@ -6,7 +6,7 @@
     var emailDomain = ViewData["EmailDomain"] as string ?? "@psm.edu.ve";
 }
 
-<form asp-action="Login" method="post" class="mt-0" onsubmit="return validateEmailDomain()">
+<form asp-action="Login" method="post" class="mt-0" id="loginForm">
     @Html.AntiForgeryToken()
 
     <div class="mb-4">
@@ -16,27 +16,30 @@
     </div>
 
     <div class="mb-3">
-        <label for="Correo" class="form-label small text-muted text-uppercase fw-semibold">Correo Institucional</label>
-        <div class="input-group">
+        <label for="Usuario" class="form-label small text-muted text-uppercase fw-semibold">Correo Institucional</label>
+        <div class="input-group has-validation">
             <span class="input-group-text bg-transparent border-end-0">
                 <i class="fas fa-envelope text-muted"></i>
             </span>
             <input type="text"
                    class="form-control border-start-0"
-                   id="Correo"
-                   name="Correo"
-                   placeholder="usuario"
+                   id="Usuario"
+                   name="Usuario"
+                   placeholder="ejemplo: luedardo.rondon"
                    autocomplete="username"
                    required
-                   pattern="^[a-zA-Z0-9._%+-]+$"
-                   title="Ingresa solo el nombre de usuario (ej: jperez)"
-                   data-domain="@domain">
-            <span class="input-group-text bg-transparent border-start-0" id="domainSuffix">@emailDomain</span>
-            <!-- Campo oculto para enviar el correo completo -->
-            <input type="hidden" id="CorreoCompleto" name="Correo">
+                   maxlength="100"
+                   title="Ingresa solo el nombre de usuario (ej: luedardo.rondon)">
+            <span class="input-group-text bg-transparent border-start-0 text-muted user-select-none" id="domainSuffix">@emailDomain</span>
+            
+            <!-- Campo oculto para enviar el correo completo al servidor -->
+            <input type="hidden" id="Correo" name="Correo" value="">
+            
+            <div id="usuarioFeedback" class="invalid-feedback">
+                Por favor ingresa tu nombre de usuario institucional
+            </div>
         </div>
-        <div id="emailError" class="text-danger small mt-1" style="display: none;"></div>
-        <span class="form-text small text-muted">Ingresa solo tu nombre de usuario institucional</span>
+        <span class="form-text small text-muted">Ingresa solo tu nombre de usuario institucional (sin @emailDomain)</span>
     </div>
     
     <div class="mb-3">
@@ -77,95 +80,34 @@
         </a>
     </div>
 </form>
+
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const emailInput = document.getElementById('Correo');
-            const emailCompletoInput = document.getElementById('CorreoCompleto');
-            const emailError = document.getElementById('emailError');
-            const togglePassword = document.getElementById('togglePassword');
-            const passwordInput = document.getElementById('Contrasena');
-            
-            
-            function validateEmailInput() {
-                if (!emailInput) return;
-                
-                const username = emailInput.value.trim();
-                
-                if (username === "") {
-                    clearEmailError();
-                    emailInput.classList.remove("is-invalid", "is-valid");
-                    return;
-                }
-                
-                // Validar que solo contenga caracteres válidos para nombre de usuario
-                const usernameRegex = /^[a-zA-Z0-9._%+-]+$/;
-                
-                if (!usernameRegex.test(username)) {
-                    showEmailError("El nombre de usuario solo puede contener letras, números y los caracteres . _ % + -");
-                    emailInput.classList.add("is-invalid");
-                    emailInput.classList.remove("is-valid");
-                } else {
-                    clearEmailError();
-                    emailInput.classList.remove("is-invalid");
-                    emailInput.classList.add("is-valid");
-                }
+            const domainElement = document.getElementById('domainSuffix');
+            const DOMAIN = domainElement ? domainElement.textContent.trim() : @ViewData["Domain"];
+            console.log("Dominio detectado:", DOMAIN);
+
+            const usuarioInput = document.getElementById('Usuario');
+            const correoHiddenInput = document.getElementById('Correo');
+            const contrasenaInput = document.getElementById('Contrasena');
+            const togglePasswordBtn = document.getElementById('togglePassword');
+            const loginForm = document.getElementById('loginForm');
+            const usuarioFeedback = document.getElementById('usuarioFeedback');
+
+             // Verificar que los elementos existen
+            if (!usuarioInput) {
+                console.error("❌ No se encontró el elemento #Usuario");
+                return;
             }
-            
-            function showEmailError(message) {
-                if (emailError) {
-                    emailError.textContent = message;
-                    emailError.style.display = "block";
-                }
+            if (!correoHiddenInput) {
+                console.error("❌ No se encontró el elemento #Correo (hidden)");
+                return;
             }
-            
-            function clearEmailError() {
-                if (emailError) {
-                    emailError.textContent = "";
-                    emailError.style.display = "none";
-                }
-            }
-            
-            // Validación antes del envío del formulario
-            window.validateEmailDomain = function() {
-                if (!emailInput || !emailCompletoInput) return false;
-                
-                const username = emailInput.value.trim();
-                
-                if (username === "") {
-                    showEmailError("El nombre de usuario es requerido");
-                    emailInput.classList.add("is-invalid");
-                    emailInput.focus();
-                    return false;
-                }
-                
-                // Validar formato del nombre de usuario
-                const usernameRegex = /^[a-zA-Z0-9._%+-]+$/;
-                if (!usernameRegex.test(username)) {
-                    showEmailError("El nombre de usuario solo puede contener letras, números y los caracteres . _ % + -");
-                    emailInput.classList.add("is-invalid");
-                    emailInput.focus();
-                    return false;
-                }
-                
-                // Construir el correo completo y asignarlo al campo oculto
-                const correoCompleto = username + DOMAIN;
-                emailCompletoInput.value = correoCompleto;
-                
-                return true;
-            };
-            
-            // Toggle password visibility
-            if (togglePassword && passwordInput) {
-                togglePassword.addEventListener('click', function() {
-                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                    passwordInput.setAttribute('type', type);
-                    const icon = this.querySelector('i');
-                    if (icon) {
-                        icon.className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
-                    }
-                });
-            }
-        });
+
+            console.log("✅ Elementos encontrados correctamente");
+
+
+        }
     </script>
 }

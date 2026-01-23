@@ -36,7 +36,7 @@ public class UsuarioController : Controller
     {
         ViewData["ReturnUrl"] = returnUrl;
         ViewData["Domain"] = _emailConfig.EmailServerAccept;
-        ViewData["EmailDomain"] = _emailConfig.EmailServerAccept.Replace("@", "@@");
+        ViewData["EmailDomain"] = _emailConfig.EmailServerAccept.Replace("@", "@");
 
         // Si ya está autenticado, redirigir al home
         if (User.Identity?.IsAuthenticated == true)
@@ -53,17 +53,18 @@ public class UsuarioController : Controller
     public async Task<IActionResult> Login(LoginDto model, string? returnUrl = null)
     {
         // Si recibimos solo el nombre de usuario, construir el correo completo
-        if (!string.IsNullOrEmpty(model.Correo) && string.IsNullOrEmpty(model.Correo))
+        if (!string.IsNullOrEmpty(model.Correo))
         {
-            model.Correo = model.Correo + _emailConfig.EmailServerAccept;
+            var correo = model.Correo + _emailConfig.EmailServerAccept;
+            model.Correo = correo;
         }
 
-        if (!ModelState.IsValid)
-        {
-            ViewData["Domain"] = _emailConfig.EmailServerAccept;
-            ViewData["EmailDomain"] = _emailConfig.EmailServerAccept.Replace("@", "@@");
-            return View(model);
-        }
+        //if (!ModelState.IsValid)
+        //{
+        //    ViewData["Domain"] = _emailConfig.EmailServerAccept;
+        //    ViewData["EmailDomain"] = _emailConfig.EmailServerAccept.Replace("@", "@@");
+        //    return View(model);
+        //}
 
         // Validación adicional del dominio
         if (!model.Correo.EndsWith(_emailConfig.EmailServerAccept, StringComparison.OrdinalIgnoreCase))

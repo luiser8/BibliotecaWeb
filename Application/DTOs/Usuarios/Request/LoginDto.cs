@@ -2,33 +2,20 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Application.DTOs.Usuarios.Request;
 
-    public class LoginDto
-    {
-    private readonly string _emailConfig = "@psm.edu.ve";
+public class LoginDto
+{
+    [Required(ErrorMessage = "El nombre de usuario es requerido")]
+    [Display(Name = "Nombre de usuario")]
+    public string? Usuario { get; set; }
 
-        [Required(ErrorMessage = "El correo institucional es requerido")]
-        [EmailAddress(ErrorMessage = "Formato de correo inválido")]
-        [RegularExpression(@"^[a-zA-Z0-9._%+-]+$",
-            ErrorMessage = "Nombre de usuario inválido")]
+    // Este campo se llenará automáticamente con JavaScript
     public string? Correo { get; set; }
 
-        [Required(ErrorMessage = "La contraseña es requerida")]
-        [DataType(DataType.Password)]
-        public string? Contrasena { get; set; }
+    [Required(ErrorMessage = "La contraseña es requerida")]
+    [DataType(DataType.Password)]
+    [Display(Name = "Contraseña")]
+    public string? Contrasena { get; set; }
 
-        public bool RememberMe { get; set; }
-
-        // Método de validación personalizada
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-        {
-            var results = new List<ValidationResult>();
-
-            if (!string.IsNullOrEmpty(Correo) && !Correo.EndsWith(_emailConfig, StringComparison.OrdinalIgnoreCase))
-            {
-                results.Add(new ValidationResult($"Solo se permiten correos del dominio {_emailConfig}",
-                    new[] { nameof(Correo) }));
-            }
-
-            return results;
-        }
-    }
+    [Display(Name = "Recordar sesión")]
+    public bool RememberMe { get; set; }
+}
