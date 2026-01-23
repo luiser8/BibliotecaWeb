@@ -2,30 +2,41 @@
 @{
     ViewData["Title"] = "Iniciar Sesión";
     Layout = "_AuthLayout";
+    var domain = ViewData["Domain"] as string ?? "@psm.edu.ve";
+    var emailDomain = ViewData["EmailDomain"] as string ?? "@psm.edu.ve";
 }
 
-<form asp-action="Login" method="post" class="mt-0">
+<form asp-action="Login" method="post" class="mt-0" onsubmit="return validateEmailDomain()">
     @Html.AntiForgeryToken()
-    
+
     <div class="mb-4">
         <h4 class="fw-semibold mb-1">Inicia sesión</h4>
         <p class="text-muted small mb-0">Accede a tu cuenta de Biblioteca Universitaria.</p>
+        <p class="text-muted small mb-0">Solo se permite el dominio <strong>@emailDomain</strong></p>
     </div>
-    
+
     <div class="mb-3">
         <label for="Correo" class="form-label small text-muted text-uppercase fw-semibold">Correo Institucional</label>
         <div class="input-group">
             <span class="input-group-text bg-transparent border-end-0">
                 <i class="fas fa-envelope text-muted"></i>
             </span>
-            <input type="email" 
-                   class="form-control border-start-0" 
-                   id="Correo" 
-                   name="Correo" 
-                   placeholder="usuario@psm.edu.ve"
+            <input type="text"
+                   class="form-control border-start-0"
+                   id="Correo"
+                   name="Correo"
+                   placeholder="usuario"
                    autocomplete="username"
-                   required>
+                   required
+                   pattern="^[a-zA-Z0-9._%+-]+$"
+                   title="Ingresa solo el nombre de usuario (ej: jperez)"
+                   data-domain="@domain">
+            <span class="input-group-text bg-transparent border-start-0" id="domainSuffix">@emailDomain</span>
+            <!-- Campo oculto para enviar el correo completo -->
+            <input type="hidden" id="CorreoCompleto" name="Correo">
         </div>
+        <div id="emailError" class="text-danger small mt-1" style="display: none;"></div>
+        <span class="form-text small text-muted">Ingresa solo tu nombre de usuario institucional</span>
     </div>
     
     <div class="mb-3">
@@ -66,22 +77,95 @@
         </a>
     </div>
 </form>
-
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Toggle password visibility
+            const emailInput = document.getElementById('Correo');
+            const emailCompletoInput = document.getElementById('CorreoCompleto');
+            const emailError = document.getElementById('emailError');
             const togglePassword = document.getElementById('togglePassword');
             const passwordInput = document.getElementById('Contrasena');
             
-            togglePassword.addEventListener('click', function() {
-                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordInput.setAttribute('type', type);
-                this.querySelector('i').className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
-            });
             
-            // Auto-focus email field
-            document.getElementById('Correo').focus();
+            function validateEmailInput() {
+                if (!emailInput) return;
+                
+                const username = emailInput.value.trim();
+                
+                if (username === "") {
+                    clearEmailError();
+                    emailInput.classList.remove("is-invalid", "is-valid");
+                    return;
+                }
+                
+                // Validar que solo contenga caracteres válidos para nombre de usuario
+                const usernameRegex = /^[a-zA-Z0-9._%+-]+$/;
+                
+                if (!usernameRegex.test(username)) {
+                    showEmailError("El nombre de usuario solo puede contener letras, números y los caracteres . _ % + -");
+                    emailInput.classList.add("is-invalid");
+                    emailInput.classList.remove("is-valid");
+                } else {
+                    clearEmailError();
+                    emailInput.classList.remove("is-invalid");
+                    emailInput.classList.add("is-valid");
+                }
+            }
+            
+            function showEmailError(message) {
+                if (emailError) {
+                    emailError.textContent = message;
+                    emailError.style.display = "block";
+                }
+            }
+            
+            function clearEmailError() {
+                if (emailError) {
+                    emailError.textContent = "";
+                    emailError.style.display = "none";
+                }
+            }
+            
+            // Validación antes del envío del formulario
+            window.validateEmailDomain = function() {
+                if (!emailInput || !emailCompletoInput) return false;
+                
+                const username = emailInput.value.trim();
+                
+                if (username === "") {
+                    showEmailError("El nombre de usuario es requerido");
+                    emailInput.classList.add("is-invalid");
+                    emailInput.focus();
+                    return false;
+                }
+                
+                // Validar formato del nombre de usuario
+                const usernameRegex = /^[a-zA-Z0-9._%+-]+$/;
+                if (!usernameRegex.test(username)) {
+                    showEmailError("El nombre de usuario solo puede contener letras, números y los caracteres . _ % + -");
+                    emailInput.classList.add("is-invalid");
+                    emailInput.focus();
+                    return false;
+                }
+                
+                // Construir el correo completo y asignarlo al campo oculto
+                const correoCompleto = username + DOMAIN;
+                emailCompletoInput.value = correoCompleto;
+                
+                return true;
+            };
+            
+            // Toggle password visibility
+            if (togglePassword && passwordInput) {
+                togglePassword.addEventListener('click', function() {
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+                    const icon = this.querySelector('i');
+                    if (icon) {
+                        icon.className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
+                    }
+                });
+            }
         });
     </script>
 }

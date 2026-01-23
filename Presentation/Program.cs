@@ -1,6 +1,7 @@
+using Application.Domain.Configuration;
 using Application.Interfaces;
 using Application.UseCases.Carreras;
-using Application.UseCases.Extension;
+using Application.UseCases.ExtensionQuery;
 using Application.UseCases.Perfil;
 using Application.UseCases.Politicas;
 using Application.UseCases.Usuarios;
@@ -19,6 +20,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Agregar configuración de AppSettings
 builder.Services.Configure<AppSettings>(
     builder.Configuration.GetSection("AppSettings"));
+builder.Services.Configure<EmailConfig>(builder.Configuration.GetSection("Security"));
 
 // Agregar servicios de controladores con vistas
 builder.Services.AddControllersWithViews();

@@ -1,18 +1,22 @@
+using Application.Domain.Configuration;
 using Application.DTOs.Usuarios.Request;
 using Application.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace Presentation.Controllers;
 
 public class UsuarioController : Controller
 {
     private readonly IAuthUseCase _authUseCase;
+    private readonly EmailConfig _emailConfig;
 
-    public UsuarioController(IAuthUseCase authUseCase)
+    public UsuarioController(IAuthUseCase authUseCase, IOptions<EmailConfig> emailConfig)
     {
         _authUseCase = authUseCase;
+        _emailConfig = emailConfig.Value;
     }
 
     [HttpGet]
@@ -31,6 +35,8 @@ public class UsuarioController : Controller
     public IActionResult Login(string? returnUrl = null)
     {
         ViewData["ReturnUrl"] = returnUrl;
+        ViewData["Domain"] = _emailConfig.EmailServerAccept;
+        ViewData["EmailDomain"] = _emailConfig.EmailServerAccept.Replace("@", "@@");
 
         // Si ya está autenticado, redirigir al home
         if (User.Identity?.IsAuthenticated == true)
@@ -46,8 +52,25 @@ public class UsuarioController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginDto model, string? returnUrl = null)
     {
+        // Si recibimos solo el nombre de usuario, construir el correo completo
+        if (!string.IsNullOrEmpty(model.Correo) && string.IsNullOrEmpty(model.Correo))
+        {
+            model.Correo = model.Correo + _emailConfig.EmailServerAccept;
+        }
+
         if (!ModelState.IsValid)
         {
+            ViewData["Domain"] = _emailConfig.EmailServerAccept;
+            ViewData["EmailDomain"] = _emailConfig.EmailServerAccept.Replace("@", "@@");
+            return View(model);
+        }
+
+        // Validación adicional del dominio
+        if (!model.Correo.EndsWith(_emailConfig.EmailServerAccept, StringComparison.OrdinalIgnoreCase))
+        {
+            ModelState.AddModelError("Correo", $"Solo se permiten correos del dominio {_emailConfig.EmailServerAccept}");
+            ViewData["Domain"] = _emailConfig.EmailServerAccept;
+            ViewData["EmailDomain"] = _emailConfig.EmailServerAccept.Replace("@", "@@");
             return View(model);
         }
 

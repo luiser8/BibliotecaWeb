@@ -13,6 +13,7 @@
       <Folder Include="DTOs\TipoUsuario\Request\" />
       <Folder Include="DTOs\TipoUsuario\Responses\" />
       <Folder Include="DTOs\Usuarios\Responses\" />
+	  <Folder Include="DTOs\Usuarios\Request\" />
     </ItemGroup>
 
     <ItemGroup>

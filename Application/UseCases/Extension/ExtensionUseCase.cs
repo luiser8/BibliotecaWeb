@@ -1,17 +1,18 @@
 using Application.DTOs.Extension.Responses;
 using Application.Interfaces;
 using Domain.Ports;
+using Domain.Entities;
 
-namespace Application.UseCases.Extension;
+namespace Application.UseCases.ExtensionQuery;
 
 public class ExtensionQueryUseCase(IExtensionRepository extensionRepository) : IExtensionQueryUseCase
 {
-    public async Task<Domain.Entities.Extension> ExecuteByIdAsync(int id)
+    public async Task<Extension> ExecuteByIdAsync(int id)
     {
         return await extensionRepository.GetByIdAsync(id);
     }
 
-    public async Task<List<Domain.Entities.Extension>> ExecuteAllAsync()
+    public async Task<List<Extension>> ExecuteAllAsync()
     {
         return await extensionRepository.GetAllAsync();
     }
