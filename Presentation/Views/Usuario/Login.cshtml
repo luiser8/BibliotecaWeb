@@ -2,8 +2,8 @@
 @{
     ViewData["Title"] = "Iniciar Sesión";
     Layout = "_AuthLayout";
-    var domain = ViewData["Domain"] as string ?? "@psm.edu.ve";
-    var emailDomain = ViewData["EmailDomain"] as string ?? "@psm.edu.ve";
+    var domain = ViewData["Domain"] as string;
+    var emailDomain = ViewData["EmailDomain"] as string;
 }
 
 <form asp-action="Login" method="post" class="mt-0" id="loginForm">
@@ -12,7 +12,6 @@
     <div class="mb-4">
         <h4 class="fw-semibold mb-1">Inicia sesión</h4>
         <p class="text-muted small mb-0">Accede a tu cuenta de Biblioteca Universitaria.</p>
-        <p class="text-muted small mb-0">Solo se permite el dominio <strong>@emailDomain</strong></p>
     </div>
 
     <div class="mb-3">
@@ -24,8 +23,8 @@
             <input type="text"
                    class="form-control border-start-0"
                    id="Usuario"
-                   name="Usuario"
-                   placeholder="ejemplo: luedardo.rondon"
+                   name="Correo"
+                   placeholder="ejemplo: correo2020"
                    autocomplete="username"
                    required
                    maxlength="100"
@@ -105,9 +104,131 @@
                 return;
             }
 
-            console.log("✅ Elementos encontrados correctamente");
+    usuarioInput.addEventListener('input', function(e) {
+            if (this.value.includes(@ViewData["Arroba"])) {
+                this.value = this.value.replace(/@ViewData["Arroba"]/g, '');
 
+            
+            // Mostrar advertencia visual
+            this.classList.add('is-invalid');
+            usuarioFeedback.textContent = 'No debe incluir el símbolo en el nombre de usuario';
+            usuarioFeedback.style.display = 'block';
+            
+            // Ocultar la advertencia después de 2 segundos
+            setTimeout(() => {
+                this.classList.remove('is-invalid');
+                usuarioFeedback.style.display = 'none';
+            }, 2000);
+        }
+    });
 
+    usuarioInput.addEventListener('paste', function(e) {
+        // Obtener el texto pegado
+        const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+            if (pastedText.includes(@ViewData["Arroba"])) {
+            e.preventDefault();
+            
+            // Mostrar advertencia
+            this.classList.add('is-invalid');
+                usuarioFeedback.textContent = 'No se puede pegar texto que contenga @ViewData["Arroba"]';
+            usuarioFeedback.style.display = 'block';
+            
+            // Ocultar la advertencia después de 2 segundos
+            setTimeout(() => {
+                this.classList.remove('is-invalid');
+                usuarioFeedback.style.display = 'none';
+            }, 2000);
+                 const withoutAt = pastedText.split(@ViewData["Arroba"])[0];
+            if (withoutAt && withoutAt.trim() !== '') {
+                document.execCommand('insertText', false, withoutAt);
+            }
+        }
+    });
+
+        // 3. Manejar el envío del formulario - construir el correo completo
+    loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Obtener el valor del usuario (sin espacios al inicio/final)
+        const username = usuarioInput.value.trim();
+        
+        // Validar que no esté vacío
+        if (!username) {
+            usuarioInput.classList.add('is-invalid');
+            usuarioFeedback.textContent = 'Por favor ingresa tu nombre de usuario institucional';
+            usuarioFeedback.style.display = 'block';
+            usuarioInput.focus();
+            return;
+        }
+                if (username.includes(@ViewData["Arroba"])) {
+            usuarioInput.classList.add('is-invalid');
+                usuarioFeedback.textContent = 'El nombre de usuario no debe contener @ViewData["Arroba"]';
+            usuarioFeedback.style.display = 'block';
+            usuarioInput.focus();
+            return;
+        }
+        
+        // Construir el correo electrónico completo
+        const emailCompleto = username + DOMAIN;
+        
+        // Asignar al campo oculto
+        correoHiddenInput.value = emailCompleto;
+        
+        // Para depuración: mostrar en consola
+        console.log("📧 Correo completo enviado:", emailCompleto);
+        
+        // Opcional: también puedes mostrar el correo completo en el campo visible (solo para visualización)
+        // usuarioInput.value = emailCompleto;
+        
+        // Enviar el formulario
+        this.submit();
+    });
+
+    // 4. Función para mostrar/ocultar contraseña
+    if (togglePasswordBtn) {
+        togglePasswordBtn.addEventListener('click', function() {
+            const type = contrasenaInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            contrasenaInput.setAttribute('type', type);
+            
+            // Cambiar el icono
+            const icon = this.querySelector('i');
+            if (type === 'text') {
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    }
+
+    // 5. Validación en tiempo real mientras el usuario escribe
+    usuarioInput.addEventListener('keyup', function() {
+        const username = this.value.trim();
+            if (username.includes(@ViewData["Arroba"])) {
+            this.classList.add('is-invalid');
+                usuarioFeedback.textContent = 'No debe incluir @ViewData["Arroba"] en el nombre de usuario';
+            usuarioFeedback.style.display = 'block';
+        } else if (username.length > 0) {
+            this.classList.remove('is-invalid');
+            this.classList.add('is-valid');
+            usuarioFeedback.style.display = 'none';
+            
+            // Quitar la clase "is-valid" después de 2 segundos
+            setTimeout(() => {
+                this.classList.remove('is-valid');
+            }, 2000);
+        } else {
+            this.classList.remove('is-invalid', 'is-valid');
+            usuarioFeedback.style.display = 'none';
+        }
+    });
+
+    // 6. Limpiar validación al enfocar el campo
+    usuarioInput.addEventListener('focus', function() {
+        this.classList.remove('is-invalid', 'is-valid');
+        usuarioFeedback.style.display = 'none';
+    });
         }
     </script>
 }

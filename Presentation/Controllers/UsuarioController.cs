@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Presentation.Middleware;
 
 namespace Presentation.Controllers;
 
@@ -37,6 +38,7 @@ public class UsuarioController : Controller
         ViewData["ReturnUrl"] = returnUrl;
         ViewData["Domain"] = _emailConfig.EmailServerAccept;
         ViewData["EmailDomain"] = _emailConfig.EmailServerAccept.Replace("@", "@");
+        ViewData["Arroba"] = "@";
 
         // Si ya está autenticado, redirigir al home
         if (User.Identity?.IsAuthenticated == true)
@@ -55,19 +57,12 @@ public class UsuarioController : Controller
         // Si recibimos solo el nombre de usuario, construir el correo completo
         if (!string.IsNullOrEmpty(model.Correo))
         {
-            var correo = model.Correo + _emailConfig.EmailServerAccept;
-            model.Correo = correo;
-        }
+            // Extraer solo el nombre de usuario (limpia @gmail.com, @hotmail.com, etc.)
+            var nombreUsuario = model.Correo.ExtraerNombreUsuario(_emailConfig.EmailServerAccept);
 
-        //if (!ModelState.IsValid)
-        //{
-        //    ViewData["Domain"] = _emailConfig.EmailServerAccept;
-        //    ViewData["EmailDomain"] = _emailConfig.EmailServerAccept.Replace("@", "@@");
-        //    return View(model);
-        //}
-
-        // Validación adicional del dominio
-        if (!model.Correo.EndsWith(_emailConfig.EmailServerAccept, StringComparison.OrdinalIgnoreCase))
+            // Construir correo institucional
+            model.Correo = nombreUsuario.ConstruirCorreoInstitucional(_emailConfig.EmailServerAccept);
+        } else
         {
             ModelState.AddModelError("Correo", $"Solo se permiten correos del dominio {_emailConfig.EmailServerAccept}");
             ViewData["Domain"] = _emailConfig.EmailServerAccept;
