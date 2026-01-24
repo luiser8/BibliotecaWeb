@@ -4,7 +4,7 @@ using Domain.Ports;
 
 namespace Application.UseCases.Carreras;
 
-public class CarrerasUseCase(ICarreraRepository carreraRepository)  :ICarrerasQueryUseCase
+public class CarrerasQueryUseCase(ICarreraRepository carreraRepository)  :ICarrerasQueryUseCase
 {
     public async Task<Carrera> ExecuteByIdAsync(int id)
     {

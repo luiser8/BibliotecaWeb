@@ -9,9 +9,9 @@ namespace Presentation.Filters
 {
     public class CargarPoliticasFilter : IAsyncActionFilter
     {
-        private readonly IPoliticasUsuarioUseCase _politicasUsuarioUseCase;
+        private readonly IPoliticasUsuariosQueryUseCase _politicasUsuarioUseCase;
 
-        public CargarPoliticasFilter(IPoliticasUsuarioUseCase politicasUsuarioUseCase)
+        public CargarPoliticasFilter(IPoliticasUsuariosQueryUseCase politicasUsuarioUseCase)
         {
             _politicasUsuarioUseCase = politicasUsuarioUseCase;
         }

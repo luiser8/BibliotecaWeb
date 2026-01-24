@@ -4,11 +4,11 @@ using Domain.Ports;
 
 namespace Application.UseCases.Politicas;
 
-public class PoliticasUsuariosUseCase : IPoliticasUsuarioUseCase
+public class PoliticasUsuariosQueryUseCase : IPoliticasUsuariosQueryUseCase
 {
     private readonly IPoliticasUsuarioRepository _politicasUsuarioRepository;
     
-    public PoliticasUsuariosUseCase(IPoliticasUsuarioRepository politicasUsuarioRepository)
+    public PoliticasUsuariosQueryUseCase(IPoliticasUsuarioRepository politicasUsuarioRepository)
     {
         _politicasUsuarioRepository = politicasUsuarioRepository;
     }

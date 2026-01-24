@@ -3,7 +3,7 @@ using Application.DTOs.Usuarios.Responses;
 
 namespace Application.Interfaces;
 
-public interface IAuthUseCase
+public interface IAuthQueryUseCase
 {
     /// <summary>
     /// Autentica un usuario y genera los Claims necesarios

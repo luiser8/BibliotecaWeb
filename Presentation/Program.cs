@@ -84,12 +84,12 @@ builder.Services.AddScoped<IUsuarioPerfilRepository, UsuarioPerfilRepository>();
 
 // Casos de uso
 builder.Services.AddScoped<IExtensionQueryUseCase, ExtensionQueryUseCase>();
-builder.Services.AddScoped<ICarrerasQueryUseCase, CarrerasUseCase>();
+builder.Services.AddScoped<ICarrerasQueryUseCase, CarrerasQueryUseCase>();
 builder.Services.AddScoped<IUsuarioQueryUseCase, UsuarioQueryUseCase>();
 builder.Services.AddScoped<IUsuarioCommandUseCase, UsuarioCommandUseCase>();
-builder.Services.AddScoped<IPoliticasUsuarioUseCase, PoliticasUsuariosUseCase>();
-builder.Services.AddScoped<IUsuarioPerfilUseCase, UsuarioPerfilUseCase>();
-builder.Services.AddScoped<IAuthUseCase, AuthUseCase>();
+builder.Services.AddScoped<IPoliticasUsuariosQueryUseCase, PoliticasUsuariosQueryUseCase>();
+builder.Services.AddScoped<IUsuarioPerfilCommandUseCase, UsuarioPerfilCommandUseCase>();
+builder.Services.AddScoped<IAuthQueryUseCase, AuthQueryUseCase>();
 
 // **REMOVER esta línea - NO registrar middleware en DI**
 // builder.Services.AddScoped<AccesoMiddleware>(); // <- ELIMINAR ESTA LÍNEA

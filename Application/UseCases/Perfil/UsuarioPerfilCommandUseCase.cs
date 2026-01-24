@@ -4,11 +4,11 @@ using Domain.Ports;
 
 namespace Application.UseCases.Perfil
 {
-    public class UsuarioPerfilUseCase : IUsuarioPerfilUseCase
+    public class UsuarioPerfilCommandUseCase : IUsuarioPerfilCommandUseCase
     {
         private readonly IUsuarioPerfilRepository _usuarioPerfilRepository;
 
-        public UsuarioPerfilUseCase(IUsuarioPerfilRepository usuarioPerfilRepository)
+        public UsuarioPerfilCommandUseCase(IUsuarioPerfilRepository usuarioPerfilRepository)
         {
             _usuarioPerfilRepository = usuarioPerfilRepository;
         }

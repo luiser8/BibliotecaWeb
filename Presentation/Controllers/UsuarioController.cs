@@ -11,10 +11,10 @@ namespace Presentation.Controllers;
 
 public class UsuarioController : Controller
 {
-    private readonly IAuthUseCase _authUseCase;
+    private readonly IAuthQueryUseCase _authUseCase;
     private readonly EmailConfig _emailConfig;
 
-    public UsuarioController(IAuthUseCase authUseCase, IOptions<EmailConfig> emailConfig)
+    public UsuarioController(IAuthQueryUseCase authUseCase, IOptions<EmailConfig> emailConfig)
     {
         _authUseCase = authUseCase;
         _emailConfig = emailConfig.Value;

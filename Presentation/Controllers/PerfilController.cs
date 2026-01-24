@@ -8,9 +8,9 @@ namespace Presentation.Controllers;
 
 public class PerfilController : Controller
 {
-    private readonly IUsuarioPerfilUseCase _usuarioPerfilUseCase;
+    private readonly IUsuarioPerfilCommandUseCase _usuarioPerfilUseCase;
 
-    public PerfilController(IUsuarioPerfilUseCase usuarioPerfilUseCase)
+    public PerfilController(IUsuarioPerfilCommandUseCase usuarioPerfilUseCase)
     {
         _usuarioPerfilUseCase = usuarioPerfilUseCase;
     }

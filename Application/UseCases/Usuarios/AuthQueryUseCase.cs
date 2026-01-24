@@ -11,11 +11,11 @@ namespace Application.UseCases.Usuarios;
 /// <summary>
 /// UseCase para manejar la autenticación de usuarios y generación de Claims
 /// </summary>
-public class AuthUseCase : IAuthUseCase
+public class AuthQueryUseCase : IAuthQueryUseCase
 {
     private readonly IUsuarioRepository _usuarioRepository;
 
-    public AuthUseCase(IUsuarioRepository usuarioRepository)
+    public AuthQueryUseCase(IUsuarioRepository usuarioRepository)
     {
         _usuarioRepository = usuarioRepository;
     }
