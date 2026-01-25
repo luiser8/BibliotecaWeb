@@ -91,9 +91,6 @@ builder.Services.AddScoped<IPoliticasUsuariosQueryUseCase, PoliticasUsuariosQuer
 builder.Services.AddScoped<IUsuarioPerfilCommandUseCase, UsuarioPerfilCommandUseCase>();
 builder.Services.AddScoped<IAuthQueryUseCase, AuthQueryUseCase>();
 
-// **REMOVER esta línea - NO registrar middleware en DI**
-// builder.Services.AddScoped<AccesoMiddleware>(); // <- ELIMINAR ESTA LÍNEA
-
 // Otros servicios
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ExceptionHandlerService>();
