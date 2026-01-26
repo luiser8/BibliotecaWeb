@@ -3,6 +3,8 @@
 @{
     ViewBag.Title = "Registro";
     Layout = "_Layout";
+    var domain = ViewData["Domain"] as string;
+    var emailDomain = ViewData["EmailDomain"] as string;
 }
 
 <div class="container mt-2">
@@ -49,20 +51,28 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="Correo" class="font-weight-bold required">Correo Institucional:</label>
-                                    <input type="email" 
-                                           id="Correo" 
-                                           name="Correo" 
-                                           class="form-control" 
+                                <label for="Usuario" class="font-weight-bold required">Correo Institucional</label>
+                                <div class="input-group has-validation">
+                                    <input type="text"
+                                           class="form-control border-start-0"
+                                           id="Usuario"
+                                           name="Correo"
+                                           placeholder="ejemplo: correo2020"
+                                           autocomplete="username"
                                            required
-                                           pattern="[a-zA-Z0-9._%+-]+[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-                                           title="Por favor ingresa un correo electrónico válido (ejemplo: usuario@psm.edu.ve)"
-                                           placeholder="ejemplo@psm.edu.ve">
-                                    <small class="form-text text-muted">Será usado para iniciar sesión</small>
-                                    <div class="invalid-feedback">
-                                        Por favor ingresa un correo electrónico válido.
+                                           maxlength="100"
+                                           title="Ingresa solo el nombre de usuario (ej: luedardo.rondon)">
+                                    <span class="input-group-text bg-transparent border-start-0 text-muted user-select-none" id="domainSuffix">@emailDomain</span>
+
+                                    <!-- Campo oculto para enviar el correo completo al servidor -->
+                                    <input type="hidden" id="Correo" name="Correo" value="">
+
+                                    <div id="usuarioFeedback" class="invalid-feedback">
+                                        Por favor ingresa tu nombre de usuario institucional
                                     </div>
                                 </div>
+                                </div>
+                                <span class="form-text small text-muted">Ingresa solo tu nombre de usuario institucional (sin @emailDomain)</span>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">

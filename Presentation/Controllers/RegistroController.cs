@@ -1,6 +1,8 @@
+using Application.Domain.Configuration;
 using Application.DTOs.Usuarios.Request;
-using Microsoft.AspNetCore.Mvc;
 using Application.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Presentation.Services;
 
 namespace Presentation.Controllers;
@@ -10,21 +12,34 @@ public class RegistroController : Controller
     private readonly IExtensionQueryUseCase _extensionUseCase;
     private readonly IUsuarioCommandUseCase _usuarioCommandUseCase;
     private readonly ExceptionHandlerService _exceptionHandler;
+    private readonly EmailConfig _emailConfig;
 
     public RegistroController(
         IExtensionQueryUseCase extensionUseCase, 
         IUsuarioCommandUseCase usuarioCommandUseCase,
-        ExceptionHandlerService exceptionHandler)
+        ExceptionHandlerService exceptionHandler,
+        IOptions<EmailConfig> emailConfig)
     {
         _extensionUseCase = extensionUseCase;
         _usuarioCommandUseCase = usuarioCommandUseCase;
         _exceptionHandler = exceptionHandler;
+        _emailConfig = emailConfig.Value;
     }
 
     // GET: Mostrar formulario de creación de estudiante
     public async Task<IActionResult> Crear()
     {
         var response = await _extensionUseCase.ExecuteAllWithExtensionAsync();
+       
+        ViewData["Domain"] = _emailConfig.EmailServerAccept;
+        ViewData["EmailDomain"] = _emailConfig.EmailServerAccept.Replace("@", "@");
+        ViewData["Arroba"] = "@";
+
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            return RedirectToAction("Index", "Home");
+        }
+
         return View(response);
     }
 
