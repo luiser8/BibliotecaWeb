@@ -1,4 +1,3 @@
-USE [Biblioteca]
 GO
 SET ANSI_NULLS ON
 GO

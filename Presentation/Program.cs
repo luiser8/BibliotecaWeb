@@ -5,9 +5,11 @@ using Application.UseCases.ExtensionQuery;
 using Application.UseCases.Perfil;
 using Application.UseCases.Politicas;
 using Application.UseCases.Usuarios;
+using Application.UseCases.Email;
 using Domain.Entities;
 using Domain.Ports;
 using Infrastructure.Configurations;
+using Infrastructure.Email;
 using Infrastructure.Repositories;
 using Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -81,6 +83,7 @@ builder.Services.AddScoped<IDatosPersonalesRepository, DatosPersonalesRepository
 builder.Services.AddScoped<IDatosAcademicosRepository, DatosAcademicosRepository>();
 builder.Services.AddScoped<IPoliticasUsuarioRepository, PoliticasUsuarioRepository>();
 builder.Services.AddScoped<IUsuarioPerfilRepository, UsuarioPerfilRepository>();
+builder.Services.AddScoped<IEmailPort, EmailAdapter>();
 
 // Casos de uso
 builder.Services.AddScoped<IExtensionQueryUseCase, ExtensionQueryUseCase>();
@@ -90,6 +93,7 @@ builder.Services.AddScoped<IUsuarioCommandUseCase, UsuarioCommandUseCase>();
 builder.Services.AddScoped<IPoliticasUsuariosQueryUseCase, PoliticasUsuariosQueryUseCase>();
 builder.Services.AddScoped<IUsuarioPerfilCommandUseCase, UsuarioPerfilCommandUseCase>();
 builder.Services.AddScoped<IAuthQueryUseCase, AuthQueryUseCase>();
+builder.Services.AddScoped<IEmailCommandUseCase, EmailCommandUseCase>();
 
 // Otros servicios
 builder.Services.AddHttpContextAccessor();

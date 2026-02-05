@@ -1,5 +1,5 @@
 
-namespace Application.UseCases;
+namespace Application.UseCases.Email;
 
 public interface IEmailCommandUseCase
 {
