@@ -79,12 +79,12 @@ INSERT INTO ExtensionCarreras (ExtensionId, CarreraId) VALUES
 (5, 12);
 
 --Tipos materiales
-INSERT INTO TiposMateriales (Tipo) VALUES
+INSERT INTO Tipos (Tipo) VALUES
 ('Físico'),
 ('Digital');
 
 --Categoria materiales
-INSERT INTO CategoriaMateriales (Categoria) VALUES
+INSERT INTO Categorias (Categoria) VALUES
 ('Libro'),
 ('Tesis'),
 ('Informe de Pasantía'),
@@ -251,7 +251,9 @@ DELETE FROM RolPoliticas;
 
 -- 4. ADMINISTRADOR: TODAS LAS POLÍTICAS (en orden)
 INSERT INTO RolPoliticas (RolId, PoliticaId)
-SELECT @AdminId, Id FROM Politicas ORDER BY Id;
+SELECT @AdminId, Id FROM Politicas
+WHERE Nombre NOT LIKE 'Mis prestamos%'
+ORDER BY Id;
 
 -- 5. DIRECTIVO: Todo menos seguridad y roles
 INSERT INTO RolPoliticas (RolId, PoliticaId)

@@ -19,6 +19,7 @@
                             <h1 class="h4 mb-1">@ViewData["NombreUsuario"]</h1>
                             <p class="text-muted mb-2">@ViewData["CorreoUsuario"]</p>
                             <span class="badge bg-light text-dark border">@ViewData["RolUsuario"]</span>
+                            <span class="badge bg-light text-dark border">@ViewData["TipoIngresoUsuario"]</span>
                         </div>
                     </div>
 
@@ -26,17 +27,29 @@
                     <div class="mb-4">
                         <div class="list-group list-group-flush">
                             <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-3 border-0">
-                                <span class="text-muted">C�dula</span>
+                                <span class="text-muted">Cedula</span>
                                 <span class="fw-medium">@ViewData["CedulaUsuario"]</span>
                             </div>
                             <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-3 border-0">
-                                <span class="text-muted">Extensi�n</span>
-                                <span class="fw-medium">@ViewData["ExtensionUsuario"]</span>
+                                <span class="text-muted">Nombres y apellidos</span>
+                                <span class="fw-medium">@ViewData["NombresUsuario"]</span>
                             </div>
                             <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-3 border-0">
-                                <span class="text-muted">Carrera</span>
-                                <span class="fw-medium">@ViewData["CarreraUsuario"]</span>
+                                <span class="text-muted">Sexo</span>
+                                <span class="fw-medium">@ViewData["SexoUsuario"]</span>
                             </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-3 border-0">
+                                <span class="text-muted">Extension</span>
+                                <span class="fw-medium">@ViewData["ExtensionUsuario"]</span>
+                            </div>
+                            @{
+                                if (!ReferenceEquals(@ViewData["CarreraUsuario"], ""))
+                                {
+                                    <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-3 border-0">
+                                        <span class="text-muted">Carrera</span>
+                                        <span class="fw-medium">@ViewData["CarreraUsuario"]</span></div>
+                                }
+                            }
                         </div>
                     </div>
 
@@ -47,7 +60,7 @@
                                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                             </svg>
-                            Cambiar Contrase�a
+                            Cambiar Contraseña
                         </button>
                     </div>
                 </div>
@@ -61,30 +74,13 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header border-bottom">
-                <h5 class="modal-title" id="passwordModalLabel">Cambiar Contrase�a</h5>
+                <h5 class="modal-title" id="passwordModalLabel">Cambiar Contraseña</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="passwordForm" method="post" asp-action="CambiarContrasena">
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="currentPassword" class="form-label">Contrase�a Actual</label>
-                        <div class="input-group">
-                            <input type="password"
-                                   class="form-control"
-                                   id="currentPassword"
-                                   name="contrasenaActual"
-                                   required>
-                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('currentPassword', this)">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                    <circle cx="12" cy="12" r="3"></circle>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="newPassword" class="form-label">Nueva Contrase�a</label>
+                        <label for="newPassword" class="form-label">Nueva Contraseña</label>
                         <div class="input-group">
                             <input type="password"
                                    class="form-control"
@@ -99,11 +95,11 @@
                                 </svg>
                             </button>
                         </div>
-                        <div class="form-text">M�nimo 8 caracteres</div>
+                        <div class="form-text">Minimo 8 caracteres</div>
                     </div>
 
                     <div class="mb-3">
-                        <label for="confirmPassword" class="form-label">Confirmar Nueva Contrase�a</label>
+                        <label for="confirmPassword" class="form-label">Confirmar Nueva Contraseña</label>
                         <div class="input-group">
                             <input type="password"
                                    class="form-control"
@@ -120,7 +116,7 @@
                     </div>
 
                     <div id="passwordError" class="alert alert-danger d-none" role="alert">
-                        Las contrase�as no coinciden
+                        Las contraseñas no coinciden
                     </div>
                 </div>
                 <div class="modal-footer border-top">

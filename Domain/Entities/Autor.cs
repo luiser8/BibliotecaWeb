@@ -8,5 +8,5 @@ public class Autor
     public bool Activo { get; set; }
     public DateTime FechaCreado { get; set; }
     
-    public ICollection<Material> Materiales { get; set; }
+    public ICollection<Materiales> Materiales { get; set; }
 }

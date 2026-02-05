@@ -12,6 +12,6 @@ public class Extension
     public int Activo { get; set; }
     public DateTime FechaCreado { get; set; }
     
-    public ICollection<Usuario> Usuarios { get; set; }
-    public ICollection<ExtensionCarrera> ExtensionCarreras { get; set; }
+    public ICollection<Usuario>? Usuarios { get; set; }
+    public ICollection<ExtensionCarrera>? ExtensionCarreras { get; set; }
 }

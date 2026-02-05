@@ -18,12 +18,15 @@ public class PerfilController : Controller
     [HttpGet]
     public IActionResult Index()
     {
-        ViewData["NombreUsuario"] = User?.FindFirstValue("NombreCompleto") ?? "";
+        ViewData["UsuarioId"] = User?.FindFirstValue("UsuarioId") ?? "";
+        ViewData["NombresUsuario"] = User?.FindFirstValue("NombreCompleto") ?? "";
+        ViewData["SexoUsuario"] = User?.FindFirstValue("Sexo") ?? "";
+        ViewData["TipoIngresoUsuario"] = User?.FindFirstValue("TipoIngreso") ?? "";
         ViewData["CedulaUsuario"] = User?.FindFirstValue("Cedula") ?? "";
         ViewData["CorreoUsuario"] = User?.FindFirstValue("Correo") ?? "";
-        ViewData["RolUsuario"] = User?.FindFirstValue("Rol") ?? "Rol";
-        ViewData["ExtensionUsuario"] = User?.FindFirstValue("Extension") ?? "Extension";
-        ViewData["CarreraUsuario"] = User?.FindFirstValue("Carrera") ?? "Carrera";
+        ViewData["RolUsuario"] = User?.FindFirstValue("Rol") ?? "";
+        ViewData["ExtensionUsuario"] = User?.FindFirstValue("Extension") ?? "";
+        ViewData["CarreraUsuario"] = User?.FindFirstValue("Carrera") ?? "";
 
         return View();
     }

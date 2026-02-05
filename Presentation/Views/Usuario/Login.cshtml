@@ -2,7 +2,6 @@
 @{
     ViewData["Title"] = "Iniciar Sesión";
     Layout = "_AuthLayout";
-    var domain = ViewData["Domain"] as string;
     var emailDomain = ViewData["EmailDomain"] as string;
 }
 
@@ -24,21 +23,20 @@
                    class="form-control border-start-0"
                    id="Usuario"
                    name="Correo"
-                   placeholder="ejemplo: correo2020"
+                   placeholder="ejemplo: pedro_perez"
                    autocomplete="username"
                    required
                    maxlength="100"
-                   title="Ingresa solo el nombre de usuario (ej: luedardo.rondon)">
+                   title="Ingresa solo el nombre de usuario (sin @ViewData["Domain"])">
             <span class="input-group-text bg-transparent border-start-0 text-muted user-select-none" id="domainSuffix">@emailDomain</span>
             
             <!-- Campo oculto para enviar el correo completo al servidor -->
-            <input type="hidden" id="Correo" name="Correo" value="">
+            <input type="hidden" id="CorreoCompleto" name="Correo" value="">
             
             <div id="usuarioFeedback" class="invalid-feedback">
                 Por favor ingresa tu nombre de usuario institucional
             </div>
         </div>
-        <span class="form-text small text-muted">Ingresa solo tu nombre de usuario institucional (sin @emailDomain)</span>
     </div>
     
     <div class="mb-3">
@@ -54,7 +52,7 @@
                    placeholder="••••••••"
                    autocomplete="current-password"
                    required>
-            <button class="btn btn-outline-secondary border-start-0" type="button" id="togglePassword">
+            <button class="btn btn-outline-secondary border-start-0" onclick="togglePassword('Contrasena', this)" type="button" id="togglePassword">
                 <i class="fas fa-eye"></i>
             </button>
         </div>
@@ -79,156 +77,257 @@
         </a>
     </div>
 </form>
-
 @section Scripts {
     <script>
+        function togglePassword(inputId, button) {
+            const input = document.getElementById(inputId);
+            const icon = button.querySelector('svg');
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+            } else {
+                input.type = 'password';
+                icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+            }
+        }
+        
         document.addEventListener('DOMContentLoaded', function() {
             const domainElement = document.getElementById('domainSuffix');
-            const DOMAIN = domainElement ? domainElement.textContent.trim() : @ViewData["Domain"];
-            console.log("Dominio detectado:", DOMAIN);
+            const DOMAIN = domainElement ? domainElement.textContent.trim() : '@ViewData["Domain"]';
+            console.log("Dominio institucional:", DOMAIN);
 
             const usuarioInput = document.getElementById('Usuario');
-            const correoHiddenInput = document.getElementById('Correo');
+            const correoCompletoInput = document.getElementById('CorreoCompleto');
             const contrasenaInput = document.getElementById('Contrasena');
             const togglePasswordBtn = document.getElementById('togglePassword');
             const loginForm = document.getElementById('loginForm');
             const usuarioFeedback = document.getElementById('usuarioFeedback');
 
-             // Verificar que los elementos existen
-            if (!usuarioInput) {
-                console.error("❌ No se encontró el elemento #Usuario");
-                return;
+            // Lista de dominios comunes para limpiar
+            const dominiosComunes = [
+                'gmail.com', 'hotmail.com', 'outlook.com', 'yahoo.com',
+                'icloud.com', 'protonmail.com', 'aol.com', 'mail.com',
+                'yandex.com', 'zoho.com', 'gmx.com', 'live.com',
+                'msn.com', 'me.com', 'mac.com', 'rocketmail.com',
+                'google.com', 'facebook.com', 'twitter.com'
+            ];
+
+            // Función para extraer solo el nombre de usuario de cualquier formato
+            function extraerNombreUsuario(input) {
+                let username = input.trim();
+
+                // 1. Si contiene @ViewData["Arroba"], tomar solo lo que está antes del primer @ViewData["Arroba"]
+                if (username.includes('@ViewData["Arroba"]')) {
+                    username = username.split('@ViewData["Arroba"]')[0].trim();
+                }
+
+                // 2. Buscar y eliminar dominios comunes incluso sin @ViewData["Arroba"]
+                for (const dominio of dominiosComunes) {
+                    const regex = new RegExp(`\\.?${dominio.replace('.', '\\.')}$`, 'i');
+                    if (regex.test(username)) {
+                        // Remover el dominio del final
+                        username = username.replace(regex, '').trim();
+
+                        // Si queda algo como "leduardo.rondon.", quitar el punto final
+                        if (username.endsWith('.')) {
+                            username = username.slice(0, -1);
+                        }
+                        break;
+                    }
+                }
+
+                // 3. Asegurar que no tenga espacios ni caracteres inválidos
+                username = username.replace(/\s+/g, '');
+
+                return username;
             }
-            if (!correoHiddenInput) {
-                console.error("❌ No se encontró el elemento #Correo (hidden)");
-                return;
+
+            // 1. Limpiar automáticamente mientras el usuario escribe
+            usuarioInput.addEventListener('input', function(e) {
+                const valorOriginal = this.value;
+                const usuarioLimpio = extraerNombreUsuario(valorOriginal);
+
+                if (usuarioLimpio !== valorOriginal) {
+                    this.value = usuarioLimpio;
+
+                    // Mostrar feedback visual
+                    this.classList.add('is-valid');
+                    usuarioFeedback.textContent = 'Solo se tomó el nombre de usuario: ' + usuarioLimpio;
+                    usuarioFeedback.style.color = '#198754';
+                    usuarioFeedback.style.display = 'block';
+                    
+                    setTimeout(() => {
+                        this.classList.remove('is-valid');
+                        usuarioFeedback.style.display = 'none';
+                    }, 2000);
+                }
+            });
+
+            // 2. Manejar el pegado de texto
+            usuarioInput.addEventListener('paste', function(e) {
+                // Obtener el texto pegado
+                const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+                
+                // Extraer solo el nombre de usuario
+                const usuarioLimpio = extraerNombreUsuario(pastedText);
+                
+                if (usuarioLimpio !== pastedText) {
+                    e.preventDefault();
+                    
+                    // Insertar solo el nombre de usuario limpio
+                    document.execCommand('insertText', false, usuarioLimpio);
+                    
+                    // Mostrar feedback
+                    this.classList.add('is-valid');
+                    setTimeout(() => {
+                        this.classList.remove('is-valid');
+                    }, 1000);
+                }
+            });
+
+            // 3. Manejar el envío del formulario
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Obtener y limpiar el nombre de usuario
+                let username = extraerNombreUsuario(usuarioInput.value);
+                
+                console.log("Usuario después de limpiar:", username);
+                
+                // Validaciones
+                if (!username) {
+                    usuarioInput.classList.add('is-invalid');
+                    usuarioFeedback.textContent = 'Por favor ingresa tu nombre de usuario institucional';
+                    usuarioFeedback.style.color = '#dc3545';
+                    usuarioFeedback.style.display = 'block';
+                    usuarioInput.focus();
+                    return;
+                }
+                
+                if (username.length < 3) {
+                    usuarioInput.classList.add('is-invalid');
+                    usuarioFeedback.textContent = 'El nombre de usuario es muy corto (mínimo 3 caracteres)';
+                    usuarioFeedback.style.color = '#dc3545';
+                    usuarioFeedback.style.display = 'block';
+                    usuarioInput.focus();
+                    return;
+                }
+                
+                // Actualizar el campo visible con el valor limpio
+                usuarioInput.value = username;
+                
+                // Construir el correo electrónico completo con el dominio institucional
+                const emailCompleto = username + DOMAIN;
+                
+                // Asignar al campo oculto que se enviará al servidor
+                correoCompletoInput.value = emailCompleto;
+                
+                // Enviar el formulario
+                this.submit();
+            });
+
+            // 4. Función para mostrar/ocultar contraseña
+            if (togglePasswordBtn && contrasenaInput) {
+                togglePasswordBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const isPassword = contrasenaInput.type === 'password';
+                    contrasenaInput.type = isPassword ? 'text' : 'password';
+                    
+                    const icon = this.querySelector('i');
+                    if (icon) {
+                        if (isPassword) {
+                            icon.classList.remove('fa-eye');
+                            icon.classList.add('fa-eye-slash');
+                        } else {
+                            icon.classList.remove('fa-eye-slash');
+                            icon.classList.add('fa-eye');
+                        }
+                    }
+                    
+                    contrasenaInput.focus();
+                });
             }
 
-    usuarioInput.addEventListener('input', function(e) {
-            if (this.value.includes(@ViewData["Arroba"])) {
-                this.value = this.value.replace(/@ViewData["Arroba"]/g, '');
+            // 5. Validación en tiempo real
+            usuarioInput.addEventListener('keyup', function() {
+                const username = this.value.trim();
+                
+                if (username.includes('@ViewData["Arroba"]') || /\.(com|net|org|edu|gov)$/i.test(username)) {
+                    this.classList.add('is-invalid');
+                    usuarioFeedback.textContent = 'Solo ingresa el nombre de usuario, sin @ViewData["Arroba"] ni dominio';
+                    usuarioFeedback.style.color = '#dc3545';
+                    usuarioFeedback.style.display = 'block';
+                } else if (username.length >= 3) {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                    usuarioFeedback.style.display = 'none';
+                } else if (username.length > 0) {
+                    this.classList.remove('is-invalid', 'is-valid');
+                    usuarioFeedback.style.display = 'none';
+                } else {
+                    this.classList.remove('is-invalid', 'is-valid');
+                    usuarioFeedback.style.display = 'none';
+                }
+            });
 
-            
-            // Mostrar advertencia visual
-            this.classList.add('is-invalid');
-            usuarioFeedback.textContent = 'No debe incluir el símbolo en el nombre de usuario';
-            usuarioFeedback.style.display = 'block';
-            
-            // Ocultar la advertencia después de 2 segundos
-            setTimeout(() => {
-                this.classList.remove('is-invalid');
-                usuarioFeedback.style.display = 'none';
-            }, 2000);
-        }
-    });
+            // 6. Limpiar al perder foco
+            usuarioInput.addEventListener('blur', function() {
+                const usernameLimpio = extraerNombreUsuario(this.value);
+                if (usernameLimpio !== this.value) {
+                    this.value = usernameLimpio;
+                    this.classList.add('is-valid');
+                    
+                    setTimeout(() => {
+                        this.classList.remove('is-valid');
+                    }, 1500);
+                }
+            });
 
-    usuarioInput.addEventListener('paste', function(e) {
-        // Obtener el texto pegado
-        const pastedText = (e.clipboardData || window.clipboardData).getData('text');
-            if (pastedText.includes(@ViewData["Arroba"])) {
-            e.preventDefault();
+            // 7. Prevenir que el formulario se envíe con Enter en campos individuales
+            usuarioInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    loginForm.dispatchEvent(new Event('submit'));
+                }
+            });
             
-            // Mostrar advertencia
-            this.classList.add('is-invalid');
-                usuarioFeedback.textContent = 'No se puede pegar texto que contenga @ViewData["Arroba"]';
-            usuarioFeedback.style.display = 'block';
-            
-            // Ocultar la advertencia después de 2 segundos
-            setTimeout(() => {
-                this.classList.remove('is-invalid');
-                usuarioFeedback.style.display = 'none';
-            }, 2000);
-                 const withoutAt = pastedText.split(@ViewData["Arroba"])[0];
-            if (withoutAt && withoutAt.trim() !== '') {
-                document.execCommand('insertText', false, withoutAt);
+            // 8. Inicializar tooltips de Bootstrap si están disponibles
+            if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+                const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                tooltipTriggerList.map(function(tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl);
+                });
             }
-        }
-    });
-
-        // 3. Manejar el envío del formulario - construir el correo completo
-    loginForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        // Obtener el valor del usuario (sin espacios al inicio/final)
-        const username = usuarioInput.value.trim();
-        
-        // Validar que no esté vacío
-        if (!username) {
-            usuarioInput.classList.add('is-invalid');
-            usuarioFeedback.textContent = 'Por favor ingresa tu nombre de usuario institucional';
-            usuarioFeedback.style.display = 'block';
-            usuarioInput.focus();
-            return;
-        }
-                if (username.includes(@ViewData["Arroba"])) {
-            usuarioInput.classList.add('is-invalid');
-                usuarioFeedback.textContent = 'El nombre de usuario no debe contener @ViewData["Arroba"]';
-            usuarioFeedback.style.display = 'block';
-            usuarioInput.focus();
-            return;
-        }
-        
-        // Construir el correo electrónico completo
-        const emailCompleto = username + DOMAIN;
-        
-        // Asignar al campo oculto
-        correoHiddenInput.value = emailCompleto;
-        
-        // Para depuración: mostrar en consola
-        console.log("📧 Correo completo enviado:", emailCompleto);
-        
-        // Opcional: también puedes mostrar el correo completo en el campo visible (solo para visualización)
-        // usuarioInput.value = emailCompleto;
-        
-        // Enviar el formulario
-        this.submit();
-    });
-
-    // 4. Función para mostrar/ocultar contraseña
-    if (togglePasswordBtn) {
-        togglePasswordBtn.addEventListener('click', function() {
-            const type = contrasenaInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            contrasenaInput.setAttribute('type', type);
             
-            // Cambiar el icono
-            const icon = this.querySelector('i');
-            if (type === 'text') {
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
         });
-    }
-
-    // 5. Validación en tiempo real mientras el usuario escribe
-    usuarioInput.addEventListener('keyup', function() {
-        const username = this.value.trim();
-            if (username.includes(@ViewData["Arroba"])) {
-            this.classList.add('is-invalid');
-                usuarioFeedback.textContent = 'No debe incluir @ViewData["Arroba"] en el nombre de usuario';
-            usuarioFeedback.style.display = 'block';
-        } else if (username.length > 0) {
-            this.classList.remove('is-invalid');
-            this.classList.add('is-valid');
-            usuarioFeedback.style.display = 'none';
-            
-            // Quitar la clase "is-valid" después de 2 segundos
-            setTimeout(() => {
-                this.classList.remove('is-valid');
-            }, 2000);
-        } else {
-            this.classList.remove('is-invalid', 'is-valid');
-            usuarioFeedback.style.display = 'none';
-        }
-    });
-
-    // 6. Limpiar validación al enfocar el campo
-    usuarioInput.addEventListener('focus', function() {
-        this.classList.remove('is-invalid', 'is-valid');
-        usuarioFeedback.style.display = 'none';
-    });
-        }
     </script>
+
+    <style>
+        /* Estilos adicionales para mejor UX */
+        .is-valid {
+            border-color: #198754 !important;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e") !important;
+        }
+        
+        .is-invalid {
+            border-color: #dc3545 !important;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e") !important;
+        }
+        
+        #usuarioFeedback {
+            transition: all 0.3s ease;
+        }
+        
+        .form-text {
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+        }
+        
+        .input-group-text {
+            background-color: #f8f9fa;
+        }
+    </style>
 }

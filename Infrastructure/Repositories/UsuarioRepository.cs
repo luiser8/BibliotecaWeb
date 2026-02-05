@@ -42,12 +42,6 @@ namespace Infrastructure.Repositories;
                 if (string.IsNullOrWhiteSpace(usuario.Contrasena))
                     throw new ArgumentException("La contraseña es requerida", nameof(usuario.Contrasena));
                 
-                // Verificar si el correo ya existe
-                /*var existe = await ExistsByEmailAsync(usuario.Correo);
-                if (existe)
-                    throw new DuplicateRecordException("Correo", usuario.Correo);
-                */
-                
                 _params.Clear();
                 _params.Add("@ExtensionId", usuario.ExtensionId);
                 _params.Add("@RolId", usuario.RolId);
@@ -60,29 +54,26 @@ namespace Infrastructure.Repositories;
                     throw new RepositoryException("ADD_FAILED", "No se pudo crear el usuario");
                 
                 // Verificar si el procedimiento almacenado devuelve un error
-                if (_dt.Columns.Contains("ErrorMessage") && _dt.Rows[0]["ErrorMessage"] != DBNull.Value)
+                if (!_dt.Columns.Contains("ErrorMessage") || _dt.Rows[0]["ErrorMessage"] == DBNull.Value)
+                    return Convert.ToInt32(_dt.Rows[0]["Id"]);
+                var errorMessage = _dt.Rows[0]["ErrorMessage"].ToString();
+                var errorCode = _dt.Columns.Contains("ErrorCode") ? 
+                    Convert.ToInt32(_dt.Rows[0]["ErrorCode"]) : 0;
+                    
+                // Manejar errores específicos del SP
+                if (errorMessage != null && (errorCode == 2601 || errorCode == 2627 || 
+                                             errorMessage.Contains("correo", StringComparison.OrdinalIgnoreCase) ||
+                                             errorMessage.Contains("duplicado", StringComparison.OrdinalIgnoreCase)))
                 {
-                    string errorMessage = _dt.Rows[0]["ErrorMessage"].ToString();
-                    int errorCode = _dt.Columns.Contains("ErrorCode") ? 
-                        Convert.ToInt32(_dt.Rows[0]["ErrorCode"]) : 0;
-                    
-                    // Manejar errores específicos del SP
-                    if (errorCode == 2601 || errorCode == 2627 || 
-                        errorMessage.Contains("correo", StringComparison.OrdinalIgnoreCase) ||
-                        errorMessage.Contains("duplicado", StringComparison.OrdinalIgnoreCase))
-                    {
-                        throw new DuplicateRecordException("Correo", usuario.Correo);
-                    }
-                    
-                    throw new RepositoryException($"SP_ERROR_{errorCode}", errorMessage);
+                    throw new DuplicateRecordException("Correo", usuario.Correo);
                 }
-                
-                return Convert.ToInt32(_dt.Rows[0]["Id"]);
-                
+                    
+                throw new RepositoryException($"SP_ERROR_{errorCode}", errorMessage);
+
             }, "AgregarUsuario");
         }
         
-        public async Task<AuthUsuario> AuthAsync(string correo, string contrasena)
+        public async Task<AuthUsuario> AuthAsync(string? correo, string? contrasena)
         {
             return await ErrorHandler.HandleRepositoryErrorAsync(async () =>
             {
@@ -111,7 +102,7 @@ namespace Infrastructure.Repositories;
                     throw new UnauthorizedAccessException("Usuario inactivo");
 
                 // 2. Verificar contraseña en código C#
-                bool esValida = false;
+                var esValida = false;
         
                 if (_passwordHasher == null)
                 {
@@ -138,11 +129,7 @@ namespace Infrastructure.Repositories;
                 
                 _dt = await _dbCon.ExecuteAsync(nameof(EUsuarioCommand.SPUsuarioGetByIdCommand), _params);
                 
-                if (_dt.Rows.Count == 0)
-                    throw new RecordNotFoundException("Usuario", id);
-                
-                return MapDataRowToUsuario(_dt.Rows[0]);
-                
+                return _dt.Rows.Count == 0 ? throw new RecordNotFoundException("Usuario", id) : MapDataRowToUsuario(_dt.Rows[0]);
             }, "ObtenerUsuarioPorId");
         }
         
@@ -157,14 +144,6 @@ namespace Infrastructure.Repositories;
                 var usuarioExistente = await GetByIdAsync(usuario.Id);
                 if (usuarioExistente == null)
                     throw new RecordNotFoundException("Usuario", usuario.Id);
-                
-                // Si cambió el correo, verificar que no exista otro con ese correo
-                /*if (!string.Equals(usuarioExistente.Correo, usuario.Correo, StringComparison.OrdinalIgnoreCase))
-                {
-                    var existe = await ExistsByEmailAsync(usuario.Correo);
-                    if (existe)
-                        throw new DuplicateRecordException("Correo", usuario.Correo);
-                }*/
                 
                 _params.Clear();
                 _params.Add("@Id", usuario.Id);
@@ -184,14 +163,10 @@ namespace Infrastructure.Repositories;
                     return false;
                 
                 // Verificar si hay error
-                if (_dt.Columns.Contains("ErrorMessage") && _dt.Rows[0]["ErrorMessage"] != DBNull.Value)
-                {
-                    string? errorMessage = _dt.Rows[0]["ErrorMessage"].ToString();
-                    throw new RepositoryException("UPDATE_FAILED", errorMessage);
-                }
-                
-                return true;
-                
+                if (!_dt.Columns.Contains("ErrorMessage") || _dt.Rows[0]["ErrorMessage"] == DBNull.Value) return true;
+                var errorMessage = _dt.Rows[0]["ErrorMessage"].ToString();
+                throw new RepositoryException("UPDATE_FAILED", errorMessage);
+
             }, "ActualizarUsuario");
         }
         
@@ -213,21 +188,17 @@ namespace Infrastructure.Repositories;
                     return false;
                 
                 // Verificar si hay error (ej: violación FK)
-                if (_dt.Columns.Contains("ErrorMessage") && _dt.Rows[0]["ErrorMessage"] != DBNull.Value)
+                if (!_dt.Columns.Contains("ErrorMessage") || _dt.Rows[0]["ErrorMessage"] == DBNull.Value) return true;
+                var errorMessage = _dt.Rows[0]["ErrorMessage"].ToString();
+                    
+                if (errorMessage != null && (errorMessage.Contains("FOREIGN KEY", StringComparison.OrdinalIgnoreCase) ||
+                                             errorMessage.Contains("relacionado", StringComparison.OrdinalIgnoreCase)))
                 {
-                    string errorMessage = _dt.Rows[0]["ErrorMessage"].ToString();
-                    
-                    if (errorMessage.Contains("FOREIGN KEY", StringComparison.OrdinalIgnoreCase) ||
-                        errorMessage.Contains("relacionado", StringComparison.OrdinalIgnoreCase))
-                    {
-                        throw new ForeignKeyViolationException("FK_Usuario", "tablas relacionadas");
-                    }
-                    
-                    throw new RepositoryException("DELETE_FAILED", errorMessage);
+                    throw new ForeignKeyViolationException("FK_Usuario", "tablas relacionadas");
                 }
-                
-                return true;
-                
+                    
+                throw new RepositoryException("DELETE_FAILED", errorMessage);
+
             }, "EliminarUsuario");
         }
         
@@ -243,6 +214,9 @@ namespace Infrastructure.Repositories;
                 Correo = row["Correo"]?.ToString() ?? string.Empty,
                 Nombres = row["Nombres"]?.ToString() ?? string.Empty,
                 Apellidos = row["Apellidos"]?.ToString() ?? string.Empty,
+                Sexo = row["Sexo"]?.ToString() ?? string.Empty,
+                Foto = row["Foto"] as byte[] ?? [],
+                TipoIngreso = row["TipoIngreso"]?.ToString() ?? string.Empty,
                 RolId = row["RolId"] != DBNull.Value ? Convert.ToInt32(row["RolId"]) : 0,
                 Rol = row["Rol"]?.ToString() ?? string.Empty,
                 ExtensionId = row["ExtensionId"] != DBNull.Value ? Convert.ToInt32(row["ExtensionId"]) : 0,
@@ -250,6 +224,7 @@ namespace Infrastructure.Repositories;
                 CarreraId = row["CarreraId"] != DBNull.Value ? Convert.ToInt32(row["CarreraId"]) : 0,
                 Carrera = row["Carrera"]?.ToString() ?? string.Empty,
                 Activo = row["Activo"] != DBNull.Value && Convert.ToByte(row["Activo"]) == 1,
+                UltimoAcceso = row["UltimoAcceso"] != DBNull.Value ? Convert.ToDateTime(row["UltimoAcceso"]) : DateTime.MinValue
             };
 
             return authUsuario;
@@ -287,13 +262,13 @@ namespace Infrastructure.Repositories;
             }
         }
         
-        private void ValidateEntity(Usuario usuario, string paramName)
+        private static void ValidateEntity(Usuario usuario, string paramName)
         {
             if (usuario == null)
                 throw new ArgumentNullException(paramName, $"{paramName} no puede ser nulo");
         }
         
-        private void ValidateId(int id, string idName)
+        private static void ValidateId(int id, string idName)
         {
             if (id <= 0)
                 throw new ArgumentException($"{idName} debe ser mayor que 0", idName);
@@ -309,15 +284,8 @@ namespace Infrastructure.Repositories;
                 _params.Add("@PageSize", pageSize);
                 
                 _dt = await _dbCon.ExecuteAsync(nameof(EUsuarioCommand.SPUsuarioGetAllCommand), _params);
-                
-                var usuarios = new List<Usuario>();
-                
-                foreach (DataRow row in _dt.Rows)
-                {
-                    usuarios.Add(MapDataRowToUsuario(row));
-                }
-                
-                return usuarios;
+
+                return (from DataRow row in _dt.Rows select MapDataRowToUsuario(row)).ToList();
                 
             }, "ObtenerTodosUsuarios");
         }

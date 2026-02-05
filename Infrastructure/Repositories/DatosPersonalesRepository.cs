@@ -45,7 +45,6 @@ public class DatosPersonalesRepository : IDatosPersonalesRepository
             _params.Add("@Cedula", datosPersonales.Cedula);
             _params.Add("@Nombres", datosPersonales.Nombres);
             _params.Add("@Apellidos", datosPersonales.Apellidos);
-            _params.Add("@FechaNacimiento", datosPersonales.FechaNacimiento);
             _params.Add("@Sexo", datosPersonales.Sexo);
 
             _dt = await _dbCon.ExecuteAsync(nameof(EDatosPersonalesCommand.SPDatosPersonalesAddCommand), _params);

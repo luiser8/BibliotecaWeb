@@ -27,13 +27,6 @@ public class AuthQueryUseCase : IAuthQueryUseCase
             // Autenticar usuario
             var usuario = await _usuarioRepository.AuthAsync(loginDto.Correo, loginDto.Contrasena);
 
-            if (usuario == null)
-            {
-                return OperationResult<AuthResult>.Error(
-                    "Correo electrónico o contraseña incorrectos. Por favor, verifica tus credenciales.",
-                    "AUTH_FAILED");
-            }
-
             // Generar Claims basados en el usuario
             var claims = GenerateClaims(usuario);
 
@@ -77,27 +70,29 @@ public class AuthQueryUseCase : IAuthQueryUseCase
     /// <summary>
     /// Genera los Claims del usuario basados en su información
     /// </summary>
-    private List<Claim> GenerateClaims(AuthUsuario usuario)
+    private static List<Claim> GenerateClaims(AuthUsuario usuario)
     {
         var nombreCompleto = $"{usuario.Nombres} {usuario.Apellidos}".Trim();
         
         var claims = new List<Claim>
         {
-            new Claim("UsuarioId", usuario.UsuarioId.ToString()),
-            new Claim("Correo", usuario.Correo ?? ""),
-            new Claim("Cedula", usuario.Cedula ?? ""),
-            new Claim("Contrasena", usuario.Contrasena ?? ""),
-            new Claim("Nombres", usuario.Nombres ?? ""),
-            new Claim("Apellidos", usuario.Apellidos ?? ""),
-            new Claim("NombreCompleto", nombreCompleto), // Agregar nombre completo como claim
-            new Claim(ClaimTypes.Name, nombreCompleto), // También como ClaimTypes.Name
-            new Claim("RolId", usuario.RolId.ToString()),
-            new Claim("Rol", usuario.Rol ?? ""),
-            new Claim("ExtensionId", usuario.ExtensionId.ToString()),
-            new Claim("Extension", usuario.Extension ?? ""),
-            new Claim("CarreraId", usuario.CarreraId.ToString()),
-            new Claim("Carrera", usuario.Carrera ?? ""),
-            new Claim(ClaimTypes.Email, usuario.Correo ?? "")
+            new ("UsuarioId", usuario.UsuarioId.ToString()),
+            new ("Correo", usuario.Correo ?? ""),
+            new ("Cedula", usuario.Cedula ?? ""),
+            new ("Contrasena", usuario.Contrasena ?? ""),
+            new ("Nombres", usuario.Nombres ?? ""),
+            new ("Apellidos", usuario.Apellidos ?? ""),
+            new ("Sexo", usuario.Sexo ?? ""),
+            new ("TipoIngreso", usuario.TipoIngreso ?? ""),
+            new ("NombreCompleto", nombreCompleto), // Agregar nombre completo como claim
+            new (ClaimTypes.Name, nombreCompleto), // También como ClaimTypes.Name
+            new ("RolId", usuario.RolId.ToString()),
+            new ("Rol", usuario.Rol ?? ""),
+            new ("ExtensionId", usuario.ExtensionId.ToString()),
+            new ("Extension", usuario.Extension ?? ""),
+            new ("CarreraId", usuario.CarreraId.ToString()),
+            new ("Carrera", usuario.Carrera ?? ""),
+            new (ClaimTypes.Email, usuario.Correo ?? "")
         };
 
         return claims;

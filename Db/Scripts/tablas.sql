@@ -78,8 +78,8 @@ CREATE TABLE DatosPersonales
 	Cedula VARCHAR(25) NOT NULL UNIQUE,
     Nombres VARCHAR(255) NOT NULL,
     Apellidos VARCHAR(255) NOT NULL,
-    FechaNacimiento VARCHAR(55) NOT NULL,
     Sexo VARCHAR(15) NOT NULL,
+	Foto VARBINARY(MAX) NULL,
 	Activo TINYINT NOT NULL DEFAULT 1,
 	FechaCreado DATETIME NOT NULL DEFAULT GETDATE(),
 	CONSTRAINT FK_USUARIO_DP_ID FOREIGN KEY (UsuarioId) REFERENCES Usuarios (Id) ON DELETE CASCADE ON UPDATE NO ACTION
@@ -116,18 +116,18 @@ CREATE TABLE Autores
 	FechaCreado DATETIME NOT NULL DEFAULT GETDATE()
 );
 
-CREATE TABLE TiposMateriales
+CREATE TABLE Tipos
 (
 	Id INT NOT NULL PRIMARY KEY IDENTITY(1,1),
-    Tipo VARCHAR(15) NULL, --Físico / Digital
+    Tipo VARCHAR(15) NOT NULL, --Físico / Digital
 	Activo TINYINT NOT NULL DEFAULT 1,
 	FechaCreado DATETIME NOT NULL DEFAULT GETDATE()
 );
 
-CREATE TABLE CategoriaMateriales
+CREATE TABLE Categorias
 (
 	Id INT NOT NULL PRIMARY KEY IDENTITY(1,1),
-    Categoria VARCHAR(55) NULL, -- Libros / Tesis / Informes de pasantias / Servicio Comunitario / Proyecto de investigacion
+    Categoria VARCHAR(55) NOT NULL, -- Libros / Tesis / Informes de pasantias / Servicio Comunitario / Proyecto de investigacion
 	Activo TINYINT NOT NULL DEFAULT 1,
 	FechaCreado DATETIME NOT NULL DEFAULT GETDATE()
 );
@@ -145,34 +145,46 @@ CREATE TABLE Materiales
 (
 	Id INT NOT NULL PRIMARY KEY IDENTITY(1,1),
 	ExtensionId INT NOT NULL,
-    TipoMaterialId INT NOT NULL,
-	CategoriaMaterialId INT NULL,
+	CategoriaId INT NOT NULL,
 	EditorialId INT NULL,
     AutorId INT NOT NULL,
     Cota VARCHAR(255) NOT NULL,
     Titulo VARCHAR(255) NOT NULL,
     Edicion VARCHAR(155) NULL,
+	Recurso VARCHAR(255) NULL, -- Si es digital tendra la ruta del archivo
+	EjemplaresActuales INT NOT NULL, -- Al prestar se van restando e incrementando al devolver
+	EjemplaresTotales INT NOT NULL, -- Total de material ingresado
     Estatus VARCHAR(25) NOT NULL, -- Activo / Inactivo / Desincorporado / En reparacion
 	Activo TINYINT NOT NULL DEFAULT 1,
 	FechaCreado DATETIME NOT NULL DEFAULT GETDATE()
-	CONSTRAINT FK_TIPO_MATERIAL_ID FOREIGN KEY (TipoMaterialId) REFERENCES TiposMateriales (Id) ON DELETE CASCADE ON UPDATE NO ACTION,
-	CONSTRAINT FK_CATEGORIA_MATERIAL_ID FOREIGN KEY (CategoriaMaterialId) REFERENCES CategoriaMateriales (Id) ON DELETE CASCADE ON UPDATE NO ACTION,
+	CONSTRAINT FK_CATEGORIA_ID FOREIGN KEY (CategoriaId) REFERENCES Categorias (Id) ON DELETE CASCADE ON UPDATE NO ACTION,
 	CONSTRAINT FK_AUTOR_MATERIALES_ID FOREIGN KEY (AutorId) REFERENCES Autores (Id) ON DELETE CASCADE ON UPDATE NO ACTION,
 	CONSTRAINT FK_EXTENSION_ID FOREIGN KEY (ExtensionId) REFERENCES Extensiones (Id) ON DELETE CASCADE ON UPDATE NO ACTION,
 	CONSTRAINT FK_EDITORIAL_ID FOREIGN KEY (EditorialId) REFERENCES Editoriales (Id) ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
+CREATE TABLE TiposMateriales
+(
+	Id INT NOT NULL PRIMARY KEY IDENTITY(1,1),
+	MaterialId INT NOT NULL,
+    TipoId INT NOT NULL,
+	Activo TINYINT NOT NULL DEFAULT 1,
+	FechaCreado DATETIME NOT NULL DEFAULT GETDATE()
+	CONSTRAINT FK_MATERIALES_ID FOREIGN KEY (MaterialId) REFERENCES Materiales (Id) ON DELETE CASCADE ON UPDATE NO ACTION,
+	CONSTRAINT FK_TIPO_ID FOREIGN KEY (TipoId) REFERENCES Tipos (Id) ON DELETE CASCADE ON UPDATE NO ACTION
+);
+
 CREATE TABLE ReglasPrestamos
 (
 	Id INT NOT NULL PRIMARY KEY IDENTITY(1,1),
-	TipoMaterialId INT NOT NULL,
+	TipoId INT NOT NULL,
     DiasLimites INT NOT NULL, -- 5 dias
     HorasLimites INT NOT NULL, -- 120 horas
     CantidadLimites INT NOT NULL, -- 3 es el limite de materiales por prestamo
     Mora DECIMAL NULL, -- Valor mora por tipo de material, puede ser recalculado por retarno de devolucion en Morosidad
 	Activo TINYINT NOT NULL DEFAULT 1,
 	FechaCreado DATETIME NOT NULL DEFAULT GETDATE()
-	CONSTRAINT FK_REGLA_TIPO_MATERIAL_ID FOREIGN KEY (TipoMaterialId) REFERENCES TiposMateriales (Id) ON DELETE CASCADE ON UPDATE NO ACTION
+	CONSTRAINT FK_REGLA_TIPO_ID FOREIGN KEY (TipoId) REFERENCES Tipos (Id) ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
 CREATE TABLE Prestamos

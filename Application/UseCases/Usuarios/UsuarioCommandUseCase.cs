@@ -33,7 +33,6 @@ public class UsuarioCommandUseCase(IUsuarioRepository usuarioRepository, IDatosP
                 Cedula = usuario.DatosPersonales?.Cedula,
                 Nombres = usuario.DatosPersonales?.Nombres,
                 Apellidos = usuario.DatosPersonales?.Apellidos,
-                FechaNacimiento = usuario.DatosPersonales?.FechaNacimiento,
                 Sexo = usuario.DatosPersonales?.Sexo,
             });
 
