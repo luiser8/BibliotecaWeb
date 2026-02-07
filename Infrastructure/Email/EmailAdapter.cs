@@ -21,10 +21,10 @@ public class EmailAdapter : IEmailPort
 
         using var client = new SmtpClient();
         // Connect to the SMTP server
-        await client.ConnectAsync("smtp.example.com", 587, SecureSocketOptions.StartTls);
+        await client.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
 
         // Authenticate with credentials (use App Passwords for Gmail/Outlook if 2FA is on)
-        await client.AuthenticateAsync("your_username", "your_app_password");
+        await client.AuthenticateAsync("leduardo.rondon@gmail.com", "byzg pckx grag kbgr");
 
         // Send the message
         await client.SendAsync(message);
