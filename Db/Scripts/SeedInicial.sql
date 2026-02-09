@@ -265,6 +265,7 @@ INSERT INTO RolPoliticas (RolId, PoliticaId)
 SELECT @DirectivoId, Id FROM Politicas
 WHERE Nombre NOT LIKE 'Roles%'
   AND Ruta NOT LIKE 'Seguridad%'
+  AND Nombre NOT LIKE 'Mis prestamos%'
 ORDER BY Id;
 
 -- 6. BIBLIOTECARIO: Todo menos seguridad, roles, políticas, extensiones, carreras, usuarios
@@ -275,6 +276,7 @@ WHERE Nombre NOT LIKE 'Roles%'
   AND Nombre NOT LIKE '%Extensiones%'
   AND Nombre NOT LIKE '%Carreras%'
   AND Nombre NOT LIKE 'Usuarios%'
+  AND Nombre NOT LIKE 'Mis prestamos%'
 ORDER BY Id;
 
 -- 7. PROFESOR: Solo políticas específicas

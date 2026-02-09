@@ -1,16 +1,62 @@
--- Insertar el usuario estudiante
+-- Insertar el usuario administrador
 INSERT INTO Usuarios (ExtensionId, RolId, Correo, Contrasena) 
-VALUES (1, 1, 'admin@psm.edu.ve', 'dp6G+V4XfwVMMCCBJPqLCw==:a9IE8oPJRxdSapJJ64cfKxIGS1jlL7NJogbpesHzhgs=');
+VALUES (1, (SELECT TOP 1 Id FROM Roles WHERE Nombre = 'Administrador'), 'administrador@psm.edu.ve', 'dp6G+V4XfwVMMCCBJPqLCw==:a9IE8oPJRxdSapJJ64cfKxIGS1jlL7NJogbpesHzhgs=');
+
+-- Insertar el usuario directivo
+INSERT INTO Usuarios (ExtensionId, RolId, Correo, Contrasena) 
+VALUES (1, (SELECT TOP 1 Id FROM Roles WHERE Nombre = 'Directivo'), 'directivo@psm.edu.ve', 'dp6G+V4XfwVMMCCBJPqLCw==:a9IE8oPJRxdSapJJ64cfKxIGS1jlL7NJogbpesHzhgs=');
+
+-- Insertar el usuario biblitecario
+INSERT INTO Usuarios (ExtensionId, RolId, Correo, Contrasena) 
+VALUES (1, (SELECT TOP 1 Id FROM Roles WHERE Nombre = 'Bibliotecario'), 'bibliotecario@psm.edu.ve', 'dp6G+V4XfwVMMCCBJPqLCw==:a9IE8oPJRxdSapJJ64cfKxIGS1jlL7NJogbpesHzhgs=');
+
+-- Insertar el usuario profesor
+INSERT INTO Usuarios (ExtensionId, RolId, Correo, Contrasena) 
+VALUES (1, (SELECT TOP 1 Id FROM Roles WHERE Nombre = 'Profesor'), 'profesor@psm.edu.ve', 'dp6G+V4XfwVMMCCBJPqLCw==:a9IE8oPJRxdSapJJ64cfKxIGS1jlL7NJogbpesHzhgs=');
+
+-- Insertar el usuario estudiante nacional
+INSERT INTO Usuarios (ExtensionId, RolId, Correo, Contrasena) 
+VALUES (1, (SELECT TOP 1 Id FROM Roles WHERE Nombre = 'Estudiante'), 'estudiante_nacional@psm.edu.ve', 'dp6G+V4XfwVMMCCBJPqLCw==:a9IE8oPJRxdSapJJ64cfKxIGS1jlL7NJogbpesHzhgs=');
+
+-- Insertar el usuario estudiante internacional
+INSERT INTO Usuarios (ExtensionId, RolId, Correo, Contrasena) 
+VALUES (1, (SELECT TOP 1 Id FROM Roles WHERE Nombre = 'Estudiante'), 'estudiante_internacional@psm.edu.ve', 'dp6G+V4XfwVMMCCBJPqLCw==:a9IE8oPJRxdSapJJ64cfKxIGS1jlL7NJogbpesHzhgs=');
 
 -- Obtener el ID del usuario insertado (asumamos que es 1)
 
--- Insertar datos personales del estudiante
+-- Insertar datos personales del administrador
 INSERT INTO DatosPersonales (UsuarioId, Cedula, Nombres, Apellidos, Sexo)
-VALUES (2, '32432425', 'Admin', 'Admin', 'Masculino');
+VALUES ((SELECT TOP 1 Id FROM Usuarios WHERE Correo = 'administrador@psm.edu.ve'), '32432425', 'Administrador', '', 'Masculino');
 
--- Insertar datos académicos del estudiante (cursando Arquitectura)
+-- Insertar datos personales del directivo
+INSERT INTO DatosPersonales (UsuarioId, Cedula, Nombres, Apellidos, Sexo)
+VALUES ((SELECT TOP 1 Id FROM Usuarios WHERE Correo = 'directivo@psm.edu.ve'), '12432421', 'Directivo', '', 'Masculino');
+
+-- Insertar datos personales del bibliotecario
+INSERT INTO DatosPersonales (UsuarioId, Cedula, Nombres, Apellidos, Sexo)
+VALUES ((SELECT TOP 1 Id FROM Usuarios WHERE Correo = 'bibliotecario@psm.edu.ve'), '22432421', 'Bibliotecario', '', 'Masculino');
+
+-- Insertar datos personales del bibliotecario
+INSERT INTO DatosPersonales (UsuarioId, Cedula, Nombres, Apellidos, Sexo)
+VALUES ((SELECT TOP 1 Id FROM Usuarios WHERE Correo = 'profesor@psm.edu.ve'), '42432421', 'Profesor', '', 'Masculino');
+
+-- Insertar datos personales del estudiante nacional
+INSERT INTO DatosPersonales (UsuarioId, Cedula, Nombres, Apellidos, Sexo)
+VALUES ((SELECT TOP 1 Id FROM Usuarios WHERE Correo = 'estudiante_nacional@psm.edu.ve'), '52432421', 'Estudiante', '', 'Masculino');
+
+-- Insertar datos personales del estudiante internacional
+INSERT INTO DatosPersonales (UsuarioId, Cedula, Nombres, Apellidos, Sexo)
+VALUES ((SELECT TOP 1 Id FROM Usuarios WHERE Correo = 'estudiante_internacional@psm.edu.ve'), '62432421', 'Estudiante', '', 'Masculino');
+
+-- Insertar datos académicos del estudiante nacional
 INSERT INTO DatosAcademicos (UsuarioId, CarreraId, TipoIngreso)
-VALUES (3, 1, 'Nacional');
+VALUES ((SELECT TOP 1 Id FROM Usuarios WHERE Correo = 'estudiante_nacional@psm.edu.ve'), 
+(SELECT TOP 1 Id FROM Carreras WHERE Nombre = 'Arquitectura'), 'Nacional');
+
+-- Insertar datos académicos del estudiante internacional
+INSERT INTO DatosAcademicos (UsuarioId, CarreraId, TipoIngreso)
+VALUES ((SELECT TOP 1 Id FROM Usuarios WHERE Correo = 'estudiante_internacional@psm.edu.ve'), 
+(SELECT TOP 1 Id FROM Carreras WHERE Nombre = 'Ingeniería Civil'), 'Internacional');
 
 --query 1
 SELECT 
@@ -33,7 +79,6 @@ SELECT
     -- Datos Personales
     dp.Nombres,
     dp.Apellidos,
-    dp.FechaNacimiento,
     dp.Sexo,
     
     -- Datos Académicos
