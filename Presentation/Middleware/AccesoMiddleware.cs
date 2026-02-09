@@ -38,7 +38,10 @@ namespace Presentation.Middleware
                 "/error",                     // Error genérico
                 "/home/privacy",
                 "/home/about",
-                "/home/contact"
+                "/home/contact",
+                "/recuperacion/index",
+                "/recuperacion/generar",
+                "/recuperacion/guardar",
             };
 
             // Verificar si la ruta actual es pública

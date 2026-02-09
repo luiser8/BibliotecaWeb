@@ -104,12 +104,6 @@ public class UsuarioController : Controller
         return RedirectToAction("Index", "Home");
     }
 
-    //GET:  /Usuario/Recuperacion
-    public IActionResult Recuperacion()
-    {
-        return View();
-    }
-
     // GET: /Account/Logout
     public async Task<IActionResult> Logout()
     {

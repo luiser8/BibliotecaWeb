@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Presentation.Filters;
 using Presentation.Middleware;
 using Presentation.Services;
+using Application.UseCases.UsuarioRecuperacion;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -84,6 +85,7 @@ builder.Services.AddScoped<IDatosAcademicosRepository, DatosAcademicosRepository
 builder.Services.AddScoped<IPoliticasUsuarioRepository, PoliticasUsuarioRepository>();
 builder.Services.AddScoped<IUsuarioPerfilRepository, UsuarioPerfilRepository>();
 builder.Services.AddScoped<IEmailPort, EmailAdapter>();
+builder.Services.AddScoped<ICodigoRecuperacion, CodigoRecuperacion>();
 
 // Casos de uso
 builder.Services.AddScoped<IExtensionQueryUseCase, ExtensionQueryUseCase>();
@@ -94,6 +96,7 @@ builder.Services.AddScoped<IPoliticasUsuariosQueryUseCase, PoliticasUsuariosQuer
 builder.Services.AddScoped<IUsuarioPerfilCommandUseCase, UsuarioPerfilCommandUseCase>();
 builder.Services.AddScoped<IAuthQueryUseCase, AuthQueryUseCase>();
 builder.Services.AddScoped<IEmailCommandUseCase, EmailCommandUseCase>();
+builder.Services.AddScoped<IUsuarioRecuperacionCommandUseCase, UsuarioRecuperacionCommandUseCase>();
 
 // Otros servicios
 builder.Services.AddHttpContextAccessor();

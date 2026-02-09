@@ -7,11 +7,16 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="DTOs\Carreras\Request\" />
-      <Folder Include="DTOs\Carreras\Responses\" />
+      <Compile Remove="DTOs\Carreras\**" />
+      <Compile Remove="DTOs\TipoUsuario\**" />
+      <EmbeddedResource Remove="DTOs\Carreras\**" />
+      <EmbeddedResource Remove="DTOs\TipoUsuario\**" />
+      <None Remove="DTOs\Carreras\**" />
+      <None Remove="DTOs\TipoUsuario\**" />
+    </ItemGroup>
+
+    <ItemGroup>
       <Folder Include="DTOs\Extension\Request\" />
-      <Folder Include="DTOs\TipoUsuario\Request\" />
-      <Folder Include="DTOs\TipoUsuario\Responses\" />
       <Folder Include="DTOs\Usuarios\Responses\" />
 	  <Folder Include="DTOs\Usuarios\Request\" />
     </ItemGroup>

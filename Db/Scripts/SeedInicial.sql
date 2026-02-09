@@ -27,7 +27,8 @@ INSERT INTO Carreras (Nombre) VALUES
 ('Ingeniería Química'),
 ('Ingeniería de Petróleo'),
 ('Ingeniería Agronómica'),
-('Ingeniería en Telecomunicaciones');
+('Ingeniería en Telecomunicaciones'),
+('Ingeniería en Producción');
 
 --EXTENSION CARRERAS
 -- Arquitectura (disponible en todas las extensiones)
@@ -74,9 +75,13 @@ INSERT INTO ExtensionCarreras (ExtensionId, CarreraId) VALUES
 INSERT INTO ExtensionCarreras (ExtensionId, CarreraId) VALUES
 (6, 11);
 
--- Ingeniería en Telecomunicaciones (disponible solo en 1 extensión)
+-- Ingeniería en Telecomunicaciones
 INSERT INTO ExtensionCarreras (ExtensionId, CarreraId) VALUES
-(5, 12);
+(1, 12), (4, 12), (5, 12);
+
+-- Ingeniería en Produccion
+INSERT INTO ExtensionCarreras (ExtensionId, CarreraId) VALUES
+(1, 13);
 
 --Tipos materiales
 INSERT INTO Tipos (Tipo) VALUES

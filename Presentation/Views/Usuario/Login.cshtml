@@ -63,7 +63,9 @@
             <input type="checkbox" class="form-check-input" id="RememberMe" name="RememberMe">
             <label class="form-check-label small" for="RememberMe">Recordar sesión</label>
         </div>
-        <a href="/usuario/recuperacion" class="login-link small">¿Olvidaste tu contraseña?</a>
+        <a href="@Url.Action("Index", "Recuperacion")" class="login-link small">
+            ¿Olvidaste tu contraseña?
+        </a>
     </div>
     
     <button type="submit" class="btn btn-primary w-100 py-2 mb-3">
