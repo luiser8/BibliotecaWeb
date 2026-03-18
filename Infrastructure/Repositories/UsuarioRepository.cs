@@ -4,31 +4,27 @@ using Domain.Commands;
 using Domain.Entities;
 using Domain.Ports;
 using Infrastructure.Handlers;
-using Infrastructure.Exceptions;
-using Microsoft.Extensions.Logging;
+using Domain.Exceptions;
 
 namespace Infrastructure.Repositories;
-    
+
     public class UsuarioRepository : IUsuarioRepository
     {
         private readonly IDataTableExecute _dbCon;
         private DataTable? _dt;
         private readonly Hashtable _params;
         private readonly IPasswordHasher? _passwordHasher;
-        private readonly ILogger<UsuarioRepository>? _logger;
-        
+
         public UsuarioRepository(
-            IDataTableExecute dataTableExecute, 
-            IPasswordHasher? passwordHasher,
-            ILogger<UsuarioRepository>? logger = null)
+            IDataTableExecute dataTableExecute,
+            IPasswordHasher? passwordHasher)
         {
             _dt = new DataTable();
             _dbCon = dataTableExecute ?? throw new ArgumentNullException(nameof(dataTableExecute));
             _params = [];
             _passwordHasher = passwordHasher;
-            _logger = logger;
         }
-        
+
         public async Task<int> AddAsync(Usuario usuario)
         {
             return await ErrorHandler.HandleRepositoryErrorAsync(async () =>
@@ -231,12 +227,11 @@ namespace Infrastructure.Repositories;
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Error al mapear DataRow a AuthUsuario");
             throw new RepositoryException("MAPPING_ERROR", 
                 "Error al convertir los datos del auth usuario: " + ex.Message);
         }
     }
-        
+
         private Usuario MapDataRowToUsuario(DataRow row)
         {
             try
@@ -256,12 +251,11 @@ namespace Infrastructure.Repositories;
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error al mapear DataRow a Usuario");
                 throw new RepositoryException("MAPPING_ERROR", 
                     "Error al convertir los datos del usuario: " + ex.Message);
             }
         }
-        
+
         private static void ValidateEntity(Usuario usuario, string paramName)
         {
             if (usuario == null)

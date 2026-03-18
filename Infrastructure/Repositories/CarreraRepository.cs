@@ -3,6 +3,7 @@ using System.Data;
 using Domain.Commands;
 using Domain.Entities;
 using Domain.Ports;
+using Infrastructure.Handlers;
 
 namespace Infrastructure.Repositories;
 
@@ -31,20 +32,23 @@ public class CarreraRepository : ICarreraRepository
 
     public async Task<List<Carrera>> GetAllWithExtensionAsync(int id)
     {
-        _params.Clear();
-        _params.Add("@IdExtension", id);
-
-        var listCarreras = new List<Carrera>();
-
-        _dt = await _dbCon.ExecuteAsync(nameof(ECarreraCommand.SPCarreraAllWithExtensionCommand), _params);
-        if (_dt.Rows.Count == 0) return listCarreras;
-        for (var i = 0; i < _dt.Rows.Count; i++)
+        return await ErrorHandler.HandleRepositoryErrorAsync(async () =>
         {
-            listCarreras.Add(MapDataRowToCarrera(_dt.Rows[i]));
-        }
-        return listCarreras;
+            _params.Clear();
+            _params.Add("@IdExtension", id);
+
+            var listCarreras = new List<Carrera>();
+
+            _dt = await _dbCon.ExecuteAsync(nameof(ECarreraCommand.SPCarreraAllWithExtensionCommand), _params);
+            if (_dt.Rows.Count == 0) return listCarreras;
+            for (var i = 0; i < _dt.Rows.Count; i++)
+            {
+                listCarreras.Add(MapDataRowToCarrera(_dt.Rows[i]));
+            }
+            return listCarreras;
+        }, "ObtenerCarrerasPorExtension");
     }
-    
+
     private static Carrera MapDataRowToCarrera(DataRow row)
     {
         return new Carrera

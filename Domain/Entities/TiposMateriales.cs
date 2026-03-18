@@ -7,6 +7,5 @@ public class TiposMateriales
     public int TipoId { get; set; }
     public bool Activo { get; set; }
     public DateTime FechaCreado { get; set; }
-    
     public Materiales? Materiales { get; set; }
 }

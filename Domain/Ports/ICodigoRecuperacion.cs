@@ -1,7 +1,7 @@
-﻿namespace Domain.Ports
+namespace Domain.Ports
 {
     public interface ICodigoRecuperacion
     {
-        string StringCodigoAsync();
+        Task<string> StringCodigoAsync();
     }
 }

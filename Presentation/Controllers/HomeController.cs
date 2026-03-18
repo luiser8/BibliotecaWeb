@@ -10,12 +10,12 @@ public class HomeController : Controller
     public IActionResult Index()
     {
         // Obtener datos del usuario para personalizar la vista
-        var nombreUsuario = User?.FindFirstValue("NombreCompleto")
-                          ?? User?.Identity?.Name
+        var nombreUsuario = User.FindFirstValue("NombreCompleto")
+                          ?? User.Identity?.Name
                           ?? "Usuario";
 
-        var rolUsuario = User?.FindFirstValue("Rol")
-                       ?? User?.FindFirst(ClaimTypes.Role)?.Value
+        var rolUsuario = User.FindFirstValue("Rol")
+                       ?? User.FindFirst(ClaimTypes.Role)?.Value
                        ?? "Usuario";
 
         // Puedes acceder a las pol�ticas ya cargadas por el filter

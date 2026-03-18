@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Data;
+using System.Data.Common;
 using Domain.Ports;
-using Microsoft.Data.SqlClient;
 
 namespace Infrastructure.Configurations;
 
@@ -24,35 +24,36 @@ public class DataTableExecute : IDataTableExecute, IDisposable
 
         var resultTable = new DataTable();
 
-        await using (var connection = _connectionFactory.CreateConnection())
-        await using (var command = new SqlCommand(storedProcedureName.ToString(), connection))
+        await using (DbConnection connection = _connectionFactory.CreateConnection())
+        await using (DbCommand command = connection.CreateCommand())
         {
+            command.CommandText = storedProcedureName;
             command.CommandType = CommandType.StoredProcedure;
             command.CommandTimeout = 180;
 
             foreach (DictionaryEntry entry in parameters)
             {
-                command.Parameters.AddWithValue(
-                    entry.Key.ToString(),
-                    entry.Value ?? DBNull.Value
-                );
+                var dbParameter = command.CreateParameter();
+                dbParameter.ParameterName = entry.Key.ToString();
+                dbParameter.Value = entry.Value ?? DBNull.Value;
+                command.Parameters.Add(dbParameter);
             }
 
             try
             {
                 await connection.OpenAsync();
 
-                using (var reader = await command.ExecuteReaderAsync())
+                await using (var reader = await command.ExecuteReaderAsync())
                 {
                     resultTable.Load(reader);
                 }
 
                 ErrorStatus = true;
             }
-            catch (SqlException ex)
+            catch (DbException ex)
             {
                 ErrorStatus = false;
-                ErrorMsg = $"SQL Error: {ex.Message}";
+                ErrorMsg = $"DB Error: {ex.Message}";
                 Console.WriteLine(ErrorMsg);
             }
             catch (Exception ex)

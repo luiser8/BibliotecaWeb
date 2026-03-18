@@ -8,6 +8,6 @@ AS
 SET NOCOUNT ON;
 BEGIN
     DECLARE @SCOPEIDENTITY INT;
-        SELECT Id FROM dbo.DatosPersonales WHERE Cedula = @Cedula
+        SELECT Id, UsuarioId FROM dbo.DatosPersonales WHERE Cedula = @Cedula
 END
 GO

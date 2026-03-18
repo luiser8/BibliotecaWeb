@@ -1,4 +1,4 @@
-﻿// Presentation/Middleware/AccesoMiddleware.cs
+// Presentation/Middleware/AccesoMiddleware.cs
 using System.Text.Json;
 
 namespace Presentation.Middleware
@@ -41,7 +41,9 @@ namespace Presentation.Middleware
                 "/home/contact",
                 "/recuperacion/index",
                 "/recuperacion/generar",
-                "/recuperacion/guardar",
+                "/recuperacion/verificarcodigo",
+                "/recuperacion/cambiarcontrasena",
+                "/recuperacion/confirmacion"
             };
 
             // Verificar si la ruta actual es pública

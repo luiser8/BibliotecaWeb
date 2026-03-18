@@ -3,7 +3,7 @@ using Application.DTOs.Usuarios.Responses;
 using Application.Interfaces;
 using Domain.Entities;
 using Domain.Ports;
-using Infrastructure.Exceptions;
+using Domain.Exceptions;
 
 namespace Application.UseCases.Usuarios;
 
@@ -16,9 +16,9 @@ public class UsuarioCommandUseCase(IUsuarioRepository usuarioRepository, IDatosP
             if(string.IsNullOrEmpty(usuario?.DatosPersonales?.Cedula))
                 return OperationResult<int>.Error("Cedula es obligatorio", "400");
             var cedulaExists = await datosPersonalesRepository.ExistsByCedula(usuario.DatosPersonales.Cedula);
-            if (cedulaExists)
-                return OperationResult<int>.Error("Cedula duplicada, ya existe", "400");
-                
+            if (cedulaExists?.Id != 0 || cedulaExists.Id > 0)
+                return OperationResult<int>.Error("Cédula duplicada, ya existe", "400");
+
             var saveUsuario = await usuarioRepository.AddAsync(new Usuario
             {
                 ExtensionId =  usuario.ExtensionId,
@@ -26,7 +26,7 @@ public class UsuarioCommandUseCase(IUsuarioRepository usuarioRepository, IDatosP
                 Correo =  usuario.Correo,
                 Contrasena = usuario.Contrasena
             });
-            
+
             await datosPersonalesRepository.AddAsync(new DatosPersonales
             {
                 UsuarioId = saveUsuario,
@@ -54,7 +54,7 @@ public class UsuarioCommandUseCase(IUsuarioRepository usuarioRepository, IDatosP
         {
             var validationErrors = new Dictionary<string, string>
             {
-                { ex.FieldName ?? "General", ex.Message }
+                { ex.FieldName, ex.Message }
             };
             return OperationResult<int>.ValidationError(validationErrors);
         }

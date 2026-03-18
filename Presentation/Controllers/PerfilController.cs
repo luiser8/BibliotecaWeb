@@ -39,7 +39,7 @@ public class PerfilController : Controller
             var usuarioId = Convert.ToInt32(User?.FindFirstValue("UsuarioId"));
             var save = await _usuarioPerfilUseCase.CambiarContrasenaAsync(usuarioId, confirmarContrasena);
 
-            if (!save)
+            if (save)
             {
                 TempData["SuccessMessage"] = "Contraseña cambiada exitosamente, sera cerrada la sesión.";
                 await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);

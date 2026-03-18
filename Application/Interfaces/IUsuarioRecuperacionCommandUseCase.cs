@@ -1,5 +1,4 @@
 ﻿using Application.DTOs.UsuarioRecuperacion.Request;
-using Application.DTOs.UsuarioRecuperacion.Responses;
 
 namespace Application.Interfaces;
 public interface IUsuarioRecuperacionCommandUseCase
@@ -7,5 +6,7 @@ public interface IUsuarioRecuperacionCommandUseCase
     /// <summary>
     /// Autentica un usuario y genera los Claims necesarios
     /// </summary>
-    string GenerarRecuperacionContrasena();
+    Task<string> GenerarRecuperacionContrasena(string email);
+
+    Task<bool> EstablacerRecuperacionContrasena(UsuarioRecuperacionDto usuarioRecuperacionDto);
 }

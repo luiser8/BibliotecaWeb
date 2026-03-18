@@ -60,7 +60,9 @@ namespace Presentation.Filters
                     "home/contact",
                     "recuperacion/index",
                     "recuperacion/generar",
-                    "recuperacion/guardar",
+                    "recuperacion/verificarcodigo",
+                    "recuperacion/cambiarcontrasena",
+                    "/recuperacion/confirmacion"
                 };
 
                 // Verificar acceso

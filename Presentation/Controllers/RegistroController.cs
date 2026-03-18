@@ -4,7 +4,6 @@ using Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Presentation.Middleware;
-using Presentation.Services;
 
 namespace Presentation.Controllers;
 
@@ -12,18 +11,15 @@ public class RegistroController : Controller
 {
     private readonly IExtensionQueryUseCase _extensionUseCase;
     private readonly IUsuarioCommandUseCase _usuarioCommandUseCase;
-    private readonly ExceptionHandlerService _exceptionHandler;
     private readonly EmailConfig _emailConfig;
 
     public RegistroController(
-        IExtensionQueryUseCase extensionUseCase, 
+        IExtensionQueryUseCase extensionUseCase,
         IUsuarioCommandUseCase usuarioCommandUseCase,
-        ExceptionHandlerService exceptionHandler,
         IOptions<EmailConfig> emailConfig)
     {
         _extensionUseCase = extensionUseCase;
         _usuarioCommandUseCase = usuarioCommandUseCase;
-        _exceptionHandler = exceptionHandler;
         _emailConfig = emailConfig.Value;
     }
 
@@ -31,7 +27,7 @@ public class RegistroController : Controller
     public async Task<IActionResult> Crear()
     {
         var extensionesAsync = await _extensionUseCase.ExecuteAllWithExtensionAsync();
-       
+
         ViewData["Domain"] = _emailConfig.EmailServerAccept;
         ViewData["EmailDomain"] = _emailConfig.EmailServerAccept.Replace("@", "@");
         ViewData["Arroba"] = "@";
