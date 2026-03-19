@@ -10,8 +10,8 @@ public class EmailAdapter : IEmailPort
     public async Task SendEmailAsync(string to, string subject, string body)
     {
         var message = new MimeMessage();
-        message.From.Add(new MailboxAddress("Sender Name", "sender@example.com"));
-        message.To.Add(new MailboxAddress("Recipient Name", to));
+        message.From.Add(new MailboxAddress("Recuperación de contraseña", "noreply@psm.edu.ve"));
+        message.To.Add(new MailboxAddress("Nombre de la destinataria", to));
         message.Subject = subject;
 
         message.Body = new TextPart("plain")

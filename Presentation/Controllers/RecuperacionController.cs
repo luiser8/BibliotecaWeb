@@ -63,19 +63,21 @@ namespace Presentation.Controllers
 
         // POST: /Recuperacion/VerificarCodigo
         [HttpPost]
-        public IActionResult VerificarCodigo(string codigoIngresado)
+        public async Task<IActionResult> VerificarCodigo(string codigoIngresado)
         {
-            var codigoGenerado = TempData["codigoGenerado"]?.ToString();
             var cedula = TempData["cedula"]?.ToString();
+            var codigoGenerado = TempData["codigoGenerado"]?.ToString();
 
-            if (string.IsNullOrEmpty(codigoGenerado) || string.IsNullOrEmpty(cedula))
+            if (string.IsNullOrEmpty(cedula) || string.IsNullOrEmpty(codigoIngresado))
             {
                 return RedirectToAction("Index");
             }
 
-            if (!string.Equals(codigoIngresado, codigoGenerado, StringComparison.OrdinalIgnoreCase))
+            var resultado = await _usuarioRecuperacionCommandUseCase.VerificarRecuperacion(codigoIngresado, cedula);
+
+            if (!resultado.EsValido)
             {
-                ViewData["error"] = "El código ingresado no es válido";
+                ViewData["error"] = resultado.MensajeError;
                 ViewData["cedula"] = cedula;
                 ViewData["codigoGenerado"] = codigoGenerado;
 
@@ -87,7 +89,7 @@ namespace Presentation.Controllers
 
             // Código válido - redirigir a cambiar contraseña
             TempData["cedula"] = cedula;
-            TempData["codigoVerificado"] = codigoGenerado;
+            TempData["codigoVerificado"] = resultado.codigo;
 
             return RedirectToAction("CambiarContrasena");
         }

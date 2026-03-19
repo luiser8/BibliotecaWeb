@@ -2,7 +2,7 @@
 @{
     ViewData["Title"] = "Iniciar Sesión";
     Layout = "_AuthLayout";
-    var emailDomain = ViewData["EmailDomain"] as string;
+    var emailDomain = ViewData["EmailDomain"] as string != null ? ViewData["EmailDomain"] as string : "@psm.edu.ve";
 }
 
 <form asp-action="Login" method="post" class="mt-0" id="loginForm">
@@ -45,10 +45,10 @@
             <span class="input-group-text bg-transparent border-end-0">
                 <i class="fas fa-lock text-muted"></i>
             </span>
-            <input type="password" 
-                   class="form-control border-start-0" 
-                   id="Contrasena" 
-                   name="Contrasena" 
+            <input type="password"
+                   class="form-control border-start-0"
+                   id="Contrasena"
+                   name="Contrasena"
                    placeholder="••••••••"
                    autocomplete="current-password"
                    required>
@@ -97,7 +97,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const domainElement = document.getElementById('domainSuffix');
             const DOMAIN = domainElement ? domainElement.textContent.trim() : '@ViewData["Domain"]';
-            console.log("Dominio institucional:", DOMAIN);
+            const ARROBA = '@ViewData["Arroba"]';
 
             const usuarioInput = document.getElementById('Usuario');
             const correoCompletoInput = document.getElementById('CorreoCompleto');
@@ -106,204 +106,56 @@
             const loginForm = document.getElementById('loginForm');
             const usuarioFeedback = document.getElementById('usuarioFeedback');
 
-            // Lista de dominios comunes para limpiar
-            const dominiosComunes = [
-                'gmail.com', 'hotmail.com', 'outlook.com', 'yahoo.com',
-                'icloud.com', 'protonmail.com', 'aol.com', 'mail.com',
-                'yandex.com', 'zoho.com', 'gmx.com', 'live.com',
-                'msn.com', 'me.com', 'mac.com', 'rocketmail.com',
-                'google.com', 'facebook.com', 'twitter.com'
-            ];
-
-            // Función para extraer solo el nombre de usuario de cualquier formato
-            function extraerNombreUsuario(input) {
+            // Función simple para limpiar el nombre de usuario
+            function limpiarUsername(input) {
+                if (!input) return '';
                 let username = input.trim();
-
-                // 1. Si contiene @ViewData["Arroba"], tomar solo lo que está antes del primer @ViewData["Arroba"]
-                if (username.includes('@ViewData["Arroba"]')) {
-                    username = username.split('@ViewData["Arroba"]')[0].trim();
+                if (username.includes(ARROBA)) {
+                    username = username.split(ARROBA)[0].trim();
                 }
-
-                // 2. Buscar y eliminar dominios comunes incluso sin @ViewData["Arroba"]
-                for (const dominio of dominiosComunes) {
-                    const regex = new RegExp(`\\.?${dominio.replace('.', '\\.')}$`, 'i');
-                    if (regex.test(username)) {
-                        // Remover el dominio del final
-                        username = username.replace(regex, '').trim();
-
-                        // Si queda algo como "leduardo.rondon.", quitar el punto final
-                        if (username.endsWith('.')) {
-                            username = username.slice(0, -1);
-                        }
-                        break;
-                    }
-                }
-
-                // 3. Asegurar que no tenga espacios ni caracteres inválidos
-                username = username.replace(/\s+/g, '');
-
-                return username;
+                return username.replace(/\s+/g, '');
             }
 
-            // 1. Limpiar automáticamente mientras el usuario escribe
-            usuarioInput.addEventListener('input', function(e) {
-                const valorOriginal = this.value;
-                const usuarioLimpio = extraerNombreUsuario(valorOriginal);
-
-                if (usuarioLimpio !== valorOriginal) {
-                    this.value = usuarioLimpio;
-
-                    // Mostrar feedback visual
-                    this.classList.add('is-valid');
-                    usuarioFeedback.textContent = 'Solo se tomó el nombre de usuario: ' + usuarioLimpio;
-                    usuarioFeedback.style.color = '#198754';
-                    usuarioFeedback.style.display = 'block';
-                    
-                    setTimeout(() => {
-                        this.classList.remove('is-valid');
-                        usuarioFeedback.style.display = 'none';
-                    }, 2000);
-                }
-            });
-
-            // 2. Manejar el pegado de texto
-            usuarioInput.addEventListener('paste', function(e) {
-                // Obtener el texto pegado
-                const pastedText = (e.clipboardData || window.clipboardData).getData('text');
-                
-                // Extraer solo el nombre de usuario
-                const usuarioLimpio = extraerNombreUsuario(pastedText);
-                
-                if (usuarioLimpio !== pastedText) {
-                    e.preventDefault();
-                    
-                    // Insertar solo el nombre de usuario limpio
-                    document.execCommand('insertText', false, usuarioLimpio);
-                    
-                    // Mostrar feedback
-                    this.classList.add('is-valid');
-                    setTimeout(() => {
-                        this.classList.remove('is-valid');
-                    }, 1000);
-                }
-            });
-
-            // 3. Manejar el envío del formulario
-            loginForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Obtener y limpiar el nombre de usuario
-                let username = extraerNombreUsuario(usuarioInput.value);
-                
-                console.log("Usuario después de limpiar:", username);
-                
-                // Validaciones
-                if (!username) {
-                    usuarioInput.classList.add('is-invalid');
-                    usuarioFeedback.textContent = 'Por favor ingresa tu nombre de usuario institucional';
-                    usuarioFeedback.style.color = '#dc3545';
-                    usuarioFeedback.style.display = 'block';
-                    usuarioInput.focus();
-                    return;
-                }
-                
-                if (username.length < 3) {
-                    usuarioInput.classList.add('is-invalid');
-                    usuarioFeedback.textContent = 'El nombre de usuario es muy corto (mínimo 3 caracteres)';
-                    usuarioFeedback.style.color = '#dc3545';
-                    usuarioFeedback.style.display = 'block';
-                    usuarioInput.focus();
-                    return;
-                }
-                
-                // Actualizar el campo visible con el valor limpio
-                usuarioInput.value = username;
-                
-                // Construir el correo electrónico completo con el dominio institucional
-                const emailCompleto = username + DOMAIN;
-                
-                // Asignar al campo oculto que se enviará al servidor
-                correoCompletoInput.value = emailCompleto;
-                
-                // Enviar el formulario
-                this.submit();
-            });
-
-            // 4. Función para mostrar/ocultar contraseña
-            if (togglePasswordBtn && contrasenaInput) {
-                togglePasswordBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    const isPassword = contrasenaInput.type === 'password';
-                    contrasenaInput.type = isPassword ? 'text' : 'password';
-                    
+            // Toggle de contraseña
+            if (togglePasswordBtn) {
+                togglePasswordBtn.addEventListener('click', function() {
+                    const input = document.getElementById('Contrasena');
                     const icon = this.querySelector('i');
-                    if (icon) {
-                        if (isPassword) {
-                            icon.classList.remove('fa-eye');
-                            icon.classList.add('fa-eye-slash');
-                        } else {
-                            icon.classList.remove('fa-eye-slash');
-                            icon.classList.add('fa-eye');
-                        }
+                    
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        icon.classList.remove('fa-eye');
+                        icon.classList.add('fa-eye-slash');
+                    } else {
+                        input.type = 'password';
+                        icon.classList.remove('fa-eye-slash');
+                        icon.classList.add('fa-eye');
                     }
-                    
-                    contrasenaInput.focus();
                 });
             }
 
-            // 5. Validación en tiempo real
-            usuarioInput.addEventListener('keyup', function() {
-                const username = this.value.trim();
+            // Manejo del envío del formulario (SIMPLE)
+            loginForm.addEventListener('submit', function(e) {
+                const username = limpiarUsername(usuarioInput.value);
                 
-                if (username.includes('@ViewData["Arroba"]') || /\.(com|net|org|edu|gov)$/i.test(username)) {
-                    this.classList.add('is-invalid');
-                    usuarioFeedback.textContent = 'Solo ingresa el nombre de usuario, sin @ViewData["Arroba"] ni dominio';
-                    usuarioFeedback.style.color = '#dc3545';
-                    usuarioFeedback.style.display = 'block';
-                } else if (username.length >= 3) {
-                    this.classList.remove('is-invalid');
-                    this.classList.add('is-valid');
-                    usuarioFeedback.style.display = 'none';
-                } else if (username.length > 0) {
-                    this.classList.remove('is-invalid', 'is-valid');
-                    usuarioFeedback.style.display = 'none';
-                } else {
-                    this.classList.remove('is-invalid', 'is-valid');
-                    usuarioFeedback.style.display = 'none';
-                }
-            });
-
-            // 6. Limpiar al perder foco
-            usuarioInput.addEventListener('blur', function() {
-                const usernameLimpio = extraerNombreUsuario(this.value);
-                if (usernameLimpio !== this.value) {
-                    this.value = usernameLimpio;
-                    this.classList.add('is-valid');
-                    
-                    setTimeout(() => {
-                        this.classList.remove('is-valid');
-                    }, 1500);
-                }
-            });
-
-            // 7. Prevenir que el formulario se envíe con Enter en campos individuales
-            usuarioInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
+                if (!username) {
                     e.preventDefault();
-                    loginForm.dispatchEvent(new Event('submit'));
+                    usuarioInput.classList.add('is-invalid');
+                    usuarioFeedback.textContent = 'Por favor ingresa tu nombre de usuario';
+                    usuarioFeedback.style.display = 'block';
+                    return;
                 }
+                
+                // Construir correo completo y enviar
+                correoCompletoInput.value = username + DOMAIN;
+                // El formulario se envía normalmente
             });
-            
-            // 8. Inicializar tooltips de Bootstrap si están disponibles
-            if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
-                const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-                tooltipTriggerList.map(function(tooltipTriggerEl) {
-                    return new bootstrap.Tooltip(tooltipTriggerEl);
-                });
-            }
-            
+
+            // Limpiar validación al escribir
+            usuarioInput.addEventListener('input', function() {
+                this.classList.remove('is-invalid');
+                usuarioFeedback.style.display = 'none';
+            });
         });
     </script>
 

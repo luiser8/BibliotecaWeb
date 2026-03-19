@@ -36,20 +36,52 @@ public class UsuarioRecuperacionCommandUseCase : IUsuarioRecuperacionCommandUseC
         var saveCodigo = await _usuarioRecuperacionRepository.RecoveryAsync(datosPersonales.UsuarioId, codigo);
 
         // Enviar el código al email del usuario
-        //await _emailPort.SendEmailAsync(saveCodigo ?? string.Empty, "Recuperación de contraseña", $"Tu código de recuperación es: {codigo}");
+        await _emailPort.SendEmailAsync(saveCodigo ?? string.Empty, "Recuperación de contraseña", $"Tu código de recuperación es: {codigo}");
 
         return codigo;
     }
 
     public async Task<bool> EstablacerRecuperacionContrasena(UsuarioRecuperacionDto usuarioRecuperacionDto)
     {
-        if(string.IsNullOrEmpty(usuarioRecuperacionDto.Codigo)) throw new NotImplementedException();
-        var verificarUsuarioCodigo = await _usuarioRecuperacionRepository.VerificarCodigoUsuario(usuarioRecuperacionDto.Codigo);
-        if(!verificarUsuarioCodigo.Activo)
-            throw new Exception("Error código de seguridad vencido");
-        var save= await _usuarioPerfilRepository.CambiarContrasenaAsync(new Usuario { Id = verificarUsuarioCodigo.UsuarioId ?? 0, Contrasena = usuarioRecuperacionDto.NuevaContrasena ?? string.Empty });
+        if (string.IsNullOrEmpty(usuarioRecuperacionDto.Codigo) || string.IsNullOrEmpty(usuarioRecuperacionDto.Cedula))
+            throw new NotImplementedException();
+
+        var resultado = await VerificarRecuperacion(usuarioRecuperacionDto.Codigo, usuarioRecuperacionDto.Cedula);
+
+        if (!resultado.EsValido)
+            throw new Exception(resultado.MensajeError);
+
+        var save = await _usuarioPerfilRepository.CambiarContrasenaAsync(new Usuario
+        {
+            Id = resultado.UsuarioId ?? 0,
+            Contrasena = usuarioRecuperacionDto.NuevaContrasena ?? string.Empty
+        });
+
         if (!save)
-            throw new Exception("Error no se pude cambiar la contraseña");
-        return await _usuarioRecuperacionRepository.VencimientoCodigo(usuarioRecuperacionDto.Codigo);
+            throw new Exception("Error no se pudo cambiar la contraseña");
+
+        return resultado.EsValido;
+    }
+
+    public async Task<VerificacionResultado> VerificarRecuperacion(string codigo, string cedula)
+    {
+        if (string.IsNullOrEmpty(codigo) || string.IsNullOrEmpty(cedula))
+            return new VerificacionResultado(false, null, "Código o cédula no proporcionados", "");
+
+        var verificarUsuarioCodigo = await _usuarioRecuperacionRepository.VerificarCodigoUsuario(codigo);
+
+        if (verificarUsuarioCodigo.Id == null || verificarUsuarioCodigo.Codigo == null)
+            return new VerificacionResultado(false, null, "Error código de seguridad no existe", "");
+
+        if (!verificarUsuarioCodigo.Activo)
+            return new VerificacionResultado(false, null, "Error código de seguridad vencido o no existe", verificarUsuarioCodigo.Codigo);
+
+        if (verificarUsuarioCodigo.Cedula != cedula)
+            return new VerificacionResultado(false, null, "Error código de seguridad no pertenece a este usuario", verificarUsuarioCodigo.Codigo);
+
+        if (DateTime.Now - verificarUsuarioCodigo.FechaCreado > TimeSpan.FromHours(24))
+            return new VerificacionResultado(false, null, "Error código de seguridad vencido por mas de 24 horas", verificarUsuarioCodigo.Codigo);
+
+        return new VerificacionResultado(true, verificarUsuarioCodigo.UsuarioId, "Código válido", verificarUsuarioCodigo.Codigo);
     }
 }

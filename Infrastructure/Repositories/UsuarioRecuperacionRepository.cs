@@ -70,6 +70,7 @@ public class UsuarioRecuperacionRepository : IUsuarioRecuperacionRepository
         {
             Id = Convert.ToInt32(row["Id"]),
             UsuarioId = Convert.ToInt32(row["UsuarioId"]),
+            Cedula = row["Cedula"].ToString(),
             Codigo = row["Codigo"].ToString(),
             Activo = row["Activo"] != DBNull.Value && Convert.ToByte(row["Activo"]) == 1,
             FechaCreado = DateTime.Parse(row["FechaCreado"].ToString() ?? string.Empty)
