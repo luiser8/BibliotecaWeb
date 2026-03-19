@@ -4,6 +4,7 @@ using System.Text.Json;
 using Domain.Commands;
 using Domain.Entities;
 using Domain.Ports;
+using Infrastructure.Handlers;
 
 namespace Infrastructure.Repositories;
 
@@ -32,70 +33,73 @@ public class ExtensionRepository : IExtensionRepository
 
     public async Task<List<ExtensionCarrera>> GetAllWithCarrerasAsync()
     {
-        var result = new List<ExtensionCarrera>();
-
-        _dt = await _dbCon.ExecuteAsync(nameof(EExtensionCommand.SPExtensionAllCarreraCommand), _params);
-
-        foreach (DataRow row in _dt.Rows)
+        return await ErrorHandler.HandleRepositoryErrorAsync(async () =>
         {
-            var itemArray = row.ItemArray;
-            var columnNames = _dt.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToArray();
-            
-            var extensionIdIndex = Array.IndexOf(columnNames, "ExtensionId");
-            var nombreIndex = Array.IndexOf(columnNames, "Nombre");
-            var ciudadIndex = Array.IndexOf(columnNames, "Ciudad");
-            var estadoIndex = Array.IndexOf(columnNames, "Estado");
-            var direccionIndex = Array.IndexOf(columnNames, "Direccion");
-            var extensionIndex = Array.IndexOf(columnNames, "Extension");
-            var carrerasIndex = Array.IndexOf(columnNames, "Carreras");
+            var result = new List<ExtensionCarrera>();
 
-            var extension = new ExtensionCarrera
+            _dt = await _dbCon.ExecuteAsync(nameof(EExtensionCommand.SPExtensionAllCarreraCommand), _params);
+
+            foreach (DataRow row in _dt.Rows)
             {
-                ExtensionId = Convert.ToInt32(itemArray[extensionIdIndex]),
-                Nombre = itemArray[nombreIndex]?.ToString() ?? string.Empty,
-                Ciudad = itemArray[ciudadIndex]?.ToString() ?? string.Empty,
-                Estado = itemArray[estadoIndex]?.ToString() ?? string.Empty,
-                Direccion = itemArray[direccionIndex]?.ToString() ?? string.Empty,
-                Extension = null,
-                Carreras = [],
-            };
-        
-            var extensionJson = itemArray[extensionIndex]?.ToString();
-            if (!string.IsNullOrEmpty(extensionJson))
-            {
-                try
+                var itemArray = row.ItemArray;
+                var columnNames = _dt.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToArray();
+                
+                var extensionIdIndex = Array.IndexOf(columnNames, "ExtensionId");
+                var nombreIndex = Array.IndexOf(columnNames, "Nombre");
+                var ciudadIndex = Array.IndexOf(columnNames, "Ciudad");
+                var estadoIndex = Array.IndexOf(columnNames, "Estado");
+                var direccionIndex = Array.IndexOf(columnNames, "Direccion");
+                var extensionIndex = Array.IndexOf(columnNames, "Extension");
+                var carrerasIndex = Array.IndexOf(columnNames, "Carreras");
+
+                var extension = new ExtensionCarrera
                 {
-                    extension.Extension = JsonSerializer.Deserialize<Extension>(extensionJson);
-                }
-                catch (JsonException ex)
+                    ExtensionId = Convert.ToInt32(itemArray[extensionIdIndex]),
+                    Nombre = itemArray[nombreIndex]?.ToString() ?? string.Empty,
+                    Ciudad = itemArray[ciudadIndex]?.ToString() ?? string.Empty,
+                    Estado = itemArray[estadoIndex]?.ToString() ?? string.Empty,
+                    Direccion = itemArray[direccionIndex]?.ToString() ?? string.Empty,
+                    Extension = null,
+                    Carreras = [],
+                };
+            
+                var extensionJson = itemArray[extensionIndex]?.ToString();
+                if (!string.IsNullOrEmpty(extensionJson))
                 {
-                    Console.WriteLine($"Error deserializando Extension: {ex.Message}");
-                    Console.WriteLine($"JSON: {extensionJson}");
-                }
-            }
-        
-            var carrerasJson = itemArray[carrerasIndex]?.ToString();
-            if (!string.IsNullOrEmpty(carrerasJson))
-            {
-                try
-                {
-                    var carreras = JsonSerializer.Deserialize<List<Carrera>>(carrerasJson);
-                    if (carreras != null)
+                    try
                     {
-                        extension.Carreras?.AddRange(carreras);
-                        Console.WriteLine($"✅ Se agregaron {carreras.Count} carreras");
+                        extension.Extension = JsonSerializer.Deserialize<Extension>(extensionJson);
+                    }
+                    catch (JsonException ex)
+                    {
+                        Console.WriteLine($"Error deserializando Extension: {ex.Message}");
+                        Console.WriteLine($"JSON: {extensionJson}");
                     }
                 }
-                catch (JsonException ex)
+            
+                var carrerasJson = itemArray[carrerasIndex]?.ToString();
+                if (!string.IsNullOrEmpty(carrerasJson))
                 {
-                    Console.WriteLine($"❌ Error deserializando Carreras: {ex.Message}");
-                    Console.WriteLine($"JSON: {carrerasJson}");
+                    try
+                    {
+                        var carreras = JsonSerializer.Deserialize<List<Carrera>>(carrerasJson);
+                        if (carreras != null)
+                        {
+                            extension.Carreras?.AddRange(carreras);
+                            Console.WriteLine($"✅ Se agregaron {carreras.Count} carreras");
+                        }
+                    }
+                    catch (JsonException ex)
+                    {
+                        Console.WriteLine($"❌ Error deserializando Carreras: {ex.Message}");
+                        Console.WriteLine($"JSON: {carrerasJson}");
+                    }
                 }
+            
+                result.Add(extension);
             }
-        
-            result.Add(extension);
-        }
 
-        return result;
+            return result;
+        }, "ObtenerExtensionesConCarreras");
     }
 }

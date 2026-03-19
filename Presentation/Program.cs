@@ -5,15 +5,17 @@ using Application.UseCases.ExtensionQuery;
 using Application.UseCases.Perfil;
 using Application.UseCases.Politicas;
 using Application.UseCases.Usuarios;
+using Application.UseCases.Email;
 using Domain.Entities;
 using Domain.Ports;
 using Infrastructure.Configurations;
+using Infrastructure.Email;
 using Infrastructure.Repositories;
 using Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Presentation.Filters;
 using Presentation.Middleware;
-using Presentation.Services;
+using Application.UseCases.UsuarioRecuperacion;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,6 +60,12 @@ if (string.IsNullOrEmpty(connectionString))
     );
 }
 
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("Publico", policy =>
+        policy.RequireAssertion(_ => true))
+    .AddPolicy("Autenticado", policy =>
+        policy.RequireAuthenticatedUser());
+
 // Configurar filtros
 builder.Services.AddScoped<CargarPoliticasFilter>();
 builder.Services.AddScoped<ValidarAccesoFilter>(); // Nuevo filtro
@@ -81,6 +89,9 @@ builder.Services.AddScoped<IDatosPersonalesRepository, DatosPersonalesRepository
 builder.Services.AddScoped<IDatosAcademicosRepository, DatosAcademicosRepository>();
 builder.Services.AddScoped<IPoliticasUsuarioRepository, PoliticasUsuarioRepository>();
 builder.Services.AddScoped<IUsuarioPerfilRepository, UsuarioPerfilRepository>();
+builder.Services.AddScoped<IUsuarioRecuperacionRepository, UsuarioRecuperacionRepository>();
+builder.Services.AddScoped<IEmailPort, EmailAdapter>();
+builder.Services.AddScoped<ICodigoRecuperacion, CodigoRecuperacion>();
 
 // Casos de uso
 builder.Services.AddScoped<IExtensionQueryUseCase, ExtensionQueryUseCase>();
@@ -90,10 +101,11 @@ builder.Services.AddScoped<IUsuarioCommandUseCase, UsuarioCommandUseCase>();
 builder.Services.AddScoped<IPoliticasUsuariosQueryUseCase, PoliticasUsuariosQueryUseCase>();
 builder.Services.AddScoped<IUsuarioPerfilCommandUseCase, UsuarioPerfilCommandUseCase>();
 builder.Services.AddScoped<IAuthQueryUseCase, AuthQueryUseCase>();
+builder.Services.AddScoped<IEmailCommandUseCase, EmailCommandUseCase>();
+builder.Services.AddScoped<IUsuarioRecuperacionCommandUseCase, UsuarioRecuperacionCommandUseCase>();
 
 // Otros servicios
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<ExceptionHandlerService>();
 
 var app = builder.Build();
 
@@ -135,6 +147,11 @@ app.MapControllerRoute(
     pattern: "{*url}",
     defaults: new { controller = "Home", action = "Error" }
 );
+
+app.MapControllerRoute(
+    name: "recuperacion",
+    pattern: "Recuperacion/{action=Index}/{id?}",
+    defaults: new { controller = "Recuperacion" });
 
 app.MapFallbackToController("Error", "Home");
 await app.RunAsync();

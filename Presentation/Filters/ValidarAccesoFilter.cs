@@ -57,7 +57,12 @@ namespace Presentation.Filters
                     "home/error",
                     "home/privacy",
                     "home/about",
-                    "home/contact"
+                    "home/contact",
+                    "recuperacion/index",
+                    "recuperacion/generar",
+                    "recuperacion/verificarcodigo",
+                    "recuperacion/cambiarcontrasena",
+                    "/recuperacion/confirmacion"
                 };
 
                 // Verificar acceso

@@ -1,0 +1,36 @@
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using MimeKit;
+using Domain.Ports;
+
+namespace Infrastructure.Email;
+
+public class EmailAdapter : IEmailPort
+{
+    public async Task SendEmailAsync(string to, string subject, string body)
+    {
+        var message = new MimeMessage();
+        message.From.Add(new MailboxAddress("Recuperación de contraseña", "noreply@psm.edu.ve"));
+        message.To.Add(new MailboxAddress("Nombre de la destinataria", to));
+        message.Subject = subject;
+
+        message.Body = new TextPart("plain")
+        {
+            Text = body
+        };
+
+        using var client = new SmtpClient();
+        // Connect to the SMTP server
+        await client.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
+
+        // Authenticate with credentials (use App Passwords for Gmail/Outlook if 2FA is on)
+        await client.AuthenticateAsync("leduardo.rondon@gmail.com", "byzg pckx grag kbgr");
+
+        // Send the message
+        await client.SendAsync(message);
+
+        // Disconnect
+        await client.DisconnectAsync(true);
+    }
+}
+

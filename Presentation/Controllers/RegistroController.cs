@@ -3,7 +3,7 @@ using Application.DTOs.Usuarios.Request;
 using Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Presentation.Services;
+using Presentation.Middleware;
 
 namespace Presentation.Controllers;
 
@@ -11,26 +11,23 @@ public class RegistroController : Controller
 {
     private readonly IExtensionQueryUseCase _extensionUseCase;
     private readonly IUsuarioCommandUseCase _usuarioCommandUseCase;
-    private readonly ExceptionHandlerService _exceptionHandler;
     private readonly EmailConfig _emailConfig;
 
     public RegistroController(
-        IExtensionQueryUseCase extensionUseCase, 
+        IExtensionQueryUseCase extensionUseCase,
         IUsuarioCommandUseCase usuarioCommandUseCase,
-        ExceptionHandlerService exceptionHandler,
         IOptions<EmailConfig> emailConfig)
     {
         _extensionUseCase = extensionUseCase;
         _usuarioCommandUseCase = usuarioCommandUseCase;
-        _exceptionHandler = exceptionHandler;
         _emailConfig = emailConfig.Value;
     }
 
     // GET: Mostrar formulario de creación de estudiante
     public async Task<IActionResult> Crear()
     {
-        var response = await _extensionUseCase.ExecuteAllWithExtensionAsync();
-       
+        var extensionesAsync = await _extensionUseCase.ExecuteAllWithExtensionAsync();
+
         ViewData["Domain"] = _emailConfig.EmailServerAccept;
         ViewData["EmailDomain"] = _emailConfig.EmailServerAccept.Replace("@", "@");
         ViewData["Arroba"] = "@";
@@ -40,7 +37,7 @@ public class RegistroController : Controller
             return RedirectToAction("Index", "Home");
         }
 
-        return View(response);
+        return View(extensionesAsync);
     }
 
     // POST: Procesar el formulario de estudiante
@@ -54,6 +51,22 @@ public class RegistroController : Controller
             return View(response);
         }
 
+        // Si recibimos solo el nombre de usuario, construir el correo completo
+        if (!string.IsNullOrEmpty(usuario.Correo))
+        {
+            // Extraer solo el nombre de usuario (limpia @gmail.com, @hotmail.com, etc.)
+            var nombreUsuario = usuario.Correo.ExtraerNombreUsuario(_emailConfig.EmailServerAccept);
+
+            // Construir correo institucional
+            usuario.Correo = nombreUsuario.ConstruirCorreoInstitucional(_emailConfig.EmailServerAccept);
+        } else
+        {
+            ModelState.AddModelError("Correo", $"Solo se permiten correos del dominio {_emailConfig.EmailServerAccept}");
+            ViewData["Domain"] = _emailConfig.EmailServerAccept;
+            ViewData["EmailDomain"] = _emailConfig.EmailServerAccept.Replace("@", "@@");
+            return View(usuario);
+        }
+        
         var result = await _usuarioCommandUseCase.ExecuteInsertAsync(usuario);
 
         if (result.Success)

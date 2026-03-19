@@ -7,7 +7,6 @@ CREATE PROCEDURE [dbo].[SPDatosPersonalesAddCommand]
 	@Cedula VARCHAR(155) = NULL,
 	@Nombres VARCHAR(255) = NULL,
     @Apellidos VARCHAR(255) = NULL,
-    @FechaNacimiento VARCHAR(55) = NULL,
     @Sexo VARCHAR(15) = NULL
 AS
 SET NOCOUNT ON;
@@ -15,8 +14,8 @@ BEGIN
     DECLARE @SCOPEIDENTITY INT;
     
     BEGIN TRY
-        INSERT INTO dbo.DatosPersonales(UsuarioId, Cedula, Nombres, Apellidos, FechaNacimiento, Sexo)
-			VALUES(@UsuarioId, @Cedula, @Nombres, @Apellidos, @FechaNacimiento, @Sexo);
+        INSERT INTO dbo.DatosPersonales(UsuarioId, Cedula, Nombres, Apellidos, Sexo)
+			VALUES(@UsuarioId, @Cedula, @Nombres, @Apellidos, @Sexo);
         
         SET @SCOPEIDENTITY = SCOPE_IDENTITY();
         

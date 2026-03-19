@@ -17,7 +17,7 @@ namespace Presentation.Extensions
         }
 
         // Métodos específicos para tipos comunes
-        public static List<string>? GetStringList(this ISession session, string key)
+        public static List<string?> GetStringList(this ISession session, string key)
         {
             var value = session.GetString(key);
             return value == null ? new List<string>() : JsonSerializer.Deserialize<List<string>>(value);

@@ -13,7 +13,7 @@ public class Prestamo
     public DateTime FechaCreado { get; set; }
     
     public ReglasPrestamo? ReglasPrestamo { get; set; }
-    public Material? Material { get; set; }
+    public Materiales? Material { get; set; }
     public Usuario? Usuario { get; set; }
     public ICollection<Morosidad>? Morosidades { get; set; }
 }

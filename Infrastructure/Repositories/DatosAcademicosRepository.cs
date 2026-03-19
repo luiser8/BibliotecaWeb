@@ -3,6 +3,7 @@ using System.Data;
 using Domain.Commands;
 using Domain.Entities;
 using Domain.Ports;
+using Infrastructure.Handlers;
 
 namespace Infrastructure.Repositories;
 
@@ -21,7 +22,7 @@ public class DatosAcademicosRepository : IDatosAcademicosRepository
     
     public async Task<int> AddAsync(DatosAcademicos datosAcademicos)
     {
-        try
+        return await ErrorHandler.HandleRepositoryErrorAsync(async () =>
         {
             _params.Clear();
             _params.Add("@UsuarioId", datosAcademicos.UsuarioId);
@@ -31,11 +32,6 @@ public class DatosAcademicosRepository : IDatosAcademicosRepository
             _dt = await _dbCon.ExecuteAsync(nameof(EDatosAcademicosCommand.SPDatosAcademicosAddCommand), _params);
             if (_dt.Rows.Count == 0) return 0;
             return Convert.ToInt32(_dt.Rows[0]["Id"]);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+        }, "AgregarDatosAcademicos");
     }
 }

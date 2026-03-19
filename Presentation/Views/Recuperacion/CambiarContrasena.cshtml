@@ -1,0 +1,135 @@
+@{
+    ViewData["Title"] = "Cambiar Contraseña";
+    Layout = "_Layout";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow border-0">
+                <div class="card-header bg-warning text-dark text-center py-3">
+                    <h4 class="mb-0">
+                        <i class="bi bi-key"></i> Cambiar Contraseña
+                    </h4>
+                </div>
+                
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-shield-lock fs-1 text-warning"></i>
+                        <h5 class="mt-2">Ingrese su nueva contraseña</h5>
+                        <p class="text-muted">
+                            Para: <strong>@ViewData["cedula"]</strong>
+                        </p>
+                    </div>
+
+                    @if (ViewData["error"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            @ViewData["error"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <form asp-action="CambiarContrasena" method="post" id="cambiarContrasenaForm">
+                        <div class="form-floating mb-3">
+                            <input type="password" 
+                                   class="form-control" 
+                                   id="nuevaContrasena" 
+                                   name="nuevaContrasena" 
+                                   placeholder="Nueva contraseña"
+                                   required 
+                                   minlength="6" />
+                            <label for="nuevaContrasena">Nueva contraseña</label>
+                            <div class="form-text">Mínimo 6 caracteres</div>
+                        </div>
+
+                        <div class="form-floating mb-4">
+                            <input type="password" 
+                                   class="form-control" 
+                                   id="confirmarContrasena" 
+                                   name="confirmarContrasena" 
+                                   placeholder="Confirmar contraseña"
+                                   required 
+                                   minlength="6" />
+                            <label for="confirmarContrasena">Confirmar contraseña</label>
+                            <div id="passwordMatch" class="invalid-feedback"></div>
+                        </div>
+
+                        <!-- Requisitos de contraseña -->
+                        <div class="bg-light p-3 rounded mb-4">
+                            <small class="text-muted d-block mb-2">
+                                <i class="bi bi-shield-check"></i> La contraseña debe contener:
+                            </small>
+                            <ul class="list-unstyled mb-0 small">
+                                <li id="reqLength" class="text-muted">
+                                    <i class="bi bi-circle"></i> Mínimo 6 caracteres
+                                </li>
+                                <li id="reqMatch" class="text-muted">
+                                    <i class="bi bi-circle"></i> Las contraseñas deben coincidir
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="d-grid gap-3">
+                            <button type="submit" class="btn btn-warning btn-lg">
+                                <i class="bi bi-check-lg"></i> Cambiar Contraseña
+                            </button>
+                            
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-lg"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Validación de contraseñas en tiempo real
+        const nuevaPassword = document.getElementById('nuevaContrasena');
+        const confirmPassword = document.getElementById('confirmarContrasena');
+        const reqLength = document.getElementById('reqLength');
+        const reqMatch = document.getElementById('reqMatch');
+
+        function validarPassword() {
+            // Validar longitud
+            if (nuevaPassword.value.length >= 6) {
+                reqLength.innerHTML = '<i class="bi bi-check-circle-fill text-success"></i> Mínimo 6 caracteres';
+                reqLength.className = 'text-success';
+            } else {
+                reqLength.innerHTML = '<i class="bi bi-circle"></i> Mínimo 6 caracteres';
+                reqLength.className = 'text-muted';
+            }
+
+            // Validar coincidencia
+            if (confirmPassword.value.length > 0) {
+                if (nuevaPassword.value === confirmPassword.value) {
+                    reqMatch.innerHTML = '<i class="bi bi-check-circle-fill text-success"></i> Las contraseñas coinciden';
+                    reqMatch.className = 'text-success';
+                    confirmPassword.classList.remove('is-invalid');
+                    confirmPassword.classList.add('is-valid');
+                } else {
+                    reqMatch.innerHTML = '<i class="bi bi-exclamation-circle-fill text-danger"></i> Las contraseñas no coinciden';
+                    reqMatch.className = 'text-danger';
+                    confirmPassword.classList.remove('is-valid');
+                    confirmPassword.classList.add('is-invalid');
+                }
+            }
+        }
+
+        nuevaPassword.addEventListener('input', validarPassword);
+        confirmPassword.addEventListener('input', validarPassword);
+
+        // Validación al enviar el formulario
+        document.getElementById('cambiarContrasenaForm').addEventListener('submit', function(e) {
+            if (nuevaPassword.value.length < 6 || nuevaPassword.value !== confirmPassword.value) {
+                e.preventDefault();
+                alert('Por favor, verifique que las contraseñas sean válidas y coincidan.');
+            }
+        });
+    </script>
+}

@@ -1,0 +1,72 @@
+﻿@{
+    ViewData["Title"] = "Recuperar Contraseña";
+    Layout = "_Layout";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow border-0">
+                <div class="card-header bg-primary text-white text-center py-3">
+                    <h4 class="mb-0">
+                        <i class="bi bi-shield-lock"></i> Recuperar Contraseña
+                    </h4>
+                </div>
+                
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-person-badge fs-1 text-primary"></i>
+                        <p class="text-muted mt-2">
+                            Ingrese su número de cédula para recibir un código de recuperación
+                        </p>
+                    </div>
+
+                    @if (ViewData["error"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            @ViewData["error"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <form asp-action="Generar" method="post">
+                        <div class="form-floating mb-4">
+                            <input type="text" 
+                                   class="form-control form-control-lg" 
+                                   id="cedula" 
+                                   name="cedula" 
+                                   placeholder="00000000"
+                                   value="@ViewData["cedula"]"
+                                   required 
+                                   autofocus />
+                            <label for="cedula">Número de Cédula</label>
+                            <div class="form-text">
+                                <i class="bi bi-info-circle"></i> Formato: 00000000
+                            </div>
+                        </div>
+                        <div class="d-grid gap-3">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-envelope-paper"></i> Generar Código
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.0/font/bootstrap-icons.min.css">
+}
+
+@section Scripts {
+    <script>
+        // Formateo automático de cédula dominicana
+        document.getElementById('cedula').addEventListener('input', function(e) {
+
+            e.target.value = value;
+        });
+    </script>
+}

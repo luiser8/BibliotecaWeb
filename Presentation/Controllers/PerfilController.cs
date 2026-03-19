@@ -18,12 +18,15 @@ public class PerfilController : Controller
     [HttpGet]
     public IActionResult Index()
     {
-        ViewData["NombreUsuario"] = User?.FindFirstValue("NombreCompleto") ?? "";
+        ViewData["UsuarioId"] = User?.FindFirstValue("UsuarioId") ?? "";
+        ViewData["NombresUsuario"] = User?.FindFirstValue("NombreCompleto") ?? "";
+        ViewData["SexoUsuario"] = User?.FindFirstValue("Sexo") ?? "";
+        ViewData["TipoIngresoUsuario"] = User?.FindFirstValue("TipoIngreso") ?? "";
         ViewData["CedulaUsuario"] = User?.FindFirstValue("Cedula") ?? "";
         ViewData["CorreoUsuario"] = User?.FindFirstValue("Correo") ?? "";
-        ViewData["RolUsuario"] = User?.FindFirstValue("Rol") ?? "Rol";
-        ViewData["ExtensionUsuario"] = User?.FindFirstValue("Extension") ?? "Extension";
-        ViewData["CarreraUsuario"] = User?.FindFirstValue("Carrera") ?? "Carrera";
+        ViewData["RolUsuario"] = User?.FindFirstValue("Rol") ?? "";
+        ViewData["ExtensionUsuario"] = User?.FindFirstValue("Extension") ?? "";
+        ViewData["CarreraUsuario"] = User?.FindFirstValue("Carrera") ?? "";
 
         return View();
     }
@@ -36,7 +39,7 @@ public class PerfilController : Controller
             var usuarioId = Convert.ToInt32(User?.FindFirstValue("UsuarioId"));
             var save = await _usuarioPerfilUseCase.CambiarContrasenaAsync(usuarioId, confirmarContrasena);
 
-            if (!save)
+            if (save)
             {
                 TempData["SuccessMessage"] = "Contraseña cambiada exitosamente, sera cerrada la sesión.";
                 await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);

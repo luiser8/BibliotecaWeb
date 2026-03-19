@@ -66,7 +66,8 @@ public class UsuarioController : Controller
         {
             ModelState.AddModelError("Correo", $"Solo se permiten correos del dominio {_emailConfig.EmailServerAccept}");
             ViewData["Domain"] = _emailConfig.EmailServerAccept;
-            ViewData["EmailDomain"] = _emailConfig.EmailServerAccept.Replace("@", "@@");
+            ViewData["EmailDomain"] = _emailConfig.EmailServerAccept.Replace("@", "@");
+            ViewData["Arroba"] = "@";
             return View(model);
         }
 
@@ -76,6 +77,8 @@ public class UsuarioController : Controller
         {
             ModelState.AddModelError("", result.ErrorMessage ?? "Error al iniciar sesión");
             TempData["ErrorMessage"] = result.ErrorMessage ?? "Error al iniciar sesión";
+            ViewData["EmailDomain"] = _emailConfig.EmailServerAccept.Replace("@", "@");
+            ViewData["Arroba"] = "@";
             return View(model);
         }
 

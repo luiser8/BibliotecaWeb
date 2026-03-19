@@ -27,7 +27,8 @@ INSERT INTO Carreras (Nombre) VALUES
 ('Ingeniería Química'),
 ('Ingeniería de Petróleo'),
 ('Ingeniería Agronómica'),
-('Ingeniería en Telecomunicaciones');
+('Ingeniería en Telecomunicaciones'),
+('Ingeniería en Producción');
 
 --EXTENSION CARRERAS
 -- Arquitectura (disponible en todas las extensiones)
@@ -74,22 +75,52 @@ INSERT INTO ExtensionCarreras (ExtensionId, CarreraId) VALUES
 INSERT INTO ExtensionCarreras (ExtensionId, CarreraId) VALUES
 (6, 11);
 
--- Ingeniería en Telecomunicaciones (disponible solo en 1 extensión)
+-- Ingeniería en Telecomunicaciones
 INSERT INTO ExtensionCarreras (ExtensionId, CarreraId) VALUES
-(5, 12);
+(1, 12), (4, 12), (5, 12);
+
+-- Ingeniería en Produccion
+INSERT INTO ExtensionCarreras (ExtensionId, CarreraId) VALUES
+(1, 13);
+
+-- Versión más compacta por grupos
+INSERT INTO Areas (Nombre) VALUES
+-- Grupo 1: Ciencias Básicas
+('Matemáticas'), ('Física'), ('Química'), ('Biología'), ('Astronomía'), ('Geología'), ('Estadística'),
+
+-- Grupo 2: Ciencias Sociales
+('Historia'), ('Geografía'), ('Filosofía'), ('Psicología'), ('Sociología'), ('Antropología'), ('Arqueología'), ('Lingüística'), ('Literatura'), ('Arte'), ('Música'), ('Religión'), ('Ética'), ('Política'), ('Economía'), ('Derecho'), ('Educación'), ('Pedagogía'),
+
+-- Grupo 3: Tecnología e Ingeniería
+('Ingeniería Producción'), ('Ingeniería Telecomunicaciones'), ('Ingeniería Civil'), ('Ingeniería Industrial'), ('Ingeniería Eléctrica'), ('Ingeniería Electrónica'), ('Ingeniería Mecánica'), ('Ingeniería Química'), ('Ingeniería de Sistemas'), ('Informática'), ('Programación'), ('Bases de Datos'), ('Redes'), ('Inteligencia Artificial'), ('Robótica'), ('Arquitectura'),
+
+-- Grupo 4: Ciencias de la Salud
+('Medicina'), ('Enfermería'), ('Odontología'), ('Veterinaria'), ('Farmacia'), ('Nutrición'), ('Salud Pública'), ('Psicología Clínica'), ('Fisioterapia'),
+
+-- Grupo 5: Negocios
+('Administración'), ('Contabilidad'), ('Finanzas'), ('Marketing'), ('Recursos Humanos'), ('Comercio Internacional'), ('Logística'), ('Turismo'), ('Gastronomía'),
+
+-- Grupo 6: Comunicación
+('Periodismo'), ('Comunicación Social'), ('Publicidad'), ('Audiovisual'),
+
+-- Grupo 7: Idiomas
+('Idiomas'), ('Inglés'), ('Francés'), ('Alemán'), ('Italiano'), ('Portugués'), ('Chino'), ('Japonés'),
+
+-- Grupo 8: Otros
+('Deportes'), ('Cultura General'), ('Enciclopedias'), ('Diccionarios'), ('Atlas'), ('Biografías'), ('Agricultura'), ('Minería'), ('Energía');
 
 --Tipos materiales
-INSERT INTO TiposMateriales (Tipo) VALUES
+INSERT INTO Tipos (Tipo) VALUES
 ('Físico'),
 ('Digital');
 
 --Categoria materiales
-INSERT INTO CategoriaMateriales (Categoria) VALUES
-('Libro'),
+INSERT INTO Categorias (Categoria) VALUES
+('Libros'),
 ('Tesis'),
-('Informe de Pasantía'),
+('Informe de Pasantías'),
 ('Servicio Comunitario'),
-('Revista'),
+('Revistas'),
 ('Proyecto de Investigación');
 
 --ROLES
@@ -105,6 +136,13 @@ INSERT INTO Politicas (Tipo, Nombre, Ruta) VALUES
 
 -- Módulo Home
 ('Header', 'Inicio', 'Home/Index'),
+
+-- Módulo Areas
+('Menu', 'Areas', 'Areas/Index'),
+('Boton', 'AreasCrear', 'Areas/Crear'),
+('Boton', 'AreasEditar', 'Areas/Editar'),
+('Boton', 'AreasEliminar', 'Areas/Eliminar'),
+('Boton', 'AreasConsultar', 'Areas/Consultar'),
 
 -- Módulo Usuarios
 ('Menu', 'Usuarios', 'Usuario/Index'),
@@ -150,19 +188,11 @@ INSERT INTO Politicas (Tipo, Nombre, Ruta) VALUES
 ('Boton', 'CarrerasConsultar', 'Carreras/Consultar'),
 
 -- Módulo Seguridad
-('Menu', 'Roles', 'Roles/Index'),
-('Boton', 'RolesCrear', '/Roles/Crear'),
-('Boton', 'RolesEditar', 'Roles/Editar'),
-('Boton', 'RolesEliminar', 'Roles/Eliminar'),
 ('Boton', 'RolesConsultar', 'Roles/Consultar'),
 ('Boton', 'RolesAsignar', 'Roles/Asignar'),
 
 -- Módulo Politicas
-('Menu', 'Politicas', 'Politicas/Index'),
-('Boton', 'PoliticasCrear', 'Prestamos/Crear'),
-('Boton', 'PoliticasEditar', 'Prestamos/Editar'),
 ('Boton', 'PoliticasConsultar', 'Prestamos/Consultar'),
-('Boton', 'PoliticasEliminar', 'Prestamos/Eliminar'),
 
 -- Módulo Reportes
 ('Menu', 'Reportes', 'Reportes/Index'),
@@ -246,18 +276,27 @@ DECLARE @MorosidadIndex INT = (SELECT Id FROM Politicas WHERE Nombre = 'Morosida
 DECLARE @MorosidadConsultar INT = (SELECT Id FROM Politicas WHERE Nombre = 'MorosidadConsultar');
 DECLARE @MorosidadUsuario INT = (SELECT Id FROM Politicas WHERE Nombre = 'MorosidadUsuario');
 
+DECLARE @AreasIndex INT = (SELECT Id FROM Politicas WHERE Nombre = 'Areas');
+DECLARE @AreasConsultar INT = (SELECT Id FROM Politicas WHERE Nombre = 'AreasConsultar');
+DECLARE @AreasCrear INT = (SELECT Id FROM Politicas WHERE Nombre = 'AreasCrear');
+DECLARE @AreasEditar INT = (SELECT Id FROM Politicas WHERE Nombre = 'AreasEditar');
+DECLARE @AreasEliminar INT = (SELECT Id FROM Politicas WHERE Nombre = 'AreasEliminar');
+
 -- 3. Limpiar asignaciones anteriores (opcional)
 DELETE FROM RolPoliticas;
 
 -- 4. ADMINISTRADOR: TODAS LAS POLÍTICAS (en orden)
 INSERT INTO RolPoliticas (RolId, PoliticaId)
-SELECT @AdminId, Id FROM Politicas ORDER BY Id;
+SELECT @AdminId, Id FROM Politicas
+WHERE Nombre NOT LIKE 'Mis prestamos%'
+ORDER BY Id;
 
 -- 5. DIRECTIVO: Todo menos seguridad y roles
 INSERT INTO RolPoliticas (RolId, PoliticaId)
 SELECT @DirectivoId, Id FROM Politicas
 WHERE Nombre NOT LIKE 'Roles%'
   AND Ruta NOT LIKE 'Seguridad%'
+  AND Nombre NOT LIKE 'Mis prestamos%'
 ORDER BY Id;
 
 -- 6. BIBLIOTECARIO: Todo menos seguridad, roles, políticas, extensiones, carreras, usuarios
@@ -268,6 +307,7 @@ WHERE Nombre NOT LIKE 'Roles%'
   AND Nombre NOT LIKE '%Extensiones%'
   AND Nombre NOT LIKE '%Carreras%'
   AND Nombre NOT LIKE 'Usuarios%'
+  AND Nombre NOT LIKE 'Mis prestamos%'
 ORDER BY Id;
 
 -- 7. PROFESOR: Solo políticas específicas

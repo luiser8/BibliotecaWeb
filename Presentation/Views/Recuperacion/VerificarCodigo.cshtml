@@ -1,0 +1,104 @@
+@{
+    ViewData["Title"] = "Verificar Código";
+    Layout = "_Layout";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow border-0">
+                <div class="card-header bg-success text-white text-center py-3">
+                    <h4 class="mb-0">
+                        <i class="bi bi-shield-check"></i> Verificar Código
+                    </h4>
+                </div>
+
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <div class="bg-light rounded-circle d-inline-flex p-3 mb-3">
+                            <i class="bi bi-envelope-check fs-1 text-success"></i>
+                        </div>
+                        <h5>Hemos enviado un código</h5>
+                        <p class="text-muted">
+                            Ingrese el código de verificación enviado a su correo electrónico
+                        </p>
+                        <small class="text-muted">
+                            Cédula: <strong>@ViewData["cedula"]</strong>
+                        </small>
+                    </div>
+
+                    <!-- Código generado (solo para desarrollo/DEBUG, quitar en producción) -->
+                    @if (ViewData["codigoGenerado"] != null)
+                    {
+                        <div class="alert alert-info alert-dismissible fade show small p-2" role="alert">
+                            <i class="bi bi-info-circle"></i> 
+                            <strong>Código de prueba:</strong> @ViewData["codigoGenerado"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    @if (ViewData["error"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            @ViewData["error"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <form asp-action="VerificarCodigo" method="post">
+                        <div class="form-floating mb-4">
+                            <input type="text" 
+                                   class="form-control form-control-lg text-center" 
+                                   id="codigoIngresado" 
+                                   name="codigoIngresado" 
+                                   placeholder="Código"
+                                   maxlength="6"
+                                   style="font-size: 1.5rem; letter-spacing: 8px;"
+                                   required 
+                                   autofocus />
+                            <label for="codigoIngresado">Código de verificación (letras y números, mayúsculas o minúsculas)</label>
+                        </div>
+
+                        <div class="d-grid gap-3">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="bi bi-check-circle"></i> Verificar Código
+                            </button>
+                            
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Solicitar nuevo código
+                            </a>
+                        </div>
+                    </form>
+
+                    <hr class="my-4">
+
+                    <div class="text-center">
+                        <small class="text-muted">
+                            ¿No recibiste el código? 
+                            <a href="#" onclick="reenviarCodigo()" class="text-decoration-none">
+                                Reenviar código
+                            </a>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Permitir solo caracteres alfanuméricos, respetando mayúsculas/minúsculas
+        document.getElementById('codigoIngresado').addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^a-zA-Z0-9]/g, '');
+        });
+
+        // Función para reenviar código
+        function reenviarCodigo() {
+            event.preventDefault();
+            // Aquí puedes implementar la lógica para reenviar el código
+            alert('Función de reenvío no implementada');
+        }
+    </script>
+}

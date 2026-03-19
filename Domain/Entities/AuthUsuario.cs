@@ -8,6 +8,9 @@ public class AuthUsuario
     public string? Contrasena { get; set; }
     public string? Nombres { get; set; }
     public string? Apellidos { get; set; }
+    public string? Sexo { get; set; }
+    public byte[]? Foto { get; set; }
+    public string? TipoIngreso { get; set; }
     public int RolId { get; set; }
     public string? Rol { get; set; }
     public int ExtensionId { get; set; }
@@ -15,4 +18,5 @@ public class AuthUsuario
     public int CarreraId { get; set; }
     public string? Carrera { get; set; }
     public bool Activo { get; set; }
+    public DateTime? UltimoAcceso { get; set; }
 }
